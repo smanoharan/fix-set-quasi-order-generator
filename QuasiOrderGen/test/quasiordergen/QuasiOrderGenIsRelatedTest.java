@@ -1,31 +1,15 @@
 package quasiordergen;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 
-/**
- *
- * @author sm264
- */
-public class QuasiOrderGenIsRelatedTest
+public class QuasiOrderGenIsRelatedTest extends QuasiOrderGenFixture
 {
-    // 5 elements : { A, B, C, D, E }
-    final int NumElem = 5;
-    final int IA = 0;
-    final int IB = 1;
-    final int IC = 2;
-    final int ID = 3;
-    final int IE = 4;
-
-    BitSet[] elementMasks;
-
     @Before
     public void setUp()
     {
@@ -39,10 +23,6 @@ public class QuasiOrderGenIsRelatedTest
         elementMasks[IE] = StringToBitSet("0001");   // E is in sub-4 only
     }
     
-    @After
-    public void tearDown() {
-    }
-
     @Test
     public void testIsRelatedForSingletonFamilyIsACompleteGraph()
     {
@@ -151,24 +131,13 @@ public class QuasiOrderGenIsRelatedTest
         }
     }
 
-    private static BitSet StringToBitSet(String BitString)
-    {
-        BitSet result = new BitSet(BitString.length());
-
-        for(int i=0;i<BitString.length();i++)
-            if (BitString.charAt(i)=='1')
-                result.set(i);
-        
-        return result;
-    }
-
-    private void assertIsRelatedIsEqualTo(boolean expected, int i, int j, BitSet subgroupFamily)
+    private void assertIsRelatedIsEqualTo(boolean expected, int i, int j, BitSet subgroupFamilyMask)
     {
         final int offset = (int)'A';
         char ci = (char)(i + offset);
         char cj = (char)(j + offset);
-        String message = "family=" + subgroupFamily + "; " + ci + "<=" + cj;
-        assertEquals(message, expected, QuasiOrderGen.isRelated(elementMasks[i], elementMasks[j], subgroupFamily));
+        String message = "family=" + subgroupFamilyMask + "; " + ci + "<=" + cj;
+        assertEquals(message, expected, QuasiOrderGen.isRelated(elementMasks[i], elementMasks[j], subgroupFamilyMask));
     }
 
     private void assertIsRelated(int i, int j, BitSet subgroupFamily)

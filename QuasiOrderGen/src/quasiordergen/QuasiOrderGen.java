@@ -25,11 +25,11 @@ public class QuasiOrderGen
         //      For each subset:
         //          [Optionally] Check if 
         //              Conjugate closed <(4)> ; 
-        //              Intersection - trivial <(1)>;
+        //              Intersection - trivial <(1)>;               [ IN PROGRESS ]
         //          For each g1 \in G ; 
         //              For each g2 \in G;
         //                  where g1 != g2
-        //                  check if g1 \in S => g2 \in S [ O(1) using bitMaps ]
+        //                  check if g1 \in S => g2 \in S           [ DONE! ]
         //                  create Relation - add to list
         //      [Optionally] Find all unique relations from list
 
@@ -63,5 +63,20 @@ public class QuasiOrderGen
 
         // if any bits are set, the relation is false (there is a counter example)
         return b.isEmpty();
+    }
+
+    /**
+     * Determine if the intersection of all the subgroups in this family is trivial (i.e. = {1})
+     * Assumes that the elements[0] is the unity element (1).
+     * Note: If the intersection is empty (which should never occur as all subgroups must contain 1), then the intersection is not trivial.
+     *
+     * @param elements The bitmasks representing the subgroup memberships of each element in the group.
+     * @param subgroupFamilyMask The bitmask representing the subgroups in this family.
+     * @return Whether the intersection of all the subgroups is trivial.
+     */
+    public static boolean isIntersectionTrivial(BitSet[] elements, BitSet subgroupFamilyMask)
+    {
+        // TODO:
+        return true;
     }
 }

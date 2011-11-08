@@ -76,7 +76,13 @@ public class QuasiOrderGen
      */
     public static boolean isIntersectionTrivial(BitSet[] elements, BitSet subgroupFamilyMask)
     {
-        // TODO:
+        int numElem = elements.length;
+        for (int i=1;i<numElem;i++) // ignore elements[0] - unity.
+        {
+            BitSet b = (BitSet)subgroupFamilyMask.clone();
+            b.and(elements[i]); // if elem was in all subsets, b would not have changed here.
+            if (b.equals(subgroupFamilyMask)) return false;
+        }
         return true;
     }
 }

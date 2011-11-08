@@ -31,11 +31,12 @@ public class QuasiOrderGenIsIntersectionTrivialTest extends QuasiOrderGenFixture
     public void TestIntersectionWhenFamilyIsSingleton()
     {
         // family is singleton: so, only trivial when family is {{A}} (when mask 000.000.001)
-        assertIntersectionIsTrivial(1);
+        int familyMask = 1;
+        assertIntersectionIsTrivial(familyMask);
         for (int i=1;i<9;i++)
         {
-            i *= 2;
-            assertIntersectionIsNotTrivial(i);
+            familyMask *= 2;
+            assertIntersectionIsNotTrivial(familyMask);
         }
     }
 

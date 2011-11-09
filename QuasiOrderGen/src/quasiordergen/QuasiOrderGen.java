@@ -1,8 +1,12 @@
 package quasiordergen;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * Generate all possible (faithful) Quasi-Orders on a given group
@@ -14,10 +18,11 @@ public class QuasiOrderGen
 {
     public static void main(String[] args)
     {
+       
         BufferedReader inputStream = null;
         InputContainer inputGroup = null;
 
-        // parse input:
+        // input:
         try
         {
             if (args.length > 1)
@@ -38,35 +43,40 @@ public class QuasiOrderGen
                 inputStream = new BufferedReader(new InputStreamReader(System.in));
             }
 
-            inputGroup = ReadInput(inputStream);
+            inputGroup = InputContainer.FromInput(inputStream);
         }
         catch(Exception e)
         {
             System.err.println("An error occurred:");
             System.err.println(e.getMessage());
+            e.printStackTrace();
             return;
         }
 
-        // TODO List:
-        //  Input -- done, needs testing / potential for improvement
-        //  Processing -- overall, conjugate closure.
-        //  Output -- todo
-
+        // process:
         long numSubsets = (1 << inputGroup.NumConjugacyClasses); // 2^M
+        Hashtable<BitSet, ArrayList<BitSet>> uniqRelations = new Hashtable<BitSet, ArrayList<BitSet>>();
+
         for (long s=1;s<numSubsets;s++)
         {
             BitSet familyMask = ToSubgroupFamilyBitSet(inputGroup.NumSubgroups, inputGroup.NumConjugacyClasses, s, inputGroup.ConjugacyClasses);
-            ConsiderSubgroupFamily(inputGroup, familyMask);
+            ConsiderSubgroupFamily(inputGroup, familyMask, uniqRelations);
+
         }
 
-        //  process:
-        //      create Relation - add to list ( // if a<=b && b<=a group them together)
-        //      [Optionally] Find all unique relations from list
 
-        //  output:        
-        //      A list of relations 
-        //      [Optionally] Convert it to a displayable form.
-        //
+        // output? TODO
+        for (Map.Entry<BitSet, ArrayList<BitSet>> e : uniqRelations.entrySet())
+        {
+            OutputFormatter.PrintRelation(e.getKey(), e.getValue(), inputGroup);
+        }
+
+        System.out.println("Found " + uniqRelations.keySet().size() + " unique relations (out of maximum possible " + (1 << inputGroup.NumConjugacyClasses) + ");");
+    }
+
+    public static int ToIndex(int i, int j, int length)
+    {
+        return i*length + j;
     }
 
     /**
@@ -94,71 +104,57 @@ public class QuasiOrderGen
     }
 
     // TODO test
-    public static void ConsiderSubgroupFamily(InputContainer inputGroup, BitSet familyMask)
+    public static void ConsiderSubgroupFamily(InputContainer inputGroup, BitSet familyMask,
+                                              Hashtable<BitSet, ArrayList<BitSet>> uniqRelations)
     {
-        System.out.println(familyMask);
-
         // check if intersection is trivial
         if (!isIntersectionTrivial(inputGroup.ElementMasks, familyMask)) return;
 
-        // TODO temp:
-        System.out.println(familyMask);
+        // TODO represent relation is some compact way
+        // ideas:
+        //  Start with all items in their own cluster
+        //  if g1 <= g2 && g2 <= g1 ; place g1 and g2 in the same cluster.
+        //  Then there is a partial order on the clusters
+        //  Output it (for now)
+        //  implement this using a disjoint set data structure.
 
-        // represent relation is some compact way
-        // TODO
-    }
+        int NE = inputGroup.NumElements;
+        BitSet relation = new BitSet(NE*NE);
 
-    // TODO test
-    private static InputContainer ReadInput(BufferedReader input) throws IOException, NumberFormatException
-    {
-        // ignore the first line, which is a textual description of the group:
-        input.readLine();
-
-        // lines 2-4: number of group elements=N, number of subgroups=K, number of conjugacy-classes=M
-        int numElem             = Integer.parseInt(input.readLine());
-        int numSubgroups        = Integer.parseInt(input.readLine());
-        int numConjugacyClasses = Integer.parseInt(input.readLine());
-
-        // next N lines: name of each element (a string)
-        // map each group element name to an index
-        HashMap<String, Integer> elementIndexMap = new HashMap<String, Integer>();
-        for (int i=0;i<numElem;i++)
-            elementIndexMap.put(input.readLine().trim(), i);
-
-        // Next K+M lines: Represents the conjugacy classes.
-        //  Each class starts with Ji which is the number of subgroups in each class.
-        //      For each class, Ji lines follow, each describing a subgroup, as a space separated list.
-
-        // create bitsets to store memberships:
-        BitSet[] conjugacyClasses = new BitSet[numConjugacyClasses];
-        BitSet[] elementMasks = new BitSet[numElem];
-
-        for (int i=0;i<numElem;i++)
-            elementMasks[i] = new BitSet(numSubgroups);
-
-        int curSubgroupIndex = 0;
-        for (int m=0;m<numConjugacyClasses;m++)
+        for (int i=0;i<NE;i++)
         {
-            int J = Integer.parseInt(input.readLine());
+            // (i,i) is automatically present
+            relation.set(ToIndex(i,i,NE));
 
-            // assign these subgroups to the correct conjugacy class
-            conjugacyClasses[m] = new BitSet(numSubgroups);
-            conjugacyClasses[m].set(curSubgroupIndex, curSubgroupIndex+J);
+            for (int j=i+1;j<NE;j++)
+            {
+                boolean ij = isRelated(inputGroup.ElementMasks[i], inputGroup.ElementMasks[j], familyMask);
+                boolean ji = isRelated(inputGroup.ElementMasks[j], inputGroup.ElementMasks[i], familyMask);
 
-            // modify the bitSets as per corresponding subgroups.
-            for (int i=0;i<J;i++)
-                ParseLine(input.readLine(), curSubgroupIndex++, elementMasks, elementIndexMap);
+                if (ij) relation.set(ToIndex(i,j,NE));
+                if (ji) relation.set(ToIndex(j,i,NE));
+            }
         }
 
-        return new InputContainer(numElem, numSubgroups, numConjugacyClasses, elementMasks, conjugacyClasses);
-    }
+        //  process:
+        //      create Relation - add to list ( // if a<=b && b<=a group them together)
+        //      [Optionally] Find all unique relations from list
 
-    // TODO Test
-    private static void ParseLine(String line, int subgroupIndex, BitSet[] elementMasks, HashMap<String, Integer> elementIndexMap)
-    {
-        // set each element in this line to be a member of the corresponding subgroup.
-        for (String elem : line.split(" "))
-            elementMasks[elementIndexMap.get(elem)].set(subgroupIndex);
+        //  output:
+        //      A list of relations
+        //      [Optionally] Convert it to a displayable form.
+        //
+
+        if (uniqRelations.containsKey(relation))
+        {
+            uniqRelations.get(relation).add(familyMask);
+        }
+        else
+        {
+            ArrayList<BitSet> families = new ArrayList<BitSet>();
+            families.add(familyMask);
+            uniqRelations.put(relation, families);
+        }
     }
 
     /**

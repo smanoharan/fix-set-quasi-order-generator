@@ -1,44 +1,164 @@
 package quasiordergen;
+
+import java.io.*;
 import java.util.BitSet;
+import java.util.HashMap;
 
 /**
+ * Generate all possible (faithful) Quasi-Orders on a given group
+ *  (specified by it's elements, subgroups and subgroup conjugacy classes)
  *
  * @author Siva Manoharan [avismanoharan@hotmail.com]
  */
 public class QuasiOrderGen 
 {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) 
+    public static void main(String[] args)
     {
-        // TODO 
-        //  input: 
-        //      Group of N elements(ArrayList<String>) ; 
-        //      K Subgroups ( List<BitArray> ) ;
-        //      [Optionally] Cayley table ;
+        BufferedReader inputStream = null;
+        InputContainer inputGroup = null;
+
+        // parse input:
+        try
+        {
+            if (args.length > 1)
+            {
+                System.err.println("Error. Incorrect number of arguments. Expected: 1.");
+                System.err.println("Usage: java quasiordergen.QuasiOrderGen [inputfile]");
+                System.err.println("If inputfile is omitted, input is assumed to be from stdin.");
+                return;
+            }
+            else if (args.length==1)
+            {
+                // input is from a file
+                inputStream = new BufferedReader(new FileReader(args[0]));
+            }
+            else
+            {
+                // input is from stdin
+                inputStream = new BufferedReader(new InputStreamReader(System.in));
+            }
+
+            inputGroup = ReadInput(inputStream);
+        }
+        catch(Exception e)
+        {
+            System.err.println("An error occurred:");
+            System.err.println(e.getMessage());
+            return;
+        }
+
+        // TODO List:
+        //  Input -- done, needs testing / potential for improvement
+        //  Processing -- overall, conjugate closure.
+        //  Output -- todo
+
+        long numSubsets = (1 << inputGroup.NumConjugacyClasses); // 2^M
+        for (long s=1;s<numSubsets;s++)
+        {
+            BitSet familyMask = ToSubgroupFamilyBitSet(inputGroup.NumSubgroups, inputGroup.NumConjugacyClasses, s, inputGroup.ConjugacyClasses);
+            ConsiderSubgroupFamily(inputGroup, familyMask);
+        }
 
         //  process:
-        //      For each element of G, create a bitArray for subgroup membership.
-        //      Generate all subsets, (2^K) represent them as bitArrays
-        //      For each subset:
-        //          [Optionally] Check if 
-        //              Conjugate closed <(4)> ; 
-        //              Intersection - trivial <(1)>;               [ IN PROGRESS ]
-        //          For each g1 \in G ; 
-        //              For each g2 \in G;
-        //                  where g1 != g2
-        //                  check if g1 \in S => g2 \in S           [ DONE! ]
-        //                  create Relation - add to list
+        //      create Relation - add to list ( // if a<=b && b<=a group them together)
         //      [Optionally] Find all unique relations from list
 
         //  output:        
         //      A list of relations 
         //      [Optionally] Convert it to a displayable form.
-        //      
-        
-        
+        //
+    }
+
+    /**
+     * Convert a mask representing the subgroup conjugacy classes to placed in this family,
+     *  into a mask representing the subgroups in this family.
+     * @param numSubgroups Number of subgroups.
+     * @param numConjugacyClasses Number of subgroup conjugacy classes.
+     * @param conjugacyMask A mask representing the conjugacy classes to be placed into this family.
+     * @param conjugacyClasses The masks of all subgroup conjugacy classes in this group.
+     * @return A mask representing the subgroups in this family.
+     */
+    public static BitSet ToSubgroupFamilyBitSet(int numSubgroups, int numConjugacyClasses, long conjugacyMask, BitSet[] conjugacyClasses)
+    {
+        // convert conjugacy class to a family-bitset.
+        BitSet familyMask = new BitSet(numSubgroups);
+        long classMask = 1;
+        for (int c=0;c<numConjugacyClasses;c++)
+        {
+            if (0 != (classMask & conjugacyMask))
+                familyMask.or(conjugacyClasses[c]);
+            
+            classMask *= 2;
+        }
+        return familyMask;
+    }
+
+    // TODO test
+    public static void ConsiderSubgroupFamily(InputContainer inputGroup, BitSet familyMask)
+    {
+        System.out.println(familyMask);
+
+        // check if intersection is trivial
+        if (!isIntersectionTrivial(inputGroup.ElementMasks, familyMask)) return;
+
+        // TODO temp:
+        System.out.println(familyMask);
+
+        // represent relation is some compact way
+        // TODO
+    }
+
+    // TODO test
+    private static InputContainer ReadInput(BufferedReader input) throws IOException, NumberFormatException
+    {
+        // ignore the first line, which is a textual description of the group:
+        input.readLine();
+
+        // lines 2-4: number of group elements=N, number of subgroups=K, number of conjugacy-classes=M
+        int numElem             = Integer.parseInt(input.readLine());
+        int numSubgroups        = Integer.parseInt(input.readLine());
+        int numConjugacyClasses = Integer.parseInt(input.readLine());
+
+        // next N lines: name of each element (a string)
+        // map each group element name to an index
+        HashMap<String, Integer> elementIndexMap = new HashMap<String, Integer>();
+        for (int i=0;i<numElem;i++)
+            elementIndexMap.put(input.readLine().trim(), i);
+
+        // Next K+M lines: Represents the conjugacy classes.
+        //  Each class starts with Ji which is the number of subgroups in each class.
+        //      For each class, Ji lines follow, each describing a subgroup, as a space separated list.
+
+        // create bitsets to store memberships:
+        BitSet[] conjugacyClasses = new BitSet[numConjugacyClasses];
+        BitSet[] elementMasks = new BitSet[numElem];
+
+        for (int i=0;i<numElem;i++)
+            elementMasks[i] = new BitSet(numSubgroups);
+
+        int curSubgroupIndex = 0;
+        for (int m=0;m<numConjugacyClasses;m++)
+        {
+            int J = Integer.parseInt(input.readLine());
+
+            // assign these subgroups to the correct conjugacy class
+            conjugacyClasses[m] = new BitSet(numSubgroups);
+            conjugacyClasses[m].set(curSubgroupIndex, curSubgroupIndex+J);
+
+            // modify the bitSets as per corresponding subgroups.
+            for (int i=0;i<J;i++)
+                ParseLine(input.readLine(), curSubgroupIndex++, elementMasks, elementIndexMap);
+        }
+
+        return new InputContainer(numElem, numSubgroups, numConjugacyClasses, elementMasks, conjugacyClasses);
+    }
+
+    // TODO Test
+    private static void ParseLine(String line, int subgroupIndex, BitSet[] elementMasks, HashMap<String, Integer> elementIndexMap)
+    {
+        // set each element in this line to be a member of the corresponding subgroup.
+        for (String elem : line.split(" "))
+            elementMasks[elementIndexMap.get(elem)].set(subgroupIndex);
     }
 
     /**
@@ -85,4 +205,24 @@ public class QuasiOrderGen
         }
         return true;
     }
+
+    /**
+     * Convert a mask (given as a long) into a BitSet. Only consider the N least significant bits, where N=length
+     * @param mask The bitmask, as a long
+     * @param length Number of bits of the long to consider
+     * @return A BitSet representing the last N bits of the bitmask.
+     */
+    protected static BitSet MaskToBitSet(long mask, int length)
+    {
+        BitSet result = new BitSet(length);
+
+        long bitValue = 1;
+        for (int i=0;i<length;i++)
+        {
+            if (0 != (mask & bitValue)) result.set(i);
+            bitValue *= 2;
+        }
+        return result;
+    }
 }
+

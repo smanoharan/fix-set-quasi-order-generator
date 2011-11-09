@@ -24,20 +24,4 @@ public class QuasiOrderGenFixture
 
         return result;
     }
-
-    protected static BitSet MaskToBitSet(int mask, int length)
-    {
-        BitSet result = new BitSet(length);
-
-        int bitValue = 1;
-        for (int i=0;i<length;i++)
-        {
-            if (0 != (mask & bitValue)) result.set(i);
-            bitValue *= 2;
-        }
-        
-        return result;
-    }
-
-        
 }

@@ -18,8 +18,8 @@ public class Generate
     public static void main(String[] args)
     {
        
-        BufferedReader inputStream = null;
-        InputContainer inputGroup = null;
+        BufferedReader inputReader = null;
+        Group inputGroup = null;
 
         // input:
         try
@@ -34,35 +34,27 @@ public class Generate
             else if (args.length==1)
             {
                 // input is from a file
-                inputStream = new BufferedReader(new FileReader(args[0]));
+                inputReader = new BufferedReader(new FileReader(args[0]));
             }
             else
             {
                 // input is from stdin
-                inputStream = new BufferedReader(new InputStreamReader(System.in));
+                inputReader = new BufferedReader(new InputStreamReader(System.in));
             }
 
-            inputGroup = InputContainer.FromInput(inputStream);
+            inputGroup = Group.FromRawGroup(RawGroup.FromJSON(inputReader));
         }
         catch(Exception e)
         {
-            System.err.println("An error occurred:");
-            System.err.println(e.getMessage());
+            System.err.println("An error occurred:\n\n"+e.getMessage());
             e.printStackTrace();
             return;
         }
         finally
         {
-            if (inputStream != null)
+            if (inputReader != null)
             {
-                try
-                {
-                    inputStream.close();
-                }
-                catch (Exception e)
-                {
-                    // Nothing we can do here.
-                }
+                try { inputReader.close(); } catch (Exception e) {} // Nothing we can do here.
             }
         }
 
@@ -73,9 +65,7 @@ public class Generate
         for (long s=1;s<numSubsets;s++)
         {
             BitSet familyMask = GroupUtil.ToSubgroupFamilyBitSet(inputGroup.NumSubgroups, inputGroup.NumConjugacyClasses, s, inputGroup.ConjugacyClasses);
-
             if (!GroupUtil.isIntersectionTrivial(inputGroup.ElementMasks, familyMask)) continue;
-
             relations.Add(RelationSet.BuildRelation(inputGroup, familyMask), familyMask);
         }
 
@@ -87,6 +77,5 @@ public class Generate
 
         System.out.println("Found " + relations.uniqRelations.keySet().size() + " unique relations (out of maximum possible " + (1 << inputGroup.NumConjugacyClasses) + ");");
     }
-
 }
 

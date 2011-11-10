@@ -47,7 +47,7 @@ public class RelationSet
      * @param familyMask A mask representing which subgroups are in this family.
      * @return The relation determined by this family.
      */
-    public static BitSet BuildRelation(InputContainer inputGroup, BitSet familyMask)
+    public static BitSet BuildRelation(Group inputGroup, BitSet familyMask)
     {
         int len = inputGroup.NumElements;
         BitSet relation = new BitSet(len*len);

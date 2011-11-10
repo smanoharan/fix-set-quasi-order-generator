@@ -5,7 +5,7 @@ import java.util.List;
 
 public class OutputFormatter
 {
-    public static void PrintRelation(BitSet relation, List<BitSet> familyMasks, InputContainer inputGroup)
+    public static void PrintRelation(BitSet relation, List<BitSet> familyMasks, Group inputGroup)
     {
         int NE = inputGroup.NumElements;
 
@@ -23,7 +23,7 @@ public class OutputFormatter
         }
     }
 
-    public static void PrintSubgroupFamily(InputContainer inputGroup, BitSet familyMask)
+    public static void PrintSubgroupFamily(Group inputGroup, BitSet familyMask)
     {
         for (int s=0;s<inputGroup.NumSubgroups;s++)
             if (familyMask.get(s)) // if s is part of the family, print it.

@@ -1,6 +1,12 @@
 package quasiorder;
 
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collection;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class QuasiOrderGenFixture
 {
@@ -23,5 +29,15 @@ public class QuasiOrderGenFixture
                 result.set(i);
 
         return result;
+    }
+
+    static <T> void assertListEqual(Collection<T> actual, T... expected)
+    {
+        List<T> expectedList = new ArrayList<T>(expected.length);
+        for(T b : expected) expectedList.add(b);
+
+        assertEquals(expectedList.size(), actual.size());
+        assertTrue(expectedList.containsAll(actual));
+        assertTrue(actual.containsAll(expectedList));
     }
 }

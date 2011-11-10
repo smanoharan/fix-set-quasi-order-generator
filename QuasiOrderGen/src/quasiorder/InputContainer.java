@@ -28,7 +28,8 @@ class InputContainer
         ConjugacyClasses = conjugacyClasses;
     }
 
-    // TODO test
+
+    // Untested: DO NOT USE ; TODO Remove
     public static InputContainer FromInput(BufferedReader input) throws IOException, NumberFormatException
     {
         // ignore the first line, which is a textual description of the group:
@@ -84,11 +85,61 @@ class InputContainer
         return new InputContainer(numElem, numSubgroups, numConjugacyClasses, elementMasks, elementNames, subgroupNames, conjugacyClasses);
     }
 
-    // TODO Test
+    // TODO Remove
     static void ParseLine(String line, int subgroupIndex, BitSet[] elementMasks, HashMap<String, Integer> elementIndexMap)
     {
         // set each element in this line to be a member of the corresponding subgroup.
         for (String elem : line.split(" "))
             elementMasks[elementIndexMap.get(elem)].set(subgroupIndex);
+    }
+
+
+    public static InputContainer FromRawGroup(RawGroup rawgroup)
+    {
+        // counts of each type:
+        int numElem = rawgroup.NumElements;
+        int numSubgroups = rawgroup.NumSubgroups;
+        int numConjugacyClasses = rawgroup.NumConjugacyClasses;
+
+        // element names:
+        HashMap<String, Integer> elementIndexMap = new HashMap<String, Integer>();
+        String[] elementNames = rawgroup.Elements;
+        for (int i=0;i<numElem;i++)
+            elementIndexMap.put(rawgroup.Elements[i], i);
+
+        BitSet[] conjugacyClasses = new BitSet[numConjugacyClasses];
+        BitSet[] elementMasks = new BitSet[numElem];
+
+        for (int i=0;i<numElem;i++)
+            elementMasks[i] = new BitSet(numSubgroups);
+
+        int curSubgroupIndex = 0;
+        String[] subgroupNames = new String[numSubgroups];
+        for (int m=0;m<numConjugacyClasses;m++)
+        {
+            String[][] conjClass = rawgroup.ConjugacyClasses[m];
+            int conjClassSize = conjClass.length;
+
+            // assign subgroups correct conjugacy class
+            conjugacyClasses[m] = new BitSet(numSubgroups);
+            conjugacyClasses[m].set(curSubgroupIndex, curSubgroupIndex+conjClassSize);
+
+            // assign elements to corresponding subgroups & build up subgroup-name.
+            for (int i=0;i<conjClassSize;i++)
+            {
+                StringBuilder subgroupName = new StringBuilder();
+                for(String elem : conjClass[i])
+                {
+                    subgroupName.append(elem);
+                    subgroupName.append(' ');
+                    elementMasks[elementIndexMap.get(elem)].set(curSubgroupIndex);
+                }
+                subgroupNames[curSubgroupIndex] = subgroupName.toString().trim();
+                curSubgroupIndex++;
+            }
+        }
+
+        return new InputContainer(numElem, numSubgroups, numConjugacyClasses, elementMasks, elementNames, subgroupNames, conjugacyClasses);
+
     }
 }

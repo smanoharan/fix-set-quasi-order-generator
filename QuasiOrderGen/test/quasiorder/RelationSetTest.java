@@ -3,10 +3,7 @@ package quasiorder;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collection;
-import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -122,15 +119,5 @@ public class RelationSetTest extends QuasiOrderGenFixture
         assertListEqual(relations.uniqRelations.get(first), familyFirst, familySecond);
         assertListEqual(relations.uniqRelations.get(second), familyFirst, familySecond);
         assertListEqual(relations.uniqRelations.get(third), familyThird);
-    }
-
-    private <T> void assertListEqual(Collection<T> actual, T... expected)
-    {
-        List<T> expectedList = new ArrayList<T>(expected.length);
-        for(T b : expected) expectedList.add(b);
-
-        assertEquals(expectedList.size(), actual.size());
-        assertTrue(expectedList.containsAll(actual));
-        assertTrue(actual.containsAll(expectedList));
     }
 }

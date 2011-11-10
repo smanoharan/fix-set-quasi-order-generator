@@ -14,7 +14,7 @@ public class OutputFormatter
 
         for(int i=0;i<NE;i++)
         {
-            System.out.print(inputGroup.ElementNames[i] + "  \t:");
+            System.out.print(String.format("%1$-20s \t:", inputGroup.ElementNames[i]));
 
             for (int j=0;j<NE;j++)
                 System.out.print(relation.get(RelationSet.ToSerialIndex(i, j, NE)) ? "x " : "  ");

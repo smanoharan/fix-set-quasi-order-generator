@@ -1,4 +1,4 @@
-package quasiordergen;
+package quasiorder;
 
 import java.util.BitSet;
 import java.util.List;
@@ -17,7 +17,7 @@ public class OutputFormatter
             System.out.print(inputGroup.ElementNames[i] + "  \t:");
 
             for (int j=0;j<NE;j++)
-                System.out.print(relation.get(QuasiOrderGen.ToIndex(i,j,NE)) ? "x " : "  ");
+                System.out.print(relation.get(RelationSet.ToSerialIndex(i, j, NE)) ? "x " : "  ");
 
             System.out.println();
         }

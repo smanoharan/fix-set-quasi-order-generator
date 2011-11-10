@@ -1,4 +1,4 @@
-package quasiordergen;
+package quasiorder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,7 +15,7 @@ class InputContainer
     public final String[] SubgroupNames;
     public final BitSet[] ConjugacyClasses;
 
-    private InputContainer(
+    public InputContainer(
             int numElements, int numSubgroups, int numConjugacyClasses,
             BitSet[] elementMasks, String[] elementNames, String[] subgroupNames, BitSet[] conjugacyClasses)
     {

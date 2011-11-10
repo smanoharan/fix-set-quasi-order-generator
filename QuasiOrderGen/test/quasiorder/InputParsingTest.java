@@ -59,7 +59,7 @@ public class InputParsingTest extends QuasiOrderGenFixture
     public void TestS3IsProcessedCorrectly() throws Exception
     {
         RawGroup rawGroup = RawGroup.FromJSON(new StringReader(JSON_STRING));
-        InputContainer actual = InputContainer.FromRawGroup(rawGroup);
+        Group actual = Group.FromRawGroup(rawGroup);
 
         assertEquals("NumElements:", NumElem, actual.NumElements);
         assertEquals("NumSubgroups:", NumSubgroups, actual.NumSubgroups);

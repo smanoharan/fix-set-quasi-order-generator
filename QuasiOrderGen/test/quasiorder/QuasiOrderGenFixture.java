@@ -1,4 +1,4 @@
-package quasiordergen;
+package quasiorder;
 
 import java.util.BitSet;
 

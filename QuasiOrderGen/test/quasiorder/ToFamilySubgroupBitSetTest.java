@@ -1,4 +1,4 @@
-package quasiordergen;
+package quasiorder;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -7,7 +7,7 @@ import java.util.BitSet;
 
 import static org.junit.Assert.assertEquals;
 
-public class QuasiOrderGenToFamilySubgroupBitSet extends QuasiOrderGenFixture
+public class ToFamilySubgroupBitSetTest extends QuasiOrderGenFixture
 {
     protected static final int NumSubgroups = 9;
     private static final int NumClasses = 5;
@@ -113,6 +113,6 @@ public class QuasiOrderGenToFamilySubgroupBitSet extends QuasiOrderGenFixture
     private void assertFamilyBitSetIsEqual(BitSet expected, long conjugateMask)
     {
         String message = "Conjugate mask: " + Long.toBinaryString(conjugateMask);
-        assertEquals(message,  expected,  QuasiOrderGen.ToSubgroupFamilyBitSet(NumSubgroups, NumClasses, conjugateMask, conjugateClasses));
+        assertEquals(message,  expected,  GroupUtil.ToSubgroupFamilyBitSet(NumSubgroups, NumClasses, conjugateMask, conjugateClasses));
     }
 }

@@ -1,11 +1,11 @@
-package quasiordergen;
+package quasiorder;
 
 import org.junit.Before;
 import org.junit.Test;
 import java.util.BitSet;
 import static org.junit.Assert.assertEquals;
 
-public class QuasiOrderGenIsIntersectionTrivialTest extends QuasiOrderGenFixture
+public class IntersectionTrivialTest extends QuasiOrderGenFixture
 {
     protected static final int NumSubgroups = 9;
 
@@ -135,9 +135,9 @@ public class QuasiOrderGenIsIntersectionTrivialTest extends QuasiOrderGenFixture
 
     private void assertIntersectionIsTrivial(boolean expected, int subgroupFamilyMask)
     {
-        BitSet familyBitSet = QuasiOrderGen.MaskToBitSet(subgroupFamilyMask, NumSubgroups);
+        BitSet familyBitSet = GroupUtil.MaskToBitSet(subgroupFamilyMask, NumSubgroups);
         String message = "family=" + subgroupFamilyMask;
-        assertEquals(message, expected, QuasiOrderGen.isIntersectionTrivial(elementMasks, familyBitSet));
+        assertEquals(message, expected, GroupUtil.isIntersectionTrivial(elementMasks, familyBitSet));
     }
 
 }

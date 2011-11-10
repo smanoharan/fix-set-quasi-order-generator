@@ -1,4 +1,4 @@
-package quasiordergen;
+package quasiorder;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -8,7 +8,7 @@ import java.util.BitSet;
 import java.util.List;
 import static org.junit.Assert.assertEquals;
 
-public class QuasiOrderGenIsRelatedTest extends QuasiOrderGenFixture
+public class IsRelatedTest extends QuasiOrderGenFixture
 {
     @Before
     public void setUp()
@@ -137,7 +137,7 @@ public class QuasiOrderGenIsRelatedTest extends QuasiOrderGenFixture
         char ci = (char)(i + offset);
         char cj = (char)(j + offset);
         String message = "family=" + subgroupFamilyMask + "; " + ci + "<=" + cj;
-        assertEquals(message, expected, QuasiOrderGen.isRelated(elementMasks[i], elementMasks[j], subgroupFamilyMask));
+        assertEquals(message, expected, GroupUtil.isRelated(elementMasks[i], elementMasks[j], subgroupFamilyMask));
     }
 
     private void assertIsRelated(int i, int j, BitSet subgroupFamily)

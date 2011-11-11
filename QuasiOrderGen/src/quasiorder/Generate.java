@@ -1,8 +1,8 @@
 package quasiorder;
 
-import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Map;
@@ -18,31 +18,33 @@ public class Generate
     public static void main(String[] args)
     {
        
-        BufferedReader inputReader = null;
+        Reader inputReader = null;
         Group inputGroup = null;
 
         // input:
         try
         {
-            if (args.length > 1)
+            if (args.length > 2)
             {
-                System.err.println("Error. Incorrect number of arguments. Expected: 1.");
-                System.err.println("Usage: java quasiorder.Generate [inputfile]");
+                System.err.println("Error. Incorrect number of arguments. Expected: 0-2.");
+                System.err.println("Usage: java quasiorder.Generate [-s] [inputfile]");
                 System.err.println("If inputfile is omitted, input is assumed to be from stdin.");
+                System.err.println("-s means automatically sort the elements");
                 return;
             }
-            else if (args.length==1)
+
+            boolean sortElements = false;
+            for (String arg : args)
             {
-                // input is from a file
-                inputReader = new BufferedReader(new FileReader(args[0]));
-            }
-            else
-            {
-                // input is from stdin
-                inputReader = new BufferedReader(new InputStreamReader(System.in));
+                if (arg.equals("-s")) sortElements = true;
+                else inputReader = new FileReader(args[0]);
             }
 
-            inputGroup = Group.FromRawGroup(RawGroup.FromJSON(inputReader));
+            // if no file is specified, read from std-in.
+            if (inputReader==null)
+                inputReader = new InputStreamReader(System.in);
+
+            inputGroup = Group.FromRawGroup(RawGroup.FromJSON(inputReader), sortElements);
         }
         catch(Exception e)
         {

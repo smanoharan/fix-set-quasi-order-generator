@@ -31,9 +31,10 @@ class Group
     /**
      * Create a group by processing a RawGroup.
      * @param rawgroup a group which is parsed json, with no processing.
+     * @param sortElem Whether or not to sort the elements.
      * @return A fully processed group.
      */
-    public static Group FromRawGroup(RawGroup rawgroup)
+    public static Group FromRawGroup(RawGroup rawgroup, boolean sortElem)
     {
         // counts of each type:
         int numElem = rawgroup.NumElements;
@@ -42,17 +43,20 @@ class Group
 
         // element names:
         HashMap<String, Integer> elementIndexMap = new HashMap<String, Integer>();
-
-        // sort the names (first by length, then lexically)
         String[] elementNames = rawgroup.Elements;
-        Arrays.sort(elementNames, new Comparator<String>()
+
+        if (sortElem)
         {
-            public int compare(String o1, String o2)
+            // sort the names (first by length, then lexically)
+            Arrays.sort(elementNames, new Comparator<String>()
             {
-                int diff = (o1.length() - o2.length());
-                return diff == 0 ? diff = o1.compareTo(o2) : diff;
-            }
-        });
+                public int compare(String o1, String o2)
+                {
+                    int diff = (o1.length() - o2.length());
+                    return diff == 0 ? diff = o1.compareTo(o2) : diff;
+                }
+            });
+        }
 
         for (int i=0;i<numElem;i++)
             elementIndexMap.put(rawgroup.Elements[i], i);

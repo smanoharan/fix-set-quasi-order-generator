@@ -3,6 +3,7 @@ package quasiorder;
 import org.junit.Test;
 
 import java.io.StringReader;
+import java.util.BitSet;
 
 import static org.junit.Assert.assertEquals;
 
@@ -56,24 +57,43 @@ public class InputParsingTest extends QuasiOrderGenFixture
     }
 
     @Test
-    public void TestS3IsProcessedCorrectly() throws Exception
+    public void TestS3IsProcessedCorrectlyWhenSorted() throws Exception
     {
-        RawGroup rawGroup = RawGroup.FromJSON(new StringReader(JSON_STRING));
-        Group actual = Group.FromRawGroup(rawGroup);
-
-        assertEquals("NumElements:", NumElem, actual.NumElements);
-        assertEquals("NumSubgroups:", NumSubgroups, actual.NumSubgroups);
-        assertEquals("NumConjugacyClasses:", NumConjClasses, actual.NumConjugacyClasses);
-        assertArraysAreEqual("Element", ELEMENTS, actual.ElementNames);
-        assertArraysAreEqual("Subgroup-Names", SUBGROUP_NAMES, actual.SubgroupNames);
-
-        assertArraysAreEqual("Element Masks", actual.ElementMasks,
+        TestS3IsProcessedCorrectly(true, ELEMENTS,
                 StringToBitSet("111111"),   // ()
                 StringToBitSet("001001"),   // (12)
                 StringToBitSet("000101"),   // (13)
                 StringToBitSet("010001"),   // (23)
                 StringToBitSet("000011"),   // (123)
-                StringToBitSet("000011"));  // (132)
+                StringToBitSet("000011")    // (132)
+        );
+    }
+
+    @Test
+    public void TestS3IsProcessedCorrectlyWhenNotSorted() throws Exception
+    {
+        TestS3IsProcessedCorrectly(false, UNSORTED_ELEMENTS,
+                StringToBitSet("111111"),   // ()
+                StringToBitSet("000101"),   // (13)
+                StringToBitSet("000011"),   // (123)
+                StringToBitSet("010001"),   // (23)
+                StringToBitSet("000011"),   // (132)
+                StringToBitSet("001001")    // (12)
+        );
+    }
+
+    private void TestS3IsProcessedCorrectly(boolean sort, String[] elems, BitSet ... elemMasks) throws Exception
+    {
+        RawGroup rawGroup = RawGroup.FromJSON(new StringReader(JSON_STRING));
+        Group actual = Group.FromRawGroup(rawGroup,sort);
+
+        assertEquals("NumElements:", NumElem, actual.NumElements);
+        assertEquals("NumSubgroups:", NumSubgroups, actual.NumSubgroups);
+        assertEquals("NumConjugacyClasses:", NumConjClasses, actual.NumConjugacyClasses);
+
+        assertArraysAreEqual("Element", elems, actual.ElementNames);
+        assertArraysAreEqual("Subgroup-Names", SUBGROUP_NAMES, actual.SubgroupNames);
+        assertArraysAreEqual("Element Masks", actual.ElementMasks, elemMasks);
 
         assertArraysAreEqual("Conjugacy Classes", actual.ConjugacyClasses,
                 StringToBitSet("100000"),   // type:()

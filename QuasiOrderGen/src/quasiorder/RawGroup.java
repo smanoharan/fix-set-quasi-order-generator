@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class RawGroup
 {
@@ -29,6 +31,7 @@ public class RawGroup
 
         // places to look:
         String[] elements = groupProp[0][0][0];
+
         int numElements = elements.length;
         String[][][] conjugacyClasses = groupProp[1];
         int numConjugacyClasses = conjugacyClasses.length;

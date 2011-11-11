@@ -5,6 +5,10 @@ import java.util.List;
 
 public class OutputFormatter
 {
+
+    // possible ideas: (TODO)
+    //  sort each relation by the number of set bits.
+    //  then perhaps combine those which produce the same relation?
     public static void PrintRelation(BitSet relation, List<BitSet> familyMasks, Group inputGroup)
     {
         int NE = inputGroup.NumElements;

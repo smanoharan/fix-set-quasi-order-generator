@@ -3,7 +3,6 @@ package quasiorder;
 import org.junit.Test;
 
 import java.io.StringReader;
-import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
@@ -24,7 +23,8 @@ public class InputParsingTest extends QuasiOrderGenFixture
     public static final int NumElem = 6;
     public static final int NumSubgroups = 6;
     public static final int NumConjClasses = 4;
-    public static final String[] ELEMENTS = new String[] { "()", "(1,3)", "(1,2,3)", "(2,3)", "(1,3,2)", "(1,2)" };
+    public static final String[] UNSORTED_ELEMENTS = new String[] { "()", "(1,3)", "(1,2,3)", "(2,3)", "(1,3,2)", "(1,2)" };
+    public static final String[] ELEMENTS = new String[] { "()", "(1,2)", "(1,3)", "(2,3)", "(1,2,3)", "(1,3,2)" };
     public static final String[][][] CONJUGACY_CLASSES = new String[][][] {
             { { "()" } },
             { { "()", "(2,3)" }, { "()", "(1,2)" }, { "()", "(1,3)" } },
@@ -48,11 +48,11 @@ public class InputParsingTest extends QuasiOrderGenFixture
         assertEquals("NumElements:", NumElem, actual.NumElements);
         assertEquals("NumSubgroups:", NumSubgroups, actual.NumSubgroups);
         assertEquals("NumConjugacyClasses:", NumConjClasses, actual.NumConjugacyClasses);
-        assertStringArrayEquals("Element", ELEMENTS, actual.Elements);
+        assertArraysAreEqual("Element", UNSORTED_ELEMENTS, actual.Elements);
 
         for(int i=0;i<NumConjClasses;i++)
             for (int j=0;j< CONJUGACY_CLASSES[i].length;j++)
-                assertStringArrayEquals("Subgroup-" + i + "-" + j, CONJUGACY_CLASSES[i][j], actual.ConjugacyClasses[i][j]);
+                assertArraysAreEqual("Subgroup-" + i + "-" + j, CONJUGACY_CLASSES[i][j], actual.ConjugacyClasses[i][j]);
     }
 
     @Test
@@ -64,25 +64,25 @@ public class InputParsingTest extends QuasiOrderGenFixture
         assertEquals("NumElements:", NumElem, actual.NumElements);
         assertEquals("NumSubgroups:", NumSubgroups, actual.NumSubgroups);
         assertEquals("NumConjugacyClasses:", NumConjClasses, actual.NumConjugacyClasses);
-        assertStringArrayEquals("Element", ELEMENTS, actual.ElementNames);
-        assertStringArrayEquals("Subgroup-Names", SUBGROUP_NAMES, actual.SubgroupNames);
+        assertArraysAreEqual("Element", ELEMENTS, actual.ElementNames);
+        assertArraysAreEqual("Subgroup-Names", SUBGROUP_NAMES, actual.SubgroupNames);
 
-        assertListEqual(Arrays.asList(actual.ElementMasks),
+        assertArraysAreEqual("Element Masks", actual.ElementMasks,
                 StringToBitSet("111111"),   // ()
+                StringToBitSet("001001"),   // (12)
                 StringToBitSet("000101"),   // (13)
-                StringToBitSet("000011"),   // (123)
                 StringToBitSet("010001"),   // (23)
-                StringToBitSet("000011"),   // (132)
-                StringToBitSet("001001"));  // (12)
+                StringToBitSet("000011"),   // (123)
+                StringToBitSet("000011"));  // (132)
 
-        assertListEqual(Arrays.asList(actual.ConjugacyClasses),
+        assertArraysAreEqual("Conjugacy Classes", actual.ConjugacyClasses,
                 StringToBitSet("100000"),   // type:()
                 StringToBitSet("011100"),   // type:(ab)
                 StringToBitSet("000010"),   // type: (abc)
                 StringToBitSet("000001"));  // type: G
     }
 
-    private static void assertStringArrayEquals(String arrayName, String[] expected, String[] actual)
+    private static <T> void assertArraysAreEqual(T arrayName, T[] expected, T... actual)
     {
         for (int i=0;i<expected.length;i++)
             assertEquals(arrayName+"-"+i, expected[i], actual[i]);

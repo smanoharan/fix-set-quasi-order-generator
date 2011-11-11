@@ -1,6 +1,8 @@
 package quasiorder;
 
+import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Comparator;
 import java.util.HashMap;
 
 class Group
@@ -40,7 +42,18 @@ class Group
 
         // element names:
         HashMap<String, Integer> elementIndexMap = new HashMap<String, Integer>();
+
+        // sort the names (first by length, then lexically)
         String[] elementNames = rawgroup.Elements;
+        Arrays.sort(elementNames, new Comparator<String>()
+        {
+            public int compare(String o1, String o2)
+            {
+                int diff = (o1.length() - o2.length());
+                return diff == 0 ? diff = o1.compareTo(o2) : diff;
+            }
+        });
+
         for (int i=0;i<numElem;i++)
             elementIndexMap.put(rawgroup.Elements[i], i);
 

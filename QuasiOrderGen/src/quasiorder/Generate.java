@@ -72,10 +72,17 @@ public class Generate
         }
 
         // output? TODO
+        ArrayList<BitSet> finalRelations = new ArrayList<BitSet>(relations.uniqRelations.size());
+        int curIndex = 0;
         for (Map.Entry<BitSet, ArrayList<BitSet>> e : relations.uniqRelations.entrySet())
         {
-            OutputFormatter.PrintRelation(e.getKey(), e.getValue(), inputGroup);
+            finalRelations.add(e.getKey());
+            OutputFormatter.PrintSubgroupFamilyList(inputGroup, e.getValue(), curIndex++);
         }
+
+        curIndex=0;
+        for(BitSet b : finalRelations)
+            OutputFormatter.PrintRelation(b, inputGroup, curIndex++);
 
         System.out.println("Found " + relations.uniqRelations.keySet().size() + " unique relations (out of maximum possible " + (1 << inputGroup.NumConjugacyClasses) + ");");
     }

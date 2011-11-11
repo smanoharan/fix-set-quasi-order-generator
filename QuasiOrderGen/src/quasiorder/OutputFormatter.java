@@ -9,12 +9,15 @@ public class OutputFormatter
     // possible ideas: (TODO)
     //  sort each relation by the number of set bits.
     //  then perhaps combine those which produce the same relation?
-    public static void PrintRelation(BitSet relation, List<BitSet> familyMasks, Group inputGroup)
+    public static void PrintRelation(BitSet relation, Group inputGroup, int index)
     {
+        System.out.println();
+        System.out.println(index+">>>");
+
         int NE = inputGroup.NumElements;
 
-        for(BitSet mask : familyMasks)
-            PrintSubgroupFamily(inputGroup, mask);
+        //for(BitSet mask : familyMasks)
+        //    PrintSubgroupFamily(inputGroup, mask);
 
         for(int i=0;i<NE;i++)
         {
@@ -25,6 +28,7 @@ public class OutputFormatter
 
             System.out.println();
         }
+        System.out.println();
     }
 
     public static void PrintSubgroupFamily(Group inputGroup, BitSet familyMask)
@@ -33,6 +37,14 @@ public class OutputFormatter
             if (familyMask.get(s)) // if s is part of the family, print it.
                 System.out.print("{"+inputGroup.SubgroupNames[s]+"} ");
 
+        System.out.println();
+    }
+
+    public static void PrintSubgroupFamilyList(Group inputGroup, List<BitSet> familyMasks, int index)
+    {
+        System.out.println();
+        System.out.println(index+">>>");
+        for(BitSet family : familyMasks) PrintSubgroupFamily(inputGroup, family);
         System.out.println();
     }
 }

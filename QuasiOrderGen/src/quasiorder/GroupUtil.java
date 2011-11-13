@@ -1,5 +1,6 @@
 package quasiorder;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 
 public class GroupUtil
@@ -47,6 +48,56 @@ public class GroupUtil
             b.and(elements[i]); // if elem was in all subsets, b would not have changed here.
             if (b.equals(subgroupFamilyMask)) return false;
         }
+        return true;
+    }
+
+    // TODO test
+    public static int[][] GenerateIntersections(Group input)
+    {
+        // TODO : Build Subgroup masks
+        BitSet[] subgroupMasks = new BitSet[input.NumSubgroups];
+        for(int i=0;i<input.NumSubgroups;i++)
+        {
+            // TODO: keep hashmap or DO THIS in the processing!
+            // In the subgroup array, as elements get identified, set them here as well.
+        }
+
+        int[][] res = new int[input.NumSubgroups][input.NumSubgroups];
+        for (int i=0;i<input.NumSubgroups;i++)
+            for (int j=i+1;j<input.NumSubgroups;j++)
+                res[i][j] = GenerateIntersection(subgroupMasks[i],subgroupMasks[j],subgroupMasks);
+        return res;
+    }
+
+    // TODO test
+    public static int GenerateIntersection(BitSet s1, BitSet s2, BitSet[] subgroups)
+    {
+        // find all elements that are in both sub1 and sub2.
+        BitSet s12 = (BitSet)s1.clone();
+        s12.and(s2);
+
+        for (int i=0;i<subgroups.length;i++)
+            if (s12.equals(subgroups[i]))
+                return i;
+
+        throw new RuntimeException("Error: Subgroup not found" + s1 + " ^ " + s2 + " not a subgroup");
+    }
+
+    // TODO test
+    public static boolean isIntersectionClosed(int[][] subgroupIntersections, BitSet subgroupFamilyMask)
+    {
+        ArrayList<Integer> subgroups = new ArrayList<Integer>();
+        for(int i=subgroupFamilyMask.nextSetBit(0); i>=0; i=subgroupFamilyMask.nextSetBit(i+1))
+            subgroups.add(i);
+
+        // for each pair of subgroups in subgroupFamilyMask
+        // check that their intersection is also in subgroupFamilyMask
+        int len = subgroups.size();
+        for(int i=0;i<len;i++)
+            for(int j=i+1;j<len;j++)
+                if (!subgroupFamilyMask.get(subgroupIntersections[subgroups.get(i)][subgroups.get(j)]))
+                    return false;
+
         return true;
     }
 

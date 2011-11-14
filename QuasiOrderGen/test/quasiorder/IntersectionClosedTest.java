@@ -125,7 +125,7 @@ public class IntersectionClosedTest extends QuasiOrderGenFixture
         // case 1  : ^ {IA, IB, IC, IAB} = {I, ...} : mask = 0.0001.1110 = 01e
         assertIntersectionIsNotClosed(0x01e);
 
-        // case 2  : ^ {IC, IAB, IAC, IBC} = {I, ...} : mask = 0.1011.1000 = 0b8
+        // case 2  : ^ {IC, IAB, IAC, IABC} = {I, ...} : mask = 0.1011.1000 = 0b8
         assertIntersectionIsNotClosed(0x0b8);
 
         // case 3  : ^ {IC, IAB, IBC, IABC} = {I, IC, IB, IAB, ...} : mask = 0.1101.1000 = 0d8
@@ -146,7 +146,7 @@ public class IntersectionClosedTest extends QuasiOrderGenFixture
     {
         BitSet familyBitSet = GroupUtil.MaskToBitSet(subgroupFamilyMask, NumSubgroups);
         String message = "family=" + subgroupFamilyMask;
-        assertEquals(message, expected, GroupUtil.isIntersectionClosed(subgroupIntersections, familyBitSet));
+        assertEquals(message, expected, GroupUtil.isIntersectionClosed(subgroupIntersections, GroupUtil.BitSetToList(familyBitSet), familyBitSet));
     }
 
 }

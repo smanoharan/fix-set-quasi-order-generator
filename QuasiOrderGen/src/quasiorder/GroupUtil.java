@@ -2,10 +2,10 @@ package quasiorder;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 
 public class GroupUtil
 {
-
     /**
      * Convert a mask representing the subgroup conjugacy classes to placed in this family,
      *  into a mask representing the subgroups in this family.
@@ -51,25 +51,59 @@ public class GroupUtil
         return true;
     }
 
+    public static List<Integer> BitSetToList(BitSet b)
+    {
+        ArrayList<Integer> list = new ArrayList<Integer>();
+        for(int i=b.nextSetBit(0); i>=0; i=b.nextSetBit(i+1))
+            list.add(i);
+        return list;
+    }
+
     /**
      * Check if the intersection of all possible pairs of subgroups in the family are present in the family.
+     *
      * @param subgroupIntersections The map of (a,b)->c where c is the intersection of a and b.
+     * @param subgroupFamily A list of items, representing each subgroup in the family.
      * @param subgroupFamilyMask The mask representing which subgroups are in this family
      * @return whether this family is intersection closed.
      */
-    public static boolean isIntersectionClosed(int[][] subgroupIntersections, BitSet subgroupFamilyMask)
+    public static boolean isIntersectionClosed(int[][] subgroupIntersections, List<Integer> subgroupFamily, BitSet subgroupFamilyMask)
     {
-        ArrayList<Integer> subgroups = new ArrayList<Integer>();
-        for(int i=subgroupFamilyMask.nextSetBit(0); i>=0; i=subgroupFamilyMask.nextSetBit(i+1))
-            subgroups.add(i);
+        return isOperationClosed(subgroupIntersections, subgroupFamily, subgroupFamilyMask);
+    }
 
-        // for each pair of subgroups in subgroupFamilyMask
-        // check that their intersection is also in subgroupFamilyMask
-        int len = subgroups.size();
-        for(int i=0;i<len;i++)
+    /**
+     * Check if Union is closed over all subgroups, only when the result is a subgroup.
+     * @param subgroupUnions A map of (a,b)->c where c is the union of a and b or is -1.
+     * @param subgroupFamily
+     * @param familyMask
+     * @return
+     */
+    public static boolean isUnionClosed(int[][] subgroupUnions, List<Integer> subgroupFamily, BitSet familyMask)
+    {
+        return isOperationClosed(subgroupUnions, subgroupFamily, familyMask);
+    }
+
+    /**
+     * Check if the operation is closed over this family of subgroups.
+     *
+     * @param operation The operation to check.
+     * @param subgroupFamily The family of subgroups, as a list.
+     * @param subgroupFamilyMask The family of subgroups as a bitset.
+     * @return Whether the operation is closed.
+     */
+    public static boolean isOperationClosed(int[][] operation, List<Integer> subgroupFamily, BitSet subgroupFamilyMask)
+    {
+        int len = subgroupFamily.size();
+        for (int i=0;i<len;i++)
+        {
             for(int j=i+1;j<len;j++)
-                if (!subgroupFamilyMask.get(subgroupIntersections[subgroups.get(i)][subgroups.get(j)]))
+            {
+                int result = operation[subgroupFamily.get(i)][subgroupFamily.get(j)];
+                if (result != -1 && !subgroupFamilyMask.get(result))
                     return false;
+            }
+        }
 
         return true;
     }
@@ -100,6 +134,7 @@ public class GroupUtil
 
     /**
      * Convert a mask (given as a long) into a BitSet. Only consider the N least significant bits, where N=length
+     *
      * @param mask The bitmask, as a long
      * @param length Number of bits of the long to consider
      * @return A BitSet representing the last N bits of the bitmask.

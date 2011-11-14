@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,6 +46,9 @@ public class Generate
                 inputReader = new InputStreamReader(System.in);
 
             inputGroup = Group.FromRawGroup(RawGroup.FromJSON(inputReader), sortElements);
+
+            // Check group is valid:
+            inputGroup.Validate(System.out);
         }
         catch(Exception e)
         {
@@ -64,7 +68,7 @@ public class Generate
         long numSubsets = (1 << inputGroup.NumConjugacyClasses); // 2^M
         RelationSet relations = new RelationSet();
 
-        // TODO Remove: Temp only.
+        int iterCount = 0;
         long maxIter = numSubsets / 4;
         long minimumClasses = (1 | (maxIter << 1));
         for (long s=0;s<maxIter;s++)
@@ -74,23 +78,32 @@ public class Generate
                     inputGroup.NumSubgroups, inputGroup.NumConjugacyClasses,
                     ccMask, inputGroup.ConjugacyClasses);
 
-            boolean isClosed = GroupUtil.isIntersectionClosed(inputGroup.SubgroupIntersections, familyMask);
+            List<Integer> family = GroupUtil.BitSetToList(familyMask);
+            boolean isIntersectionClosed = GroupUtil.isIntersectionClosed(inputGroup.SubgroupIntersections, family, familyMask);
+            boolean isUnionClosed = GroupUtil.isUnionClosed(inputGroup.SubgroupUnions, family, familyMask);
 
-            System.out.println(
-                    String.format("%1s \t\t %2$6s \t\t (%3$6s) \t\t " + familyMask,
-                            isClosed, Long.toBinaryString(ccMask), Long.toBinaryString(s)));
+            // Note: This is still NOT unique as Union of 3 maybe a subgroup while Union of any two pairs in that 3 are not subgroups!
 
-            relations.Add(RelationSet.BuildRelation(inputGroup, familyMask), familyMask);
+            if (isIntersectionClosed && isUnionClosed)
+            {
+                iterCount++;
+                relations.Add(RelationSet.BuildRelation(inputGroup, familyMask), familyMask);
+
+                System.out.println(
+                    String.format("%1s \t\t %2s \t\t (%3s) \t\t " + familyMask,
+                        isIntersectionClosed, Long.toBinaryString(ccMask), Long.toBinaryString(s)));
+            }
+
         }
 
 
-        if (numSubsets < 0)
-        for (long s=1;s<numSubsets;s++)
-        {
-            BitSet familyMask = GroupUtil.ToSubgroupFamilyBitSet(inputGroup.NumSubgroups, inputGroup.NumConjugacyClasses, s, inputGroup.ConjugacyClasses);
-            if (!GroupUtil.isIntersectionTrivial(inputGroup.ElementMasks, familyMask)) continue;
-            relations.Add(RelationSet.BuildRelation(inputGroup, familyMask), familyMask);
-        }
+        // TODO Remove: Old
+//        for (long s=1;s<numSubsets;s++)
+//        {
+//            BitSet familyMask = GroupUtil.ToSubgroupFamilyBitSet(inputGroup.NumSubgroups, inputGroup.NumConjugacyClasses, s, inputGroup.ConjugacyClasses);
+//            if (!GroupUtil.isIntersectionTrivial(inputGroup.ElementMasks, familyMask)) continue;
+//            relations.Add(RelationSet.BuildRelation(inputGroup, familyMask), familyMask);
+//        }
 
         // output? TODO
         ArrayList<BitSet> finalRelations = new ArrayList<BitSet>(relations.uniqRelations.size());
@@ -105,7 +118,8 @@ public class Generate
         for(BitSet b : finalRelations)
             OutputFormatter.PrintRelation(b, inputGroup, curIndex++);
 
-        System.out.println("Found " + relations.uniqRelations.keySet().size() + " unique relations (out of maximum possible " + (1 << inputGroup.NumConjugacyClasses) + ");");
+        System.out.println(String.format("Found %1d unique relations, from %2d investigated relations, [ out of %3d or %4d ]",
+                relations.uniqRelations.keySet().size(), iterCount, 1 << inputGroup.NumConjugacyClasses, 1 << inputGroup.NumSubgroups));
     }
 }
 

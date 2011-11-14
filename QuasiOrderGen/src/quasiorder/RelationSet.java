@@ -1,8 +1,6 @@
 package quasiorder;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Hashtable;
+import java.util.*;
 
 /**
  * Holds a set of relations.
@@ -82,4 +80,56 @@ public class RelationSet
         return i*rowLength + j;
     }
 
+
+    class FixedBitSet implements Comparable<FixedBitSet>
+    {
+        public final BitSet Relation;
+        public final int Cardinality;
+
+        public FixedBitSet(BitSet relation)
+        {
+            this.Cardinality = relation.cardinality();
+            this.Relation = relation;
+        }
+
+        public int compareTo(FixedBitSet o)
+        {
+            return o.Cardinality - this.Cardinality; // this is a DESCENDING order!
+        }
+    }
+
+    // TODO test : generate the entire relation on quasi-orders, by set inclusion.
+    public BitSet OverallQuasiOrder()
+    {
+        // start with the unique relations (ordered by number of set bits)
+        ArrayList<FixedBitSet> relations = new ArrayList<FixedBitSet>();
+        for(BitSet b : uniqRelations.keySet()) relations.add(new FixedBitSet(b));
+        Collections.sort(relations);
+
+        int numRels = relations.size();
+        BitSet result = new BitSet(numRels*numRels);
+
+        for(int i=0;i<numRels;i++)
+        {
+            result.set(ToSerialIndex(i,i,numRels));
+            FixedBitSet eI = relations.get(i);
+            for(int j=i+1;j<numRels;j++)
+            {
+                // determine the order: card[i] >= card[j] is guaranteed by sorting.
+                // if cardinality is equal then relations must be different (so a and b are not related).
+                FixedBitSet eJ = relations.get(j);
+                if (eI.Cardinality != eJ.Cardinality)
+                {
+                    // only possible relation is (j,i) which occurs when j <= i;
+                    BitSet jCopy = (BitSet)eJ.Relation.clone();
+                    jCopy.and(eI.Relation);
+                    if (jCopy.equals(eJ.Relation))
+                        result.set(ToSerialIndex(j,i,numRels));
+                }
+            }
+        }
+        // for each rel, for each rel, if intersect is equal then subset. // useToSerialIndex(i,j,NumRels)
+
+        return result;
+    }
 }

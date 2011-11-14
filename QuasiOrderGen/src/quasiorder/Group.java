@@ -1,5 +1,6 @@
 package quasiorder;
 
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Comparator;
@@ -16,10 +17,11 @@ class Group
     public final BitSet[] ConjugacyClasses;
     public final BitSet[] SubgroupMasks;
     public final int[][] SubgroupIntersections;
+    public final int[][] SubgroupUnions;
 
     public Group(
             int numElements, int numSubgroups, int numConjugacyClasses,
-            BitSet[] elementMasks, String[] elementNames, BitSet[] subgroupMasks, String[] subgroupNames, int[][] subgroupIntersections, BitSet[] conjugacyClasses)
+            BitSet[] elementMasks, String[] elementNames, BitSet[] subgroupMasks, String[] subgroupNames, int[][] subgroupIntersections, int[][] subgroupUnions, BitSet[] conjugacyClasses)
     {
         NumElements = numElements;
         NumSubgroups = numSubgroups;
@@ -29,6 +31,7 @@ class Group
         SubgroupMasks = subgroupMasks;
         SubgroupNames = subgroupNames;
         SubgroupIntersections = subgroupIntersections;
+        SubgroupUnions = subgroupUnions;
         ConjugacyClasses = conjugacyClasses;
     }
 
@@ -107,10 +110,20 @@ class Group
 
         // calculate the intersection of each pair of subgroups
         int[][] subgroupIntersections = GenerateIntersections(numSubgroups, subgroupMasks);
+        int[][] subgroupUnions = GenerateUnions(numSubgroups, subgroupMasks);
 
         return new Group(numElem, numSubgroups, numConjugacyClasses,
                 elementMasks, elementNames, subgroupMasks, subgroupNames,
-                subgroupIntersections, conjugacyClasses);
+                subgroupIntersections, subgroupUnions, conjugacyClasses);
+    }
+
+    // TODO test
+    public static int[][] GenerateUnions(int numSubgroups, BitSet[] subgroupMasks)
+    {
+        return GenerateCombinations(numSubgroups, subgroupMasks, new IBitSetOperation()
+        {
+            public void combine(BitSet b1, BitSet b2) { b1.or(b2); }
+        }, true);
     }
 
     /**
@@ -121,13 +134,34 @@ class Group
      */
     public static int[][] GenerateIntersections(int numSubgroups, BitSet[] subgroupMasks)
     {
+        return GenerateCombinations(numSubgroups, subgroupMasks, new IBitSetOperation()
+        {
+            public void combine(BitSet b1, BitSet b2) { b1.and(b2); }
+        }, false);
+    }
+
+    interface IBitSetOperation
+    {
+        void combine(BitSet b1, BitSet b2);
+    }
+
+    /**
+     * Determine the combinations of each pair of subgroups, using a bit-op (which modifies the first bitset).
+     * @param numSubgroups The number of subgroups in this group.
+     * @param subgroupMasks The membership masks of each subgroup (i.e. which elements are in each subgroup).
+     * @param bitOp A function which modifies the first operator by combining it with the second.
+     * @param ignoreMissing If a.combine(b) results in a bitset which is not a subgroup, this is considered "Missing". If true, return -1. Else throw exception.
+     * @return An array where if  entry(i,j) = k ; then the combination of the i'th and j'th subgroup is the k'th (all indices 0-based).
+     */
+    private static int[][] GenerateCombinations(int numSubgroups, BitSet[] subgroupMasks, IBitSetOperation bitOp, boolean ignoreMissing)
+    {
         int[][] res = new int[numSubgroups][numSubgroups];
         for (int i=0;i<numSubgroups;i++)
         {
             res[i][i] = i;
             for (int j=i+1;j<numSubgroups;j++)
             {
-                int intersection = GenerateIntersection(i, j, subgroupMasks);
+                int intersection = GenerateCombination(i, j, subgroupMasks, bitOp, ignoreMissing);
                 res[i][j] = intersection;
                 res[j][i] = intersection;
             }
@@ -136,22 +170,45 @@ class Group
     }
 
     /**
-     * Calculate the intersection of the two given subgroups.
+     * Calculate the combination of the two given subgroups, using the specified bit-op.
      * @param s1 The index of the first subgroup
      * @param s2 The index of the second
      * @param subgroups The subgroup membership masks
+     * @param bitOp A function which modifies the first operator by combining it with the second.
+     * @param ignoreMissing If a.combine(b) results in a bitset which is not a subgroup, this is considered "Missing". If true, return -1. Else throw exception.
      * @return the index of the subgroup which is equal to (s1 intersect s2).
      */
-    public static int GenerateIntersection(int s1, int s2, BitSet[] subgroups)
+    static int GenerateCombination(int s1, int s2, BitSet[] subgroups, IBitSetOperation bitOp, boolean ignoreMissing)
     {
         // find all elements that are in both sub1 and sub2.
         BitSet s12 = (BitSet)subgroups[s1].clone();
-        s12.and(subgroups[s2]);
+        bitOp.combine(s12, subgroups[s2]);
 
         for (int i=0;i<subgroups.length;i++)
             if (s12.equals(subgroups[i]))
                 return i;
 
-        throw new RuntimeException("Error: Subgroup not found" + subgroups[s1] + " ^ " + subgroups[s2] + " not a subgroup");
+        if (ignoreMissing) return -1;
+        else throw new RuntimeException("Error: Subgroup not found" + subgroups[s1] + " ^ " + subgroups[s2] + " not a subgroup");
+    }
+
+    public void Validate(PrintStream out) throws Exception
+    {
+        // check identity: must be an element of each subgroup.
+        out.println("Checking identity: \"" + ElementNames[0] + "\"");
+        int nextClearBit = ElementMasks[0].nextClearBit(0);
+        if (nextClearBit >= 0 && nextClearBit < NumSubgroups) throw new Exception("Trivial element is not a member of some subgroup(" + nextClearBit + "): " + ElementMasks[0]);
+
+        // check subgroups: 1st must be trivial, last must have all subgroups.
+        out.println("Checking subgroups: Count=" + NumSubgroups);
+
+        BitSet trivialSubgroup = SubgroupMasks[0];
+        int nextSetBit = trivialSubgroup.nextSetBit(1);
+        if (!trivialSubgroup.get(0) || (nextSetBit >= 0 && nextSetBit < NumElements))
+            throw new Exception("1st subgroup is not trivial");
+
+        BitSet fullGroup = SubgroupMasks[SubgroupMasks.length-1];
+        nextClearBit = fullGroup.nextClearBit(1);
+        if (nextClearBit >= 0 && nextClearBit < NumElements) throw new Exception("Last subgroup is not the whole group.");
     }
 }

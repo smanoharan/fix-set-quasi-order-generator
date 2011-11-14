@@ -130,11 +130,22 @@ public class InputParsingTest extends QuasiOrderGenFixture
                 new int[] {0, 1, 2, 3, 4, 5}
         };
 
+        int[][] subgroupUnions = new int[][]{
+                new int[] {0,  1,  2,  3,  4, 5},
+                new int[] {1,  1, -1, -1, -1, 5},
+                new int[] {2, -1,  2, -1, -1, 5},
+                new int[] {3, -1, -1,  3, -1, 5},
+                new int[] {4, -1, -1, -1,  4, 5},
+                new int[] {5,  5,  5,  5,  5, 5}
+        };
+
         for (int i=0;i<NumSubgroups;i++)
         {
             int[] actualSubgroupIntersection = actual.SubgroupIntersections[i];
+            int[] actualSubgroupUnion=  actual.SubgroupUnions[i];
             for (int j=0;j<actualSubgroupIntersection.length;j++)
             {
+                assertEquals("SubgroupUnions-"+i+"-"+j, subgroupUnions[i][j], actualSubgroupUnion[j]);
                 assertEquals("SubgroupIntersections-"+i+"-"+j, subgroupIntersections[i][j], actualSubgroupIntersection[j]);
             }
         }
@@ -178,12 +189,13 @@ public class InputParsingTest extends QuasiOrderGenFixture
 
     private static void AssertIntersectionIsCorrect(int i1, int i2, int expectedIndex, BitSet[] subgroups)
     {
-        int actualIndex = Group.GenerateIntersection(i1, i2, subgroups);
+        int actualIndex = Group.GenerateCombination(i1, i2, subgroups, new Group.IBitSetOperation() {
+            public void combine(BitSet b1, BitSet b2) { b1.and(b2);}
+        }, true);
         String msg = "Intersection of " + subgroups[i1] + " and " + subgroups[i2] +
                 ": expected " + subgroups[expectedIndex] + " actual:" + subgroups[actualIndex];
         assertEquals(msg, expectedIndex, actualIndex);
     }
-
 
     private static <T> void assertArraysAreEqual(T arrayName, T[] expected, T... actual)
     {

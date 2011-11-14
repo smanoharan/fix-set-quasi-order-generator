@@ -5,8 +5,6 @@ import org.junit.Test;
 
 import java.util.BitSet;
 
-import static org.junit.Assert.*;
-
 public class RelationSetTest extends QuasiOrderGenFixture
 {
     private static final int NumElem = 4;
@@ -32,10 +30,10 @@ public class RelationSetTest extends QuasiOrderGenFixture
         BitSet[] subgroupMasks = new BitSet[] {StringToBitSet("10"), StringToBitSet("11")};
         elementMasks = new BitSet[] {StringToBitSet("11"), StringToBitSet("01")};
         int[][] subgroupIntersections = new int[][]{ new int[] {0, 0}, new int[] {0, 1}};
-
+        int[][] subgroupUnions = new int[][]{ new int[]{0, 1}, new int[]{1, 1}};
         Group inputGroup =
                 new Group(numElements, numSubgroups, numConjugacyClasses,
-                elementMasks, elementNames, subgroupMasks, subgroupNames, subgroupIntersections, conjugacyClasses);
+                elementMasks, elementNames, subgroupMasks, subgroupNames, subgroupIntersections, subgroupUnions, conjugacyClasses);
 
         // subgroup family: { {()} } ; expected : all but 1<=(12)
         assertRelationEqual(inputGroup, "10", "1011");
@@ -63,9 +61,12 @@ public class RelationSetTest extends QuasiOrderGenFixture
         BitSet[] conjugacyClasses = new BitSet[] { StringToBitSet("100"), StringToBitSet("010"), StringToBitSet("001")};
         elementMasks = new BitSet[] { StringToBitSet("111"), StringToBitSet("001"), StringToBitSet("011"), StringToBitSet("001") };
         int[][] subgroupIntersections = new int[][]{ new int[] {0, 0, 0}, new int[] {0, 1, 1}, new int[] {0, 1, 2} };
+        int[][] subgroupUnions = new int[][]{new int[]{0, 1, 2}, new int[]{1, 1, 2}, new int[]{2, 2, 2}};
+
         Group inputGroup =
                 new Group(numElements, numSubgroups, numConjugacyClasses,
-                elementMasks, elementNames, subgroupMasks, subgroupNames, subgroupIntersections, conjugacyClasses);
+                elementMasks, elementNames, subgroupMasks, subgroupNames,
+                        subgroupIntersections, subgroupUnions, conjugacyClasses);
 
         // subgroup family: { {0} } ; expected : all but 0<={1,2,3} ;
         assertRelationEqual(inputGroup, "100", "1000"+"1111"+"1111"+"1111");
@@ -78,13 +79,6 @@ public class RelationSetTest extends QuasiOrderGenFixture
 
         // subgroup family: { {0}, {0,2} } : expected: (0) <-- (2) <-- (1,3)
         assertRelationEqual(inputGroup, "110", "1000"+"1111"+"1010"+"1111");
-    }
-
-    private static void assertRelationEqual(Group input, String familyMask, String expectedRel)
-    {
-        String messsage = "familyMask: " + familyMask + " expectedRel: " + expectedRel;
-        BitSet actual = RelationSet.BuildRelation(input, StringToBitSet(familyMask));
-        assertEquals(messsage, StringToBitSet(expectedRel), actual);
     }
 
     @Test

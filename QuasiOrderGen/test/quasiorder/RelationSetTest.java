@@ -29,11 +29,13 @@ public class RelationSetTest extends QuasiOrderGenFixture
         String[] elementNames = new String[] {"()", "(12)"};
         String[] subgroupNames = new String[] {"()", "() (12)"};
         BitSet[] conjugacyClasses = new BitSet[] {StringToBitSet("10"), StringToBitSet("01")};
+        BitSet[] subgroupMasks = new BitSet[] {StringToBitSet("10"), StringToBitSet("11")};
         elementMasks = new BitSet[] {StringToBitSet("11"), StringToBitSet("01")};
+        int[][] subgroupIntersections = new int[][]{ new int[] {0, 0}, new int[] {0, 1}};
 
         Group inputGroup =
                 new Group(numElements, numSubgroups, numConjugacyClasses,
-                elementMasks, elementNames, subgroupNames, conjugacyClasses);
+                elementMasks, elementNames, subgroupMasks, subgroupNames, subgroupIntersections, conjugacyClasses);
 
         // subgroup family: { {()} } ; expected : all but 1<=(12)
         assertRelationEqual(inputGroup, "10", "1011");
@@ -57,12 +59,13 @@ public class RelationSetTest extends QuasiOrderGenFixture
 
         String[] elementNames = new String[] {"0", "1", "2", "3"};
         String[] subgroupNames = new String[] {"T", "N", "G"}; // trivial, normal, (whole)group
+        BitSet[] subgroupMasks = new BitSet[] { StringToBitSet("1000"), StringToBitSet("1010"), StringToBitSet("1111")};
         BitSet[] conjugacyClasses = new BitSet[] { StringToBitSet("100"), StringToBitSet("010"), StringToBitSet("001")};
         elementMasks = new BitSet[] { StringToBitSet("111"), StringToBitSet("001"), StringToBitSet("011"), StringToBitSet("001") };
-
+        int[][] subgroupIntersections = new int[][]{ new int[] {0, 0, 0}, new int[] {0, 1, 1}, new int[] {0, 1, 2} };
         Group inputGroup =
                 new Group(numElements, numSubgroups, numConjugacyClasses,
-                elementMasks, elementNames, subgroupNames, conjugacyClasses);
+                elementMasks, elementNames, subgroupMasks, subgroupNames, subgroupIntersections, conjugacyClasses);
 
         // subgroup family: { {0} } ; expected : all but 0<={1,2,3} ;
         assertRelationEqual(inputGroup, "100", "1000"+"1111"+"1111"+"1111");

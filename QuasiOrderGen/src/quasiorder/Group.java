@@ -14,17 +14,21 @@ class Group
     public final String[] ElementNames;
     public final String[] SubgroupNames;
     public final BitSet[] ConjugacyClasses;
+    public final BitSet[] SubgroupMasks;
+    public final int[][] SubgroupIntersections;
 
     public Group(
             int numElements, int numSubgroups, int numConjugacyClasses,
-            BitSet[] elementMasks, String[] elementNames, String[] subgroupNames, BitSet[] conjugacyClasses)
+            BitSet[] elementMasks, String[] elementNames, BitSet[] subgroupMasks, String[] subgroupNames, int[][] subgroupIntersections, BitSet[] conjugacyClasses)
     {
         NumElements = numElements;
         NumSubgroups = numSubgroups;
         NumConjugacyClasses = numConjugacyClasses;
         ElementMasks = elementMasks;
         ElementNames = elementNames;
+        SubgroupMasks = subgroupMasks;
         SubgroupNames = subgroupNames;
+        SubgroupIntersections = subgroupIntersections;
         ConjugacyClasses = conjugacyClasses;
     }
 
@@ -63,9 +67,13 @@ class Group
 
         BitSet[] conjugacyClasses = new BitSet[numConjugacyClasses];
         BitSet[] elementMasks = new BitSet[numElem];
+        BitSet[] subgroupMasks = new BitSet[numSubgroups]; 
 
         for (int i=0;i<numElem;i++)
             elementMasks[i] = new BitSet(numSubgroups);
+
+        for (int i=0;i<numSubgroups;i++)
+            subgroupMasks[i] = new BitSet(numElem);
 
         int curSubgroupIndex = 0;
         String[] subgroupNames = new String[numSubgroups];
@@ -86,13 +94,64 @@ class Group
                 {
                     subgroupName.append(elem);
                     subgroupName.append(' ');
-                    elementMasks[elementIndexMap.get(elem)].set(curSubgroupIndex);
+
+                    // set the subgroup membership, and the element membership.
+                    int elemIndex = elementIndexMap.get(elem);
+                    elementMasks[elemIndex].set(curSubgroupIndex);
+                    subgroupMasks[curSubgroupIndex].set(elemIndex);
                 }
                 subgroupNames[curSubgroupIndex] = subgroupName.toString().trim();
                 curSubgroupIndex++;
             }
         }
 
-        return new Group(numElem, numSubgroups, numConjugacyClasses, elementMasks, elementNames, subgroupNames, conjugacyClasses);
+        // calculate the intersection of each pair of subgroups
+        int[][] subgroupIntersections = GenerateIntersections(numSubgroups, subgroupMasks);
+
+        return new Group(numElem, numSubgroups, numConjugacyClasses,
+                elementMasks, elementNames, subgroupMasks, subgroupNames,
+                subgroupIntersections, conjugacyClasses);
+    }
+
+    /**
+     * Determine the intersections of each pair of subgroups.
+     * @param numSubgroups The number of subgroups in this group.
+     * @param subgroupMasks The membership masks of each subgroup (i.e. which elements are in each subgroup).
+     * @return An array where if  entry(i,j) = k ; then the intersection of the i'th and j'th subgroup is the k'th (all indices 0-based).
+     */
+    public static int[][] GenerateIntersections(int numSubgroups, BitSet[] subgroupMasks)
+    {
+        int[][] res = new int[numSubgroups][numSubgroups];
+        for (int i=0;i<numSubgroups;i++)
+        {
+            res[i][i] = i;
+            for (int j=i+1;j<numSubgroups;j++)
+            {
+                int intersection = GenerateIntersection(i, j, subgroupMasks);
+                res[i][j] = intersection;
+                res[j][i] = intersection;
+            }
+        }
+        return res;
+    }
+
+    /**
+     * Calculate the intersection of the two given subgroups.
+     * @param s1 The index of the first subgroup
+     * @param s2 The index of the second
+     * @param subgroups The subgroup membership masks
+     * @return the index of the subgroup which is equal to (s1 intersect s2).
+     */
+    public static int GenerateIntersection(int s1, int s2, BitSet[] subgroups)
+    {
+        // find all elements that are in both sub1 and sub2.
+        BitSet s12 = (BitSet)subgroups[s1].clone();
+        s12.and(subgroups[s2]);
+
+        for (int i=0;i<subgroups.length;i++)
+            if (s12.equals(subgroups[i]))
+                return i;
+
+        throw new RuntimeException("Error: Subgroup not found" + subgroups[s1] + " ^ " + subgroups[s2] + " not a subgroup");
     }
 }

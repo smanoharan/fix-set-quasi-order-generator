@@ -64,6 +64,27 @@ public class Generate
         long numSubsets = (1 << inputGroup.NumConjugacyClasses); // 2^M
         RelationSet relations = new RelationSet();
 
+        // TODO Remove: Temp only.
+        long maxIter = numSubsets / 4;
+        long minimumClasses = (1 | (maxIter << 1));
+        for (long s=0;s<maxIter;s++)
+        {
+            long ccMask = (minimumClasses | (s << 1));
+            BitSet familyMask = GroupUtil.ToSubgroupFamilyBitSet(
+                    inputGroup.NumSubgroups, inputGroup.NumConjugacyClasses,
+                    ccMask, inputGroup.ConjugacyClasses);
+
+            boolean isClosed = GroupUtil.isIntersectionClosed(inputGroup.SubgroupIntersections, familyMask);
+
+            System.out.println(
+                    String.format("%1s \t\t %2$6s \t\t (%3$6s) \t\t " + familyMask,
+                            isClosed, Long.toBinaryString(ccMask), Long.toBinaryString(s)));
+
+            relations.Add(RelationSet.BuildRelation(inputGroup, familyMask), familyMask);
+        }
+
+
+        if (numSubsets < 0)
         for (long s=1;s<numSubsets;s++)
         {
             BitSet familyMask = GroupUtil.ToSubgroupFamilyBitSet(inputGroup.NumSubgroups, inputGroup.NumConjugacyClasses, s, inputGroup.ConjugacyClasses);

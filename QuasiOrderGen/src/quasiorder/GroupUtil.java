@@ -51,39 +51,12 @@ public class GroupUtil
         return true;
     }
 
-    // TODO test
-    public static int[][] GenerateIntersections(Group input)
-    {
-        // TODO : Build Subgroup masks
-        BitSet[] subgroupMasks = new BitSet[input.NumSubgroups];
-        for(int i=0;i<input.NumSubgroups;i++)
-        {
-            // TODO: keep hashmap or DO THIS in the processing!
-            // In the subgroup array, as elements get identified, set them here as well.
-        }
-
-        int[][] res = new int[input.NumSubgroups][input.NumSubgroups];
-        for (int i=0;i<input.NumSubgroups;i++)
-            for (int j=i+1;j<input.NumSubgroups;j++)
-                res[i][j] = GenerateIntersection(subgroupMasks[i],subgroupMasks[j],subgroupMasks);
-        return res;
-    }
-
-    // TODO test
-    public static int GenerateIntersection(BitSet s1, BitSet s2, BitSet[] subgroups)
-    {
-        // find all elements that are in both sub1 and sub2.
-        BitSet s12 = (BitSet)s1.clone();
-        s12.and(s2);
-
-        for (int i=0;i<subgroups.length;i++)
-            if (s12.equals(subgroups[i]))
-                return i;
-
-        throw new RuntimeException("Error: Subgroup not found" + s1 + " ^ " + s2 + " not a subgroup");
-    }
-
-    // TODO test
+    /**
+     * Check if the intersection of all possible pairs of subgroups in the family are present in the family.
+     * @param subgroupIntersections The map of (a,b)->c where c is the intersection of a and b.
+     * @param subgroupFamilyMask The mask representing which subgroups are in this family
+     * @return whether this family is intersection closed.
+     */
     public static boolean isIntersectionClosed(int[][] subgroupIntersections, BitSet subgroupFamilyMask)
     {
         ArrayList<Integer> subgroups = new ArrayList<Integer>();

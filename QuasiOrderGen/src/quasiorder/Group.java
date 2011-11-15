@@ -117,7 +117,14 @@ class Group
                 subgroupIntersections, subgroupUnions, conjugacyClasses);
     }
 
-    // TODO test
+    /**
+     * Generate the pairwise unions of each pair of subgroups,
+     *  and then generate a map from SxS->S, where S is the index of the subgroup.
+     *
+     * @param numSubgroups Number of subgroups in this group.
+     * @param subgroupMasks The membership masks of these subgroups.
+     * @return The map (a,b)=>c, where c = indexOf(sub[a] U sub[b]) or -1 if sub[a] U sub[b] is not a subgroup
+     */
     public static int[][] GenerateUnions(int numSubgroups, BitSet[] subgroupMasks)
     {
         return GenerateCombinations(numSubgroups, subgroupMasks, new IBitSetOperation()

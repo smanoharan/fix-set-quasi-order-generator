@@ -3,10 +3,8 @@ package quasiorder;
 import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Generate all possible (faithful) Quasi-Orders on a given group
@@ -96,30 +94,34 @@ public class Generate
 
         }
 
-
-        // TODO Remove: Old
-//        for (long s=1;s<numSubsets;s++)
-//        {
-//            BitSet familyMask = GroupUtil.ToSubgroupFamilyBitSet(inputGroup.NumSubgroups, inputGroup.NumConjugacyClasses, s, inputGroup.ConjugacyClasses);
-//            if (!GroupUtil.isIntersectionTrivial(inputGroup.ElementMasks, familyMask)) continue;
-//            relations.Add(RelationSet.BuildRelation(inputGroup, familyMask), familyMask);
-//        }
-
         // output? TODO
-        ArrayList<BitSet> finalRelations = new ArrayList<BitSet>(relations.uniqRelations.size());
+        relations.SortRelations();
+
+        // print families:
         int curIndex = 0;
-        for (Map.Entry<BitSet, ArrayList<BitSet>> e : relations.uniqRelations.entrySet())
-        {
-            finalRelations.add(e.getKey());
-            OutputFormatter.PrintSubgroupFamilyList(inputGroup, e.getValue(), curIndex++);
-        }
+        for (FixedBitSet b : relations.Relations)
+            OutputFormatter.PrintSubgroupFamilyList(inputGroup, relations.RelationsFamilyMap.get(b.Relation), curIndex++);
 
+        // print quasi-orders:
         curIndex=0;
-        for(BitSet b : finalRelations)
-            OutputFormatter.PrintRelation(b, inputGroup, curIndex++);
+        for(FixedBitSet b : relations.Relations)
+            OutputFormatter.PrintRelation(b.Relation, inputGroup.ElementNames, inputGroup.NumElements, curIndex++);
 
-        System.out.println(String.format("Found %1d unique relations, from %2d investigated relations, [ out of %3d or %4d ]",
-                relations.uniqRelations.keySet().size(), iterCount, 1 << inputGroup.NumConjugacyClasses, 1 << inputGroup.NumSubgroups));
+        // print the lattice of all fix-set quasi-orders:
+        int numRels = relations.Relations.size();
+        String[] relNames = new String[numRels];
+        for (int i=0;i<numRels;i++)
+            relNames[i] = Integer.toString(i);
+
+        System.out.println("\n\n" + "Lattice of all fix set quasi orders: ");
+        BitSet fixSetQOLattice = relations.GenerateOverallQuasiOrder();
+        OutputFormatter.PrintRelation(fixSetQOLattice, relNames, numRels, 0);
+        System.out.println(OutputFormatter.PrintRelationEdges(fixSetQOLattice, relNames, numRels));
+
+        System.out.println(String.format("\n\nFound %d unique relations, from %d investigated relations, [ out of 2^%d or 2^%d ]",
+                relations.RelationsFamilyMap.keySet().size(), iterCount, inputGroup.NumConjugacyClasses, inputGroup.NumSubgroups));
+
+
     }
 }
 

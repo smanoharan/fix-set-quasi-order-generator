@@ -9,11 +9,13 @@ import java.util.*;
  */
 public class RelationSet
 {
-    public final Hashtable<BitSet, ArrayList<BitSet>> uniqRelations;
+    public final Hashtable<BitSet, ArrayList<BitSet>> RelationsFamilyMap;
+    public final ArrayList<FixedBitSet> Relations;
 
     public RelationSet()
     {
-        this.uniqRelations = new Hashtable<BitSet, ArrayList<BitSet>>();
+        this.RelationsFamilyMap = new Hashtable<BitSet, ArrayList<BitSet>>();
+        this.Relations = new ArrayList<FixedBitSet>();
     }
 
     /**
@@ -26,15 +28,16 @@ public class RelationSet
      */
     public void Add(BitSet rel, BitSet familyMask)
     {
-        if (uniqRelations.containsKey(rel))
+        if (RelationsFamilyMap.containsKey(rel))
         {
-            uniqRelations.get(rel).add(familyMask);
+            RelationsFamilyMap.get(rel).add(familyMask);
         }
         else
         {
             ArrayList<BitSet> families = new ArrayList<BitSet>();
             families.add(familyMask);
-            uniqRelations.put(rel, families);
+            RelationsFamilyMap.put(rel, families);
+            Relations.add(new FixedBitSet(rel));
         }
     }
 
@@ -80,44 +83,34 @@ public class RelationSet
         return i*rowLength + j;
     }
 
-
-    class FixedBitSet implements Comparable<FixedBitSet>
+    /**
+     * Sort the relations in this set by cardinality of the bit-sets
+     */
+    public void SortRelations()
     {
-        public final BitSet Relation;
-        public final int Cardinality;
-
-        public FixedBitSet(BitSet relation)
-        {
-            this.Cardinality = relation.cardinality();
-            this.Relation = relation;
-        }
-
-        public int compareTo(FixedBitSet o)
-        {
-            return o.Cardinality - this.Cardinality; // this is a DESCENDING order!
-        }
+        Collections.sort(Relations);
     }
 
-    // TODO test : generate the entire relation on quasi-orders, by set inclusion.
-    public BitSet OverallQuasiOrder()
+
+    /**
+     * Generates the lattice of fix-set quasi-orders.
+     * @return The bitset representing this lattice/relation.
+     */
+    public BitSet GenerateOverallQuasiOrder()
     {
         // start with the unique relations (ordered by number of set bits)
-        ArrayList<FixedBitSet> relations = new ArrayList<FixedBitSet>();
-        for(BitSet b : uniqRelations.keySet()) relations.add(new FixedBitSet(b));
-        Collections.sort(relations);
-
-        int numRels = relations.size();
+        int numRels = Relations.size();
         BitSet result = new BitSet(numRels*numRels);
 
         for(int i=0;i<numRels;i++)
         {
             result.set(ToSerialIndex(i,i,numRels));
-            FixedBitSet eI = relations.get(i);
+            FixedBitSet eI = Relations.get(i);
             for(int j=i+1;j<numRels;j++)
             {
                 // determine the order: card[i] >= card[j] is guaranteed by sorting.
                 // if cardinality is equal then relations must be different (so a and b are not related).
-                FixedBitSet eJ = relations.get(j);
+                FixedBitSet eJ = Relations.get(j);
                 if (eI.Cardinality != eJ.Cardinality)
                 {
                     // only possible relation is (j,i) which occurs when j <= i;
@@ -128,7 +121,6 @@ public class RelationSet
                 }
             }
         }
-        // for each rel, for each rel, if intersect is equal then subset. // useToSerialIndex(i,j,NumRels)
 
         return result;
     }

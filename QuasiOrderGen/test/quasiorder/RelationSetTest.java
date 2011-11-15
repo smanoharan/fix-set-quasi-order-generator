@@ -91,8 +91,8 @@ public class RelationSetTest extends QuasiOrderGenFixture
         relations.Add(first, familyFirst);
 
         // test only the first relation exists
-        assertListEqual(relations.uniqRelations.keySet(), first);
-        assertListEqual(relations.uniqRelations.get(first), familyFirst);
+        assertListEqual(relations.RelationsFamilyMap.keySet(), first);
+        assertListEqual(relations.RelationsFamilyMap.get(first), familyFirst);
 
         // add the same entry again, with a different family
         BitSet second = (BitSet)first.clone();
@@ -100,10 +100,10 @@ public class RelationSetTest extends QuasiOrderGenFixture
         relations.Add(second, familySecond);
 
         // test that the first relation exists, but with two families:
-        assertListEqual(relations.uniqRelations.keySet(), first);
-        assertListEqual(relations.uniqRelations.keySet(), second);
-        assertListEqual(relations.uniqRelations.get(first), familyFirst, familySecond);
-        assertListEqual(relations.uniqRelations.get(second), familyFirst, familySecond);
+        assertListEqual(relations.RelationsFamilyMap.keySet(), first);
+        assertListEqual(relations.RelationsFamilyMap.keySet(), second);
+        assertListEqual(relations.RelationsFamilyMap.get(first), familyFirst, familySecond);
+        assertListEqual(relations.RelationsFamilyMap.get(second), familyFirst, familySecond);
 
         // add a different entry
         BitSet third = new BitSet(NumElem*NumElem);
@@ -112,9 +112,9 @@ public class RelationSetTest extends QuasiOrderGenFixture
         relations.Add(third, familyThird);
 
         // test that there are now two relations with appropriate families:
-        assertListEqual(relations.uniqRelations.keySet(), first, third);
-        assertListEqual(relations.uniqRelations.get(first), familyFirst, familySecond);
-        assertListEqual(relations.uniqRelations.get(second), familyFirst, familySecond);
-        assertListEqual(relations.uniqRelations.get(third), familyThird);
+        assertListEqual(relations.RelationsFamilyMap.keySet(), first, third);
+        assertListEqual(relations.RelationsFamilyMap.get(first), familyFirst, familySecond);
+        assertListEqual(relations.RelationsFamilyMap.get(second), familyFirst, familySecond);
+        assertListEqual(relations.RelationsFamilyMap.get(third), familyThird);
     }
 }

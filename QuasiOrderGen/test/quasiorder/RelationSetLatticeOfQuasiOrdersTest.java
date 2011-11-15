@@ -21,8 +21,8 @@ public class RelationSetLatticeOfQuasiOrdersTest extends QuasiOrderGenFixture
         relations.Add(StringToBitSet("1011"), StringToBitSet("10"));
         relations.Add(StringToBitSet("1111"), StringToBitSet("01"));
         relations.Add(StringToBitSet("1011"), StringToBitSet("11"));
-
-        assertEquals(StringToBitSet("1011"), relations.OverallQuasiOrder());
+        relations.SortRelations();
+        assertEquals(StringToBitSet("1011"), relations.GenerateOverallQuasiOrder());
     }
 
     @Test
@@ -39,9 +39,10 @@ public class RelationSetLatticeOfQuasiOrdersTest extends QuasiOrderGenFixture
         relations.Add(StringToBitSet("100"+"000"+"110"+"000"+"101"+"000"+"100"+"100"+"100"+"011"+"100"+"011"), StringToBitSet("11"));
         relations.Add(StringToBitSet("100"+"000"+"111"+"111"+"111"+"111"+"111"+"111"+"111"+"111"+"111"+"111"), StringToBitSet("00"));
         relations.Add(StringToBitSet("100"+"000"+"111"+"111"+"111"+"111"+"111"+"111"+"100"+"011"+"100"+"011"), StringToBitSet("01"));
+        relations.SortRelations();
 
         // expected overall relation:
-        assertEquals(StringToBitSet("1000"+"1100"+"1010"+"1111"), relations.OverallQuasiOrder());
+        assertEquals(StringToBitSet("1000"+"1100"+"1010"+"1111"), relations.GenerateOverallQuasiOrder());
     }
 
     @Test
@@ -53,9 +54,10 @@ public class RelationSetLatticeOfQuasiOrdersTest extends QuasiOrderGenFixture
         relations.Add(StringToBitSet("100"+"000"+"111"+"111"+"111"+"111"+"100"+"100"+"100"+"010"+"100"+"001"), StringToBitSet("10"));
         relations.Add(StringToBitSet("100"+"000"+"111"+"000"+"111"+"000"+"111"+"111"+"111"+"111"+"111"+"111"), StringToBitSet("01"));
         relations.Add(StringToBitSet("100"+"000"+"111"+"111"+"111"+"111"+"111"+"111"+"111"+"111"+"111"+"111"), StringToBitSet("00"));
+        relations.SortRelations();
 
         // expected overall relation:
-        assertEquals(StringToBitSet("1000"+"1100"+"1010"+"1111"), relations.OverallQuasiOrder());
+        assertEquals(StringToBitSet("1000"+"1100"+"1010"+"1111"), relations.GenerateOverallQuasiOrder());
     }
 
     @Test
@@ -67,8 +69,9 @@ public class RelationSetLatticeOfQuasiOrdersTest extends QuasiOrderGenFixture
         relations.Add(StringToBitSet("1111"), StringToBitSet("000"));
         relations.Add(StringToBitSet("1101"), StringToBitSet("010"));
         relations.Add(StringToBitSet("1000"), StringToBitSet("100"));
+        relations.SortRelations();
 
         // expected overall relation:
-        assertEquals(StringToBitSet("10000"+"11000"+"10100"+"11110"+"11111"), relations.OverallQuasiOrder());
+        assertEquals(StringToBitSet("10000"+"11000"+"10100"+"11110"+"11111"), relations.GenerateOverallQuasiOrder());
     }
 }

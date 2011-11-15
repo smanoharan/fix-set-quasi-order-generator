@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Arrays;
-import java.util.Comparator;
 
 public class RawGroup
 {
@@ -24,10 +22,13 @@ public class RawGroup
         ConjugacyClasses = conjugacyClasses;
     }
 
-    public static RawGroup FromJSON(Reader jsonOutput) throws IOException
+    public static RawGroup FromJSON(Reader jsonReader) throws IOException
     {
         // parse JSON (which has arrays of arrays of arrays of strings)
-        String[][][][] groupProp = ( new Gson()).fromJson(jsonOutput, String[][][][].class);
+        String[][][][] groupProp = ( new Gson()).fromJson(jsonReader, String[][][][].class);
+
+        // try closing the input-stream. If this fails, nothing we can do.
+        try { jsonReader.close(); } catch (Exception e) {}
 
         // places to look:
         String[] elements = groupProp[0][0][0];

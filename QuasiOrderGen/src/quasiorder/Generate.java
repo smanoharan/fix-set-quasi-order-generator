@@ -1,8 +1,6 @@
 package quasiorder;
 
-import java.io.FileReader;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.util.BitSet;
 import java.util.List;
 
@@ -16,9 +14,10 @@ public class Generate
 {
     public static void main(String[] args)
     {
-       
-        Reader inputReader = null;
         Group inputGroup = null;
+        String title = "group";
+        PrintWriter rawOutput = null;
+        PrintWriter latOutput = null;
 
         // input:
         try
@@ -26,9 +25,11 @@ public class Generate
             if (args.length > 2)
             {
                 System.err.println("Error. Incorrect number of arguments. Expected: 0-2.");
-                System.err.println("Usage: java quasiorder.Generate [-s] [inputfile]");
-                System.err.println("If inputfile is omitted, input is assumed to be from stdin.");
-                System.err.println("-s means automatically sort the elements");
+                System.err.println("Usage: java quasiorder.Generate title [-s]");
+                System.err.println("\t-s means automatically sort the elements");
+                System.err.println("\tThe input file is assumed to be \"<title>.in\".");
+                System.err.println("\tThe raw output will be placed in \"<title>.out\".");
+                System.err.println("\tThe lattice of all fix-set quasi-orders will be placed in \"<title>.lat\".");
                 return;
             }
 
@@ -36,30 +37,21 @@ public class Generate
             for (String arg : args)
             {
                 if (arg.equals("-s")) sortElements = true;
-                else inputReader = new FileReader(args[0]);
+                else title = arg;
             }
 
-            // if no file is specified, read from std-in.
-            if (inputReader==null)
-                inputReader = new InputStreamReader(System.in);
+            // read and validate input:
+            inputGroup = Group.FromRawGroup(RawGroup.FromJSON(new FileReader(title + ".in")), sortElements);
+            inputGroup.Validate(System.err);
 
-            inputGroup = Group.FromRawGroup(RawGroup.FromJSON(inputReader), sortElements);
-
-            // Check group is valid:
-            inputGroup.Validate(System.out);
+            rawOutput = new PrintWriter(title + ".out");
+            latOutput = new PrintWriter(title + ".lat");
         }
         catch(Exception e)
         {
             System.err.println("An error occurred:\n\n"+e.getMessage());
             e.printStackTrace();
             return;
-        }
-        finally
-        {
-            if (inputReader != null)
-            {
-                try { inputReader.close(); } catch (Exception e) {} // Nothing we can do here.
-            }
         }
 
         // process:
@@ -81,14 +73,12 @@ public class Generate
             boolean isUnionClosed = GroupUtil.isUnionClosed(inputGroup.SubgroupUnions, family, familyMask);
 
             // Note: This is still NOT unique as Union of 3 maybe a subgroup while Union of any two pairs in that 3 are not subgroups!
-
             if (isIntersectionClosed && isUnionClosed)
             {
                 iterCount++;
                 relations.Add(RelationSet.BuildRelation(inputGroup, familyMask), familyMask);
 
-                System.out.println(
-                    String.format("%1s \t\t %2s \t\t (%3s) \t\t " + familyMask,
+                rawOutput.println(String.format("%1s \t\t %2s \t\t (%3s) \t\t " + familyMask,
                         isIntersectionClosed, Long.toBinaryString(ccMask), Long.toBinaryString(s)));
             }
 
@@ -100,12 +90,12 @@ public class Generate
         // print families:
         int curIndex = 0;
         for (FixedBitSet b : relations.Relations)
-            OutputFormatter.PrintSubgroupFamilyList(inputGroup, relations.RelationsFamilyMap.get(b.Relation), curIndex++);
+            OutputFormatter.PrintSubgroupFamilyList(inputGroup, relations.RelationsFamilyMap.get(b.Relation), curIndex++, rawOutput);
 
         // print quasi-orders:
         curIndex=0;
         for(FixedBitSet b : relations.Relations)
-            OutputFormatter.PrintRelation(b.Relation, inputGroup.ElementNames, inputGroup.NumElements, curIndex++);
+            OutputFormatter.PrintRelation(b.Relation, inputGroup.ElementNames, inputGroup.NumElements, curIndex++, rawOutput);
 
         // print the lattice of all fix-set quasi-orders:
         int numRels = relations.Relations.size();
@@ -113,15 +103,19 @@ public class Generate
         for (int i=0;i<numRels;i++)
             relNames[i] = Integer.toString(i);
 
-        System.out.println("\n\n" + "Lattice of all fix set quasi orders: ");
+        rawOutput.println("\n\n" + "Lattice of all fix set quasi orders: ");
         BitSet fixSetQOLattice = relations.GenerateOverallQuasiOrder();
-        OutputFormatter.PrintRelation(fixSetQOLattice, relNames, numRels, 0);
-        System.out.println(OutputFormatter.PrintRelationEdges(fixSetQOLattice, relNames, numRels));
+        OutputFormatter.PrintRelation(fixSetQOLattice, relNames, numRels, 0, rawOutput);
+        latOutput.println(OutputFormatter.PrintRelationEdges(fixSetQOLattice, relNames, numRels));
 
-        System.out.println(String.format("\n\nFound %d unique relations, from %d investigated relations, [ out of 2^%d or 2^%d ]",
-                relations.RelationsFamilyMap.keySet().size(), iterCount, inputGroup.NumConjugacyClasses, inputGroup.NumSubgroups));
+        String summaryString = String.format("Found %d unique relations, from %d investigated relations, [ out of 2^%d or 2^%d ]",
+                relations.RelationsFamilyMap.keySet().size(), iterCount, inputGroup.NumConjugacyClasses, inputGroup.NumSubgroups);
 
+        rawOutput.println("\n\n"+summaryString);
+        System.err.println(summaryString);
 
+        rawOutput.flush(); rawOutput.close();
+        latOutput.flush(); latOutput.close();
     }
 }
 

@@ -9,7 +9,7 @@ public class RelationOutputTest extends QuasiOrderGenFixture
 {
     private int NumElem = 4;
     private String[] ELEMENT_NAMES = new String[]{"()", "(1,2)"};
-    private static final String OUTPUT_HEADER = "strict digraph {\n";
+    private static final String OUTPUT_HEADER = "strict digraph {\nedge [ arrowhead=\"none\"; arrowtail=\"none\"]\n";
     private static final String OUTPUT_FOOTER = "\n}\n";
 
     @Before

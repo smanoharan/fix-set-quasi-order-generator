@@ -17,7 +17,7 @@ public class OutputFormatter
     public static String PrintRelationEdges(BitSet relation, String[] elementNames, int numElem)
     {
         StringBuilder res = new StringBuilder();
-        res.append("strict digraph {\n");
+        res.append("strict digraph {\nedge [ arrowhead=\"none\"; arrowtail=\"none\"]\n");
 
         for(int i=relation.nextSetBit(0); i>=0; i=relation.nextSetBit(i + 1))
         {
@@ -30,10 +30,6 @@ public class OutputFormatter
         return res.toString();
     }
 
-
-    // possible ideas: (TODO)
-    //  sort each relation by the number of set bits.
-    //  then perhaps combine those which produce the same relation?
     public static void PrintRelation(BitSet relation, String[] elementNames, int NE, int index, PrintWriter wOut)
     {
         wOut.println("\n"+index+">>>");

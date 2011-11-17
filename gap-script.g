@@ -1,3 +1,5 @@
+homepath:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/data/g-";
+
 ExportGroup:= function(f,g)
 
 	local csg, first, es, cr, c;
@@ -25,5 +27,23 @@ ExportGroup:= function(f,g)
 	AppendTo(f,"\n\t]\n]\n");
 end;
 
-ExportGroup("E:/temp.txt",SymmetricGroup(4));
 
+ExportAllGroups := function(path, lb, ub)
+	local logPath, i, counter, g, gid;	
+
+	logPath:=Concatenation(path, "names.txt");
+	LogTo(logPath);
+	for i in [ lb .. ub ] do SmallGroupsInformation(i); od;
+	LogTo();
+
+	for i in [ lb .. ub ]
+	do
+        	counter:=1;
+        	for g in AllSmallGroups(i)
+        	do
+                	gid:=Concatenation(String(i), "-", String(counter));
+                	ExportGroup(Concatenation(path, gid, ".in"), g);
+                	counter:=counter+1;
+        	od;
+	od;
+end;

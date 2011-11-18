@@ -155,6 +155,7 @@ public class InputParsingTest extends QuasiOrderGenFixture
                 StringToBitSet("011100"),   // type:(ab)
                 StringToBitSet("000010"),   // type: (abc)
                 StringToBitSet("000001"));  // type: G
+        assertEquals("IsSubgroupNormal", StringToBitSet("100011"), actual.IsSubgroupNormal);
     }
 
     @Test

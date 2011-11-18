@@ -14,10 +14,12 @@ public class OutputFormatter
      * @param numElem The number of elements
      * @return A string representing the relation in DOT form.
      */
-    public static String PrintRelationEdges(BitSet relation, String[] elementNames, int numElem)
+    public static String PrintRelationEdges(BitSet relation, String[] elementNames, String[] colors, int numElem)
     {
         StringBuilder res = new StringBuilder();
         res.append("strict digraph {\nedge [ arrowhead=\"none\"; arrowtail=\"none\"]\n");
+        for (int i=0;i<numElem;i++)
+            res.append(String.format("%s [fillcolor=%s]\n",elementNames[i], colors[i]));
 
         for(int i=relation.nextSetBit(0); i>=0; i=relation.nextSetBit(i + 1))
         {

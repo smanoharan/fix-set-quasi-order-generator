@@ -8,9 +8,11 @@ class FixedBitSet implements Comparable<FixedBitSet>
 {
     public final BitSet Relation;
     public final int Cardinality;
+    public final String Colour;
 
-    public FixedBitSet(BitSet relation)
+    public FixedBitSet(BitSet relation, String colour)
     {
+        Colour = colour;
         this.Cardinality = relation.cardinality();
         this.Relation = relation;
     }

@@ -14,20 +14,28 @@ import java.util.List;
  */
 public class Generate
 {
+    private static final int REL_MAX_SIZE = 500;
+    private static int iterCount;
+    private static final String[] COLOURS = new String[]{"yellow", "green", "red", "orange"};
+
     public static void main(String[] args)
     {
         Group inputGroup = null;
-        String title = "group";
+        String title = null;
 
         try
         {
-            // input:
-            if (args.length > 3)
+            // parse command line arguments:
+            if (args.length < 1 || args.length > 7)
             {
-                System.err.println("Error. Incorrect number of arguments. Expected: 0-3.");
-                System.err.println("Usage: java quasiorder.Generate title [-s] [-o]");
+                System.err.println("Error. Incorrect number of arguments. Expected: 1-7.");
+                System.err.println("Usage: java quasiorder.Generate title [-s] [-o] [-t] [-f] [-n]");
                 System.err.println("\t-s means automatically sort the elements");
                 System.err.println("\t-o means include graph files for all quasi-orders (in the file \"<title>.q<N>.lat\"");
+                System.err.println("\t-t means do not output lattices for relations larger than " + REL_MAX_SIZE + " fix-orders.");
+                System.err.println("\t-f means only include faithful fix-orders.");
+                System.err.println("\t-u means only include normal fix-orders.");
+                System.err.println();
                 System.err.println("\tThe title is the name of the group. <prefix>.in will be shortened to <prefix>");
                 System.err.println("\tThe input file is assumed to be \"<title>.in\".");
                 System.err.println("\tThe raw output will be placed in \"<title>.out\".");
@@ -37,12 +45,20 @@ public class Generate
 
             boolean sortElements = false;
             boolean outputAllGraphs = false;
+            boolean thresholdRelationsBySize = false;
+            boolean faithfulOnly = false;
+            boolean normalOnly = false;
             for (String arg : args)
             {
                 if (arg.equals("-s")) sortElements = true;
                 else if (arg.equals("-o")) outputAllGraphs = true;
+                else if (arg.equals("-t")) thresholdRelationsBySize = true;
+                else if (arg.equals("-f")) faithfulOnly = true;
+                else if (arg.equals("-n")) normalOnly = true;
                 else title = (arg.endsWith(".in")) ? arg.substring(0, arg.length() - 3) : arg;
             }
+
+            if (title == null) throw new RuntimeException("Title not included!");
 
             // read and validate input:
             inputGroup = Group.FromRawGroup(RawGroup.FromJSON(new FileReader(title + ".in")), sortElements);
@@ -52,29 +68,21 @@ public class Generate
             long numSubsets = (1 << inputGroup.NumConjugacyClasses); // 2^M
             RelationSet relations = new RelationSet();
 
-            int iterCount = 0;
-            long maxIter = numSubsets / 4;
-            long minimumClasses = (1 | (maxIter << 1));
-            for (long s=0;s<maxIter;s++)
+            iterCount = 0;
+            long maxIter = numSubsets / 2;
+            if (maxIter==0)
             {
-                long ccMask = (minimumClasses | (s << 1));
-                BitSet familyMask = GroupUtil.ToSubgroupFamilyBitSet(
-                        inputGroup.NumSubgroups, inputGroup.NumConjugacyClasses,
-                        ccMask, inputGroup.ConjugacyClasses);
-
-                List<Integer> family = GroupUtil.BitSetToList(familyMask);
-                boolean isIntersectionClosed = GroupUtil.isIntersectionClosed(inputGroup.SubgroupIntersections, family, familyMask);
-                boolean isUnionClosed = GroupUtil.isUnionClosed(inputGroup.SubgroupUnions, family, familyMask);
-
-                // Note: This is still NOT unique as Union of 3 maybe a subgroup while Union of any two pairs in that 3 are not subgroups!
-                if (isIntersectionClosed && isUnionClosed)
-                {
-                    iterCount++;
-                    relations.Add(RelationSet.BuildRelation(inputGroup, familyMask), familyMask);
-                }
+                // numSubsets is 2 (i.e. Number of conjugacy classes of subgroups is 1) ;
+                ProcessConjugacyFamily(inputGroup, relations, 1, normalOnly);
+            }
+            else
+            {
+                int incr = faithfulOnly ? 2 : 1;
+                for (long s=faithfulOnly?1:0; s<maxIter; s+=incr)
+                    ProcessConjugacyFamily(inputGroup, relations, (maxIter | s), normalOnly);
             }
 
-            PrintAllOutput(inputGroup, relations, title, iterCount, outputAllGraphs);
+            PrintAllOutput(inputGroup, relations, title, outputAllGraphs, thresholdRelationsBySize);
         }
         catch(Exception e)
         {
@@ -83,20 +91,58 @@ public class Generate
         }
     }
 
-    private static void PrintAllOutput(Group inputGroup, RelationSet relations, String title, int iterCount, boolean allGraphs) throws IOException
+    // TODO test - somehow?
+    private static void ProcessConjugacyFamily(Group inputGroup, RelationSet relations, long ccMask, boolean normalOnly)
+    {
+        BitSet familyMask = GroupUtil.ToSubgroupFamilyBitSet(inputGroup.NumSubgroups, inputGroup.NumConjugacyClasses,
+                ccMask, inputGroup.ConjugacyClasses);
+
+        List<Integer> family = GroupUtil.BitSetToList(familyMask);
+        boolean isIntersectionClosed = GroupUtil.isIntersectionClosed(inputGroup.SubgroupIntersections, family, familyMask);
+        boolean isUnionClosed = GroupUtil.isUnionClosed(inputGroup.SubgroupUnions, family, familyMask);
+
+        // Note: This is still NOT unique as Union of 3 maybe a subgroup while Union of any two pairs in that 3 are not subgroups!
+        if (isIntersectionClosed && isUnionClosed)
+        {
+            iterCount++;
+            BitSet relation = RelationSet.BuildRelation(inputGroup, familyMask);
+            boolean isFaithful = IsFaithful(relation, inputGroup.NumElements);
+            boolean isNormal = IsNormal(familyMask, inputGroup.IsSubgroupNormal);
+
+	    if (!normalOnly || isNormal)
+	            relations.Add(relation, familyMask, COLOURS[ (isFaithful?0:1) + (isNormal?2:0) ]);
+        }
+    }
+
+    static boolean IsFaithful(BitSet rel, int numElem)
+    {
+       return rel.nextSetBit(1) >= numElem;
+    }
+
+    static boolean IsNormal(BitSet familyMask, BitSet normalMask)
+    {
+        BitSet ft = (BitSet)familyMask.clone();
+        ft.and(normalMask);
+        return ft.equals(familyMask);
+    }
+
+    private static void PrintAllOutput(Group inputGroup, RelationSet relations, String title, boolean allGraphs, boolean thresholdRelationsBySize) throws IOException
     {
         // create the output streams:
         PrintWriter rawOutput = new PrintWriter(title + ".out");
-        PrintWriter latOutput = new PrintWriter(title + ".full.lat");
-        PrintWriter jsonLatOutput = new PrintWriter(title + ".json");
 
         // sort all relations, by cardinality (size).
         relations.SortRelations();
 
         // print families:
+        String colours[] = new String[relations.Relations.size()];
         int curIndex = 0;
         for (FixedBitSet b : relations.Relations)
-            OutputFormatter.PrintSubgroupFamilyList(inputGroup, relations.RelationsFamilyMap.get(b.Relation), curIndex++, rawOutput);
+        {
+            OutputFormatter.PrintSubgroupFamilyList(inputGroup, relations.RelationsFamilyMap.get(b.Relation), curIndex, rawOutput);
+            colours[curIndex] = b.Colour;
+            curIndex++;
+        }
 
         // print quasi-orders:
         curIndex=0;
@@ -110,27 +156,32 @@ public class Generate
             for(FixedBitSet b : relations.Relations)
             {
                 PrintWriter graphWriter = new PrintWriter(title + ".g" + curIndex++ + ".lat");
-                graphWriter.println(OutputFormatter.PrintRelationEdges(b.Relation, inputGroup.ElementNames, inputGroup.NumElements));
+                graphWriter.println(OutputFormatter.PrintRelationEdges(b.Relation, inputGroup.ElementNames, colours, inputGroup.NumElements));
                 graphWriter.close();
             }
         }
 
         // print the lattice of all fix-set quasi-orders:
-        PrintLatticeOfAllFixSetQuasiOrders(inputGroup, rawOutput, latOutput, jsonLatOutput, relations, iterCount);
+        if (!thresholdRelationsBySize || relations.Relations.size() < REL_MAX_SIZE)
+            PrintLatticeOfAllFixSetQuasiOrders(rawOutput, title, relations, colours);
+        else System.err.println("Skipped lattice: size=" + relations.RelationsFamilyMap.keySet().size() + " is too big");
+
+        // print summary
+        String summaryString = String.format("Found %d unique relations, from %d investigated relations, [ out of 2^%d or 2^%d ]",
+                relations.RelationsFamilyMap.keySet().size(), iterCount, inputGroup.NumConjugacyClasses, inputGroup.NumSubgroups);
+
+        rawOutput.println("\n\n"+summaryString);
+        System.err.println(summaryString);
 
         rawOutput.flush();
-        latOutput.flush();
-        jsonLatOutput.flush();
-
         rawOutput.close();
-        latOutput.close();
-        jsonLatOutput.close();
     }
 
-    private static void PrintLatticeOfAllFixSetQuasiOrders(
-            Group inputGroup, PrintWriter rawOutput, PrintWriter latOutput,
-            PrintWriter jsonLatOutput, RelationSet relations, int iterCount)
+    private static void PrintLatticeOfAllFixSetQuasiOrders(PrintWriter rawOutput, String title, RelationSet relations, String[] colours) throws IOException
     {
+        PrintWriter latOutput = new PrintWriter(title + ".full.lat");
+        PrintWriter jsonLatOutput = new PrintWriter(title + ".json");
+
         int numRels = relations.Relations.size();
         String[] relNames = new String[numRels];
         for (int i=0;i<numRels;i++)
@@ -139,14 +190,14 @@ public class Generate
         rawOutput.println("\n\n" + "Lattice of all fix set quasi orders: ");
         BitSet fixSetQOLattice = relations.GenerateOverallQuasiOrder();
         OutputFormatter.PrintRelation(fixSetQOLattice, relNames, numRels, 0, rawOutput);
-        latOutput.println(OutputFormatter.PrintRelationEdges(fixSetQOLattice, relNames, numRels));
+        latOutput.println(OutputFormatter.PrintRelationEdges(fixSetQOLattice, relNames, colours, numRels));
 
-        String summaryString = String.format("Found %d unique relations, from %d investigated relations, [ out of 2^%d or 2^%d ]",
-                relations.RelationsFamilyMap.keySet().size(), iterCount, inputGroup.NumConjugacyClasses, inputGroup.NumSubgroups);
-
-        rawOutput.println("\n\n"+summaryString);
-        System.err.println(summaryString);
         (new Gson()).toJson(fixSetQOLattice, BitSet.class, jsonLatOutput);
+
+        latOutput.flush();
+        jsonLatOutput.flush();
+        latOutput.close();
+        jsonLatOutput.close();
     }
 }
 

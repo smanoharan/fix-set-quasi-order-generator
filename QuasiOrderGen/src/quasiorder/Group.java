@@ -18,10 +18,11 @@ class Group
     public final BitSet[] SubgroupMasks;
     public final int[][] SubgroupIntersections;
     public final int[][] SubgroupUnions;
+    public final BitSet IsSubgroupNormal;
 
     public Group(
             int numElements, int numSubgroups, int numConjugacyClasses,
-            BitSet[] elementMasks, String[] elementNames, BitSet[] subgroupMasks, String[] subgroupNames, int[][] subgroupIntersections, int[][] subgroupUnions, BitSet[] conjugacyClasses)
+            BitSet[] elementMasks, String[] elementNames, BitSet[] subgroupMasks, String[] subgroupNames, int[][] subgroupIntersections, int[][] subgroupUnions, BitSet[] conjugacyClasses, BitSet conjugacyClassNormal)
     {
         NumElements = numElements;
         NumSubgroups = numSubgroups;
@@ -33,6 +34,7 @@ class Group
         SubgroupIntersections = subgroupIntersections;
         SubgroupUnions = subgroupUnions;
         ConjugacyClasses = conjugacyClasses;
+        IsSubgroupNormal = conjugacyClassNormal;
     }
 
     /**
@@ -79,11 +81,16 @@ class Group
             subgroupMasks[i] = new BitSet(numElem);
 
         int curSubgroupIndex = 0;
+        BitSet isSubgroupNormal = new BitSet(numSubgroups);
         String[] subgroupNames = new String[numSubgroups];
+
         for (int m=0;m<numConjugacyClasses;m++)
         {
             String[][] conjClass = rawgroup.ConjugacyClasses[m];
             int conjClassSize = conjClass.length;
+
+            // determine if subgroup is normal (which is iff conj-class is singleton):
+            if (conjClassSize==1) isSubgroupNormal.set(curSubgroupIndex);
 
             // assign subgroups correct conjugacy class
             conjugacyClasses[m] = new BitSet(numSubgroups);
@@ -114,7 +121,7 @@ class Group
 
         return new Group(numElem, numSubgroups, numConjugacyClasses,
                 elementMasks, elementNames, subgroupMasks, subgroupNames,
-                subgroupIntersections, subgroupUnions, conjugacyClasses);
+                subgroupIntersections, subgroupUnions, conjugacyClasses, isSubgroupNormal);
     }
 
     /**

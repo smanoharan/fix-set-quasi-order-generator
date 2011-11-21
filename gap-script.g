@@ -1,5 +1,6 @@
 homedata:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/data/g-";
 homesp:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/spdata/g-";
+homeW:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/wholedata/g-";
 
 ExportGroup:= function(f,g)
 

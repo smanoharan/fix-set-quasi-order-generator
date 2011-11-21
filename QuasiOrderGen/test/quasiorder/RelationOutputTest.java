@@ -55,7 +55,10 @@ public class RelationOutputTest extends QuasiOrderGenFixture
 
     private void assertRelationOutputIs(String relation, String expected, String elementHeader, int NumElem)
     {
+        boolean[] include = new boolean[NumElem];
+        for (int i=0;i<NumElem;i++) include[i]=true;
+
         assertEquals("Relation: " + relation, OUTPUT_HEADER + elementHeader + expected + OUTPUT_FOOTER,
-                OutputFormatter.PrintRelationEdges(StringToBitSet(relation), ELEMENT_NAMES, COLORS, NumElem));
+                OutputFormatter.PrintRelationEdges(StringToBitSet(relation), ELEMENT_NAMES, COLORS, NumElem, include));
     }
 }

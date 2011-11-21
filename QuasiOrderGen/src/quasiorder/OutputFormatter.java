@@ -6,26 +6,29 @@ import java.util.List;
 
 public class OutputFormatter
 {
-
     /**
      * Output this relation as a dot file (for GraphViz), where the edges are spelled out in plaintext.
+     *
      * @param relation The relation to output
      * @param elementNames The names of each element in the relation
      * @param numElem The number of elements
+     * @param include
      * @return A string representing the relation in DOT form.
      */
-    public static String PrintRelationEdges(BitSet relation, String[] elementNames, String[] colors, int numElem)
+    public static String PrintRelationEdges(BitSet relation, String[] elementNames, String[] colors, int numElem, boolean[] include)
     {
         StringBuilder res = new StringBuilder();
         res.append("strict digraph {\nedge [ arrowhead=\"none\"; arrowtail=\"none\"]\n");
         for (int i=0;i<numElem;i++)
-            res.append(String.format("%s [fillcolor=%s]\n",elementNames[i], colors[i]));
+            if (include[i])
+                res.append(String.format("%s [fillcolor=%s]\n",elementNames[i], colors[i]));
 
         for(int i=relation.nextSetBit(0); i>=0; i=relation.nextSetBit(i + 1))
         {
             int y = i % numElem;
             int x = i / numElem;
-            res.append(elementNames[y] + "->" + elementNames[x] + "\n");
+            if (include[x] && include[y])
+                res.append(elementNames[y] + "->" + elementNames[x] + "\n");
         }
 
         res.append("}\n");
@@ -35,7 +38,6 @@ public class OutputFormatter
     public static void PrintRelation(BitSet relation, String[] elementNames, int NE, int index, PrintWriter wOut)
     {
         wOut.println("\n"+index+">>>");
-
         for(int i=0;i<NE;i++)
         {
             wOut.print(String.format("%1$-20s \t:", elementNames[i]));
@@ -45,7 +47,6 @@ public class OutputFormatter
 
             wOut.println();
         }
-
         wOut.println();
     }
 
@@ -54,7 +55,6 @@ public class OutputFormatter
         for (int s=0;s<inputGroup.NumSubgroups;s++)
             if (familyMask.get(s)) // if s is part of the family, print it.
                 wOut.print("{"+inputGroup.SubgroupNames[s]+"} ");
-
         wOut.println();
     }
 

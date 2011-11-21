@@ -26,8 +26,10 @@ public class RelationSet
      * @param rel The relation to add.
      * @param familyMask The familyMask which generated this relation.
      * @param Colour
+     * @param isNormal
+     * @param isFaithful
      */
-    public void Add(BitSet rel, BitSet familyMask, String Colour)
+    public void Add(BitSet rel, BitSet familyMask, String Colour, boolean isNormal, boolean isFaithful)
     {
         if (RelationsFamilyMap.containsKey(rel))
         {
@@ -38,7 +40,7 @@ public class RelationSet
             ArrayList<BitSet> families = new ArrayList<BitSet>();
             families.add(familyMask);
             RelationsFamilyMap.put(rel, families);
-            Relations.add(new FixedBitSet(rel, Colour));
+            Relations.add(new FixedBitSet(rel, Colour, isNormal, isFaithful));
         }
     }
 

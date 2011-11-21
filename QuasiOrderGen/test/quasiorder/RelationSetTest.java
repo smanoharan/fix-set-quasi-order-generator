@@ -91,7 +91,7 @@ public class RelationSetTest extends QuasiOrderGenFixture
         BitSet first = new BitSet(NumElem*NumElem);
         first.set(NumElem, NumElem*(NumElem-1)); // set some bits
         BitSet familyFirst = StringToBitSet("00110");
-        relations.Add(first, familyFirst, Colour);
+        relations.Add(first, familyFirst, Colour, true, true);
 
         // test only the first relation exists
         assertListEqual(relations.RelationsFamilyMap.keySet(), first);
@@ -100,7 +100,7 @@ public class RelationSetTest extends QuasiOrderGenFixture
         // add the same entry again, with a different family
         BitSet second = (BitSet)first.clone();
         BitSet familySecond = StringToBitSet("10100");
-        relations.Add(second, familySecond, Colour);
+        relations.Add(second, familySecond, Colour, true, true);
 
         // test that the first relation exists, but with two families:
         assertListEqual(relations.RelationsFamilyMap.keySet(), first);
@@ -112,7 +112,7 @@ public class RelationSetTest extends QuasiOrderGenFixture
         BitSet third = new BitSet(NumElem*NumElem);
         third.set(0);
         BitSet familyThird = StringToBitSet("00011");
-        relations.Add(third, familyThird, Colour);
+        relations.Add(third, familyThird, Colour, true, true);
 
         // test that there are now two relations with appropriate families:
         assertListEqual(relations.RelationsFamilyMap.keySet(), first, third);

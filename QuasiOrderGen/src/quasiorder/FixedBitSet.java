@@ -9,10 +9,14 @@ class FixedBitSet implements Comparable<FixedBitSet>
     public final BitSet Relation;
     public final int Cardinality;
     public final String Colour;
+    public final boolean isFaithful;
+    public final boolean isNormal;
 
-    public FixedBitSet(BitSet relation, String colour)
+    public FixedBitSet(BitSet relation, String colour, boolean normal, boolean faithful)
     {
         Colour = colour;
+        isNormal = normal;
+        isFaithful = faithful;
         this.Cardinality = relation.cardinality();
         this.Relation = relation;
     }

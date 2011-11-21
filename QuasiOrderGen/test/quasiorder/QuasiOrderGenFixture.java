@@ -44,7 +44,12 @@ public class QuasiOrderGenFixture
     static void assertRelationEqual(Group input, String familyMask, String expectedRel)
     {
         String messsage = "familyMask: " + familyMask + " expectedRel: " + expectedRel;
-        BitSet actual = RelationSet.BuildRelation(input, StringToBitSet(familyMask));
+        BitSet actual = FixOrderSet.BuildRelation(input, StringToBitSet(familyMask));
         assertEquals(messsage, StringToBitSet(expectedRel), actual);
+    }
+
+    static FixOrder ToFixOrder(BitSet b)
+    {
+        return new FixOrder(b, true, true);
     }
 }

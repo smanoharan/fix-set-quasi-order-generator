@@ -7,15 +7,15 @@ import java.util.*;
  * Automatically handles duplicates.
  *  That is, creates a linked list of families for each relation.
  */
-public class RelationSet
+public class FixOrderSet
 {
-    public final Hashtable<BitSet, ArrayList<BitSet>> RelationsFamilyMap;
-    public final ArrayList<FixedBitSet> Relations;
+    public final Hashtable<FixOrder, ArrayList<BitSet>> FixOrderToFamilyMap;
+    public final ArrayList<FixOrder> FixOrders;
 
-    public RelationSet()
+    public FixOrderSet()
     {
-        this.RelationsFamilyMap = new Hashtable<BitSet, ArrayList<BitSet>>();
-        this.Relations = new ArrayList<FixedBitSet>();
+        this.FixOrderToFamilyMap = new Hashtable<FixOrder, ArrayList<BitSet>>();
+        this.FixOrders = new ArrayList<FixOrder>();
     }
 
     /**
@@ -23,24 +23,21 @@ public class RelationSet
      * If this relation already exists in this set, relation is not added again.
      *  However, the family mask will be added to the list of family masks for this relation.
      *
-     * @param rel The relation to add.
+     * @param fixOrder The relation to add.
      * @param familyMask The familyMask which generated this relation.
-     * @param Colour
-     * @param isNormal
-     * @param isFaithful
      */
-    public void Add(BitSet rel, BitSet familyMask, String Colour, boolean isNormal, boolean isFaithful)
+    public void Add(FixOrder fixOrder, BitSet familyMask)
     {
-        if (RelationsFamilyMap.containsKey(rel))
+        if (FixOrderToFamilyMap.containsKey(fixOrder))
         {
-            RelationsFamilyMap.get(rel).add(familyMask);
+            FixOrderToFamilyMap.get(fixOrder).add(familyMask);
         }
         else
         {
             ArrayList<BitSet> families = new ArrayList<BitSet>();
             families.add(familyMask);
-            RelationsFamilyMap.put(rel, families);
-            Relations.add(new FixedBitSet(rel, Colour, isNormal, isFaithful));
+            FixOrderToFamilyMap.put(fixOrder, families);
+            FixOrders.add(fixOrder);
         }
     }
 
@@ -58,7 +55,7 @@ public class RelationSet
 
         for (int i=0;i<len;i++)
         {
-            relation.set(RelationSet.ToSerialIndex(i, i, len)); // i <= i holds for all i
+            relation.set(FixOrderSet.ToSerialIndex(i, i, len)); // i <= i holds for all i
 
             for (int j=i+1;j<len;j++)
             {
@@ -91,7 +88,7 @@ public class RelationSet
      */
     public void SortRelations()
     {
-        Collections.sort(Relations);
+        Collections.sort(FixOrders);
     }
 
 
@@ -102,18 +99,18 @@ public class RelationSet
     public BitSet GenerateOverallQuasiOrder()
     {
         // start with the unique relations (ordered by number of set bits)
-        int numRels = Relations.size();
+        int numRels = FixOrders.size();
         BitSet result = new BitSet(numRels*numRels);
 
         for(int i=0;i<numRels;i++)
         {
             result.set(ToSerialIndex(i,i,numRels));
-            FixedBitSet eI = Relations.get(i);
+            FixOrder eI = FixOrders.get(i);
             for(int j=i+1;j<numRels;j++)
             {
                 // determine the order: card[i] >= card[j] is guaranteed by sorting.
                 // if cardinality is equal then relations must be different (so a and b are not related).
-                FixedBitSet eJ = Relations.get(j);
+                FixOrder eJ = FixOrders.get(j);
                 if (eI.Cardinality != eJ.Cardinality)
                 {
                     // only possible relation is (j,i) which occurs when j <= i;

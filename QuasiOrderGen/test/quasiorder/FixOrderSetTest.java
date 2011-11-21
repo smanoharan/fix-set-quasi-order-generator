@@ -5,16 +5,16 @@ import org.junit.Test;
 
 import java.util.BitSet;
 
-public class RelationSetTest extends QuasiOrderGenFixture
+public class FixOrderSetTest extends QuasiOrderGenFixture
 {
     private static final int NumElem = 4;
-    private RelationSet relations;
+    private FixOrderSet relations;
     private String Colour = "red";
 
     @Before
     public void Setup()
     {
-        relations = new RelationSet();
+        relations = new FixOrderSet();
     }
 
     @Test
@@ -88,36 +88,39 @@ public class RelationSetTest extends QuasiOrderGenFixture
     public void AddingDuplicatesChangesFamilyListButNotKeySet()
     {
         // add a single entry
-        BitSet first = new BitSet(NumElem*NumElem);
-        first.set(NumElem, NumElem*(NumElem-1)); // set some bits
+        BitSet firstB = new BitSet(NumElem*NumElem);
+        firstB.set(NumElem, NumElem*(NumElem-1)); // set some bits
+        FixOrder first = ToFixOrder(firstB);
         BitSet familyFirst = StringToBitSet("00110");
-        relations.Add(first, familyFirst, Colour, true, true);
+        relations.Add(first, familyFirst);
 
         // test only the first relation exists
-        assertListEqual(relations.RelationsFamilyMap.keySet(), first);
-        assertListEqual(relations.RelationsFamilyMap.get(first), familyFirst);
+        assertListEqual(relations.FixOrderToFamilyMap.keySet(), first);
+        assertListEqual(relations.FixOrderToFamilyMap.get(first), familyFirst);
 
         // add the same entry again, with a different family
-        BitSet second = (BitSet)first.clone();
+        BitSet secondB = (BitSet)first.Relation.clone();
+        FixOrder second = ToFixOrder(secondB);
         BitSet familySecond = StringToBitSet("10100");
-        relations.Add(second, familySecond, Colour, true, true);
+        relations.Add(second, familySecond);
 
         // test that the first relation exists, but with two families:
-        assertListEqual(relations.RelationsFamilyMap.keySet(), first);
-        assertListEqual(relations.RelationsFamilyMap.keySet(), second);
-        assertListEqual(relations.RelationsFamilyMap.get(first), familyFirst, familySecond);
-        assertListEqual(relations.RelationsFamilyMap.get(second), familyFirst, familySecond);
+        assertListEqual(relations.FixOrderToFamilyMap.keySet(), first);
+        assertListEqual(relations.FixOrderToFamilyMap.keySet(), second);
+        assertListEqual(relations.FixOrderToFamilyMap.get(first), familyFirst, familySecond);
+        assertListEqual(relations.FixOrderToFamilyMap.get(second), familyFirst, familySecond);
 
         // add a different entry
-        BitSet third = new BitSet(NumElem*NumElem);
-        third.set(0);
+        BitSet thirdB = new BitSet(NumElem*NumElem);
+        thirdB.set(0);
+        FixOrder third = ToFixOrder(thirdB);
         BitSet familyThird = StringToBitSet("00011");
-        relations.Add(third, familyThird, Colour, true, true);
+        relations.Add(third, familyThird);
 
         // test that there are now two relations with appropriate families:
-        assertListEqual(relations.RelationsFamilyMap.keySet(), first, third);
-        assertListEqual(relations.RelationsFamilyMap.get(first), familyFirst, familySecond);
-        assertListEqual(relations.RelationsFamilyMap.get(second), familyFirst, familySecond);
-        assertListEqual(relations.RelationsFamilyMap.get(third), familyThird);
+        assertListEqual(relations.FixOrderToFamilyMap.keySet(), first, third);
+        assertListEqual(relations.FixOrderToFamilyMap.get(first), familyFirst, familySecond);
+        assertListEqual(relations.FixOrderToFamilyMap.get(second), familyFirst, familySecond);
+        assertListEqual(relations.FixOrderToFamilyMap.get(third), familyThird);
     }
 }

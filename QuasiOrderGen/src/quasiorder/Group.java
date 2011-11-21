@@ -1,6 +1,10 @@
 package quasiorder;
 
+import com.google.gson.Gson;
+
+import java.io.IOException;
 import java.io.PrintStream;
+import java.io.Reader;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Comparator;
@@ -116,94 +120,39 @@ class Group
         }
 
         // calculate the intersection of each pair of subgroups
-        int[][] subgroupIntersections = GenerateIntersections(numSubgroups, subgroupMasks);
-        int[][] subgroupUnions = GenerateUnions(numSubgroups, subgroupMasks);
+        int[][] subgroupIntersections = GroupUtil.GenerateIntersections(numSubgroups, subgroupMasks);
+        int[][] subgroupUnions = GroupUtil.GenerateUnions(numSubgroups, subgroupMasks);
 
         return new Group(numElem, numSubgroups, numConjugacyClasses,
                 elementMasks, elementNames, subgroupMasks, subgroupNames,
                 subgroupIntersections, subgroupUnions, conjugacyClasses, isSubgroupNormal);
     }
 
-    /**
-     * Generate the pairwise unions of each pair of subgroups,
-     *  and then generate a map from SxS->S, where S is the index of the subgroup.
-     *
-     * @param numSubgroups Number of subgroups in this group.
-     * @param subgroupMasks The membership masks of these subgroups.
-     * @return The map (a,b)=>c, where c = indexOf(sub[a] U sub[b]) or -1 if sub[a] U sub[b] is not a subgroup
-     */
-    public static int[][] GenerateUnions(int numSubgroups, BitSet[] subgroupMasks)
+    public static RawGroup FromJSON(Reader jsonReader) throws IOException
     {
-        return GenerateCombinations(numSubgroups, subgroupMasks, new IBitSetOperation()
-        {
-            public void combine(BitSet b1, BitSet b2) { b1.or(b2); }
-        }, true);
-    }
+        // parse JSON (which has arrays of arrays of arrays of strings)
+        String[][][][] groupProp = ( new Gson()).fromJson(jsonReader, String[][][][].class);
 
-    /**
-     * Determine the intersections of each pair of subgroups.
-     * @param numSubgroups The number of subgroups in this group.
-     * @param subgroupMasks The membership masks of each subgroup (i.e. which elements are in each subgroup).
-     * @return An array where if  entry(i,j) = k ; then the intersection of the i'th and j'th subgroup is the k'th (all indices 0-based).
-     */
-    public static int[][] GenerateIntersections(int numSubgroups, BitSet[] subgroupMasks)
-    {
-        return GenerateCombinations(numSubgroups, subgroupMasks, new IBitSetOperation()
-        {
-            public void combine(BitSet b1, BitSet b2) { b1.and(b2); }
-        }, false);
+        // try closing the input-stream. If this fails, nothing we can do.
+        try { jsonReader.close(); } catch (Exception e) {}
+
+        // places to look:
+        String[] elements = groupProp[0][0][0];
+
+        int numElements = elements.length;
+        String[][][] conjugacyClasses = groupProp[1];
+        int numConjugacyClasses = conjugacyClasses.length;
+
+        // calculate number of subgroups
+        int NumSubgroups = 0;
+        for(String[][] arr : conjugacyClasses) NumSubgroups += arr.length;
+
+        return new RawGroup(numElements, NumSubgroups, numConjugacyClasses, elements, conjugacyClasses);
     }
 
     interface IBitSetOperation
     {
         void combine(BitSet b1, BitSet b2);
-    }
-
-    /**
-     * Determine the combinations of each pair of subgroups, using a bit-op (which modifies the first bitset).
-     * @param numSubgroups The number of subgroups in this group.
-     * @param subgroupMasks The membership masks of each subgroup (i.e. which elements are in each subgroup).
-     * @param bitOp A function which modifies the first operator by combining it with the second.
-     * @param ignoreMissing If a.combine(b) results in a bitset which is not a subgroup, this is considered "Missing". If true, return -1. Else throw exception.
-     * @return An array where if  entry(i,j) = k ; then the combination of the i'th and j'th subgroup is the k'th (all indices 0-based).
-     */
-    private static int[][] GenerateCombinations(int numSubgroups, BitSet[] subgroupMasks, IBitSetOperation bitOp, boolean ignoreMissing)
-    {
-        int[][] res = new int[numSubgroups][numSubgroups];
-        for (int i=0;i<numSubgroups;i++)
-        {
-            res[i][i] = i;
-            for (int j=i+1;j<numSubgroups;j++)
-            {
-                int intersection = GenerateCombination(i, j, subgroupMasks, bitOp, ignoreMissing);
-                res[i][j] = intersection;
-                res[j][i] = intersection;
-            }
-        }
-        return res;
-    }
-
-    /**
-     * Calculate the combination of the two given subgroups, using the specified bit-op.
-     * @param s1 The index of the first subgroup
-     * @param s2 The index of the second
-     * @param subgroups The subgroup membership masks
-     * @param bitOp A function which modifies the first operator by combining it with the second.
-     * @param ignoreMissing If a.combine(b) results in a bitset which is not a subgroup, this is considered "Missing". If true, return -1. Else throw exception.
-     * @return the index of the subgroup which is equal to (s1 intersect s2).
-     */
-    static int GenerateCombination(int s1, int s2, BitSet[] subgroups, IBitSetOperation bitOp, boolean ignoreMissing)
-    {
-        // find all elements that are in both sub1 and sub2.
-        BitSet s12 = (BitSet)subgroups[s1].clone();
-        bitOp.combine(s12, subgroups[s2]);
-
-        for (int i=0;i<subgroups.length;i++)
-            if (s12.equals(subgroups[i]))
-                return i;
-
-        if (ignoreMissing) return -1;
-        else throw new RuntimeException("Error: Subgroup not found" + subgroups[s1] + " ^ " + subgroups[s2] + " not a subgroup");
     }
 
     public void Validate(PrintStream out) throws Exception
@@ -224,5 +173,23 @@ class Group
         BitSet fullGroup = SubgroupMasks[SubgroupMasks.length-1];
         nextClearBit = fullGroup.nextClearBit(1);
         if (nextClearBit >= 0 && nextClearBit < NumElements) throw new Exception("Last subgroup is not the whole group.");
+    }
+
+    public static class RawGroup
+    {
+        public final int NumElements;
+        public final int NumSubgroups;
+        public final int NumConjugacyClasses;
+        public final String[] Elements;
+        public final String[][][] ConjugacyClasses;
+
+        protected RawGroup(int numElements, int numSubgroups, int numConjugacyClasses, String[] elements, String[][][] conjugacyClasses)
+        {
+            NumElements = numElements;
+            NumSubgroups = numSubgroups;
+            NumConjugacyClasses = numConjugacyClasses;
+            Elements = elements;
+            ConjugacyClasses = conjugacyClasses;
+        }
     }
 }

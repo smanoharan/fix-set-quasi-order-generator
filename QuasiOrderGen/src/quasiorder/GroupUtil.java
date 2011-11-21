@@ -151,4 +151,81 @@ public class GroupUtil
         }
         return result;
     }
+
+    /**
+     * Generate the pairwise unions of each pair of subgroups,
+     *  and then generate a map from SxS->S, where S is the index of the subgroup.
+     *
+     * @param numSubgroups Number of subgroups in this group.
+     * @param subgroupMasks The membership masks of these subgroups.
+     * @return The map (a,b)=>c, where c = indexOf(sub[a] U sub[b]) or -1 if sub[a] U sub[b] is not a subgroup
+     */
+    public static int[][] GenerateUnions(int numSubgroups, BitSet[] subgroupMasks)
+    {
+        return GenerateCombinations(numSubgroups, subgroupMasks, new Group.IBitSetOperation()
+        {
+            public void combine(BitSet b1, BitSet b2) { b1.or(b2); }
+        }, true);
+    }
+
+    /**
+     * Determine the intersections of each pair of subgroups.
+     * @param numSubgroups The number of subgroups in this group.
+     * @param subgroupMasks The membership masks of each subgroup (i.e. which elements are in each subgroup).
+     * @return An array where if  entry(i,j) = k ; then the intersection of the i'th and j'th subgroup is the k'th (all indices 0-based).
+     */
+    public static int[][] GenerateIntersections(int numSubgroups, BitSet[] subgroupMasks)
+    {
+        return GenerateCombinations(numSubgroups, subgroupMasks, new Group.IBitSetOperation()
+        {
+            public void combine(BitSet b1, BitSet b2) { b1.and(b2); }
+        }, false);
+    }
+
+    /**
+     * Determine the combinations of each pair of subgroups, using a bit-op (which modifies the first bitset).
+     * @param numSubgroups The number of subgroups in this group.
+     * @param subgroupMasks The membership masks of each subgroup (i.e. which elements are in each subgroup).
+     * @param bitOp A function which modifies the first operator by combining it with the second.
+     * @param ignoreMissing If a.combine(b) results in a bitset which is not a subgroup, this is considered "Missing". If true, return -1. Else throw exception.
+     * @return An array where if  entry(i,j) = k ; then the combination of the i'th and j'th subgroup is the k'th (all indices 0-based).
+     */
+    static int[][] GenerateCombinations(int numSubgroups, BitSet[] subgroupMasks, Group.IBitSetOperation bitOp, boolean ignoreMissing)
+    {
+        int[][] res = new int[numSubgroups][numSubgroups];
+        for (int i=0;i<numSubgroups;i++)
+        {
+            res[i][i] = i;
+            for (int j=i+1;j<numSubgroups;j++)
+            {
+                int intersection = GenerateCombination(i, j, subgroupMasks, bitOp, ignoreMissing);
+                res[i][j] = intersection;
+                res[j][i] = intersection;
+            }
+        }
+        return res;
+    }
+
+    /**
+     * Calculate the combination of the two given subgroups, using the specified bit-op.
+     * @param s1 The index of the first subgroup
+     * @param s2 The index of the second
+     * @param subgroups The subgroup membership masks
+     * @param bitOp A function which modifies the first operator by combining it with the second.
+     * @param ignoreMissing If a.combine(b) results in a bitset which is not a subgroup, this is considered "Missing". If true, return -1. Else throw exception.
+     * @return the index of the subgroup which is equal to (s1 intersect s2).
+     */
+    static int GenerateCombination(int s1, int s2, BitSet[] subgroups, Group.IBitSetOperation bitOp, boolean ignoreMissing)
+    {
+        // find all elements that are in both sub1 and sub2.
+        BitSet s12 = (BitSet)subgroups[s1].clone();
+        bitOp.combine(s12, subgroups[s2]);
+
+        for (int i=0;i<subgroups.length;i++)
+            if (s12.equals(subgroups[i]))
+                return i;
+
+        if (ignoreMissing) return -1;
+        else throw new RuntimeException("Error: Subgroup not found" + subgroups[s1] + " ^ " + subgroups[s2] + " not a subgroup");
+    }
 }

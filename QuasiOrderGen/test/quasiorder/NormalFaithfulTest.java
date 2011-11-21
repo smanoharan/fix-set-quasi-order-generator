@@ -90,7 +90,7 @@ public class NormalFaithfulTest extends QuasiOrderGenFixture
 
     private static void assertIsFaithful(boolean expected, String relation, int numElem)
     {
-        assertEquals(expected, Generate.IsFaithful(StringToBitSet(relation), numElem));
+        assertEquals(expected, FixOrder.IsFaithful(StringToBitSet(relation), numElem));
     }
 
     private static void assertIsNormal(String familyMask, String isSubgroupNormal)
@@ -105,7 +105,7 @@ public class NormalFaithfulTest extends QuasiOrderGenFixture
 
     private static void assertIsNormal(boolean expected, String familyMask, String IsSubgroupNormal)
     {
-        assertEquals(expected, Generate.IsNormal(StringToBitSet(familyMask), StringToBitSet(IsSubgroupNormal)));
+        assertEquals(expected, FixOrder.IsNormal(StringToBitSet(familyMask), StringToBitSet(IsSubgroupNormal)));
     }
 
 }

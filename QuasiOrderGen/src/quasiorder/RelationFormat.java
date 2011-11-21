@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 import java.util.BitSet;
 import java.util.List;
 
-public class OutputFormatter
+public class RelationFormat
 {
     /**
      * Output this relation as a dot file (for GraphViz), where the edges are spelled out in plaintext.
@@ -12,7 +12,7 @@ public class OutputFormatter
      * @param relation The relation to output
      * @param elementNames The names of each element in the relation
      * @param numElem The number of elements
-     * @param include
+     * @param include A filter, showing whether or not to include each element in the output
      * @return A string representing the relation in DOT form.
      */
     public static String PrintRelationEdges(BitSet relation, String[] elementNames, String[] colors, int numElem, boolean[] include)
@@ -43,7 +43,7 @@ public class OutputFormatter
             wOut.print(String.format("%1$-20s \t:", elementNames[i]));
 
             for (int j=0;j<NE;j++)
-                wOut.print(relation.get(RelationSet.ToSerialIndex(i, j, NE)) ? "x " : "  ");
+                wOut.print(relation.get(FixOrderSet.ToSerialIndex(i, j, NE)) ? "x " : "  ");
 
             wOut.println();
         }

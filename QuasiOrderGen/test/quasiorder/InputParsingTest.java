@@ -44,7 +44,7 @@ public class InputParsingTest extends QuasiOrderGenFixture
     @Test
     public void TestJSONOfS3ParsesCorrectly() throws Exception
     {
-        RawGroup actual = RawGroup.FromJSON(new StringReader(JSON_STRING));
+        Group.RawGroup actual = Group.FromJSON(new StringReader(JSON_STRING));
 
         assertEquals("NumElements:", NumElem, actual.NumElements);
         assertEquals("NumSubgroups:", NumSubgroups, actual.NumSubgroups);
@@ -109,7 +109,7 @@ public class InputParsingTest extends QuasiOrderGenFixture
 
     private void TestS3IsProcessedCorrectly(boolean sort, String[] elems, BitSet[] elemMasks, BitSet[] subgroupMasks) throws Exception
     {
-        RawGroup rawGroup = RawGroup.FromJSON(new StringReader(JSON_STRING));
+        Group.RawGroup rawGroup = Group.FromJSON(new StringReader(JSON_STRING));
         Group actual = Group.FromRawGroup(rawGroup,sort);
 
         assertEquals("NumElements:", NumElem, actual.NumElements);
@@ -190,8 +190,10 @@ public class InputParsingTest extends QuasiOrderGenFixture
 
     private static void AssertIntersectionIsCorrect(int i1, int i2, int expectedIndex, BitSet[] subgroups)
     {
-        int actualIndex = Group.GenerateCombination(i1, i2, subgroups, new Group.IBitSetOperation() {
-            public void combine(BitSet b1, BitSet b2) { b1.and(b2);}
+        int actualIndex = GroupUtil.GenerateCombination(i1, i2, subgroups, new Group.IBitSetOperation() {
+            public void combine(BitSet b1, BitSet b2) {
+                b1.and(b2);
+            }
         }, true);
         String msg = "Intersection of " + subgroups[i1] + " and " + subgroups[i2] +
                 ": expected " + subgroups[expectedIndex] + " actual:" + subgroups[actualIndex];

@@ -17,6 +17,9 @@ public class NormalFaithfulTest extends QuasiOrderGenFixture
 
         // subgroup family: { {()} , { () (12) } } ; expected: all but 1<=(12)
         assertIsFaithful("1011", numElem);
+
+        // subgroup family corresponding to 1000
+        assertIsFaithful("1", 1);
     }
 
     @Test
@@ -41,16 +44,19 @@ public class NormalFaithfulTest extends QuasiOrderGenFixture
     public void TestRelationsOfS2AreNormal()
     {
         // S2: { (), (12) }
-        String isSubgroupNormal = "11";
+        String subgroup = "11";
 
         // subgroup family: { {()} } ;
-        assertIsNormal("10", isSubgroupNormal);
+        assertIsNormal("10", subgroup);
 
         // subgroup family: { {() (12) } ;
-        assertIsNormal("01", isSubgroupNormal);
+        assertIsNormal("01", subgroup);
 
         // subgroup family: { {()} , { () (12) } } ;
-        assertIsNormal("11", isSubgroupNormal);
+        assertIsNormal("11", subgroup);
+
+        // subgroup family: { {} } only
+        assertIsNormal("1", "1");
     }
 
 

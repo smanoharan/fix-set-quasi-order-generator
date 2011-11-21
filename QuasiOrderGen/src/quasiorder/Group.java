@@ -209,12 +209,12 @@ class Group
     public void Validate(PrintStream out) throws Exception
     {
         // check identity: must be an element of each subgroup.
-        out.println("Checking identity: \"" + ElementNames[0] + "\"");
+        //out.println("Checking identity: \"" + ElementNames[0] + "\"");
         int nextClearBit = ElementMasks[0].nextClearBit(0);
         if (nextClearBit >= 0 && nextClearBit < NumSubgroups) throw new Exception("Trivial element is not a member of some subgroup(" + nextClearBit + "): " + ElementMasks[0]);
 
         // check subgroups: 1st must be trivial, last must have all subgroups.
-        out.println("Checking subgroups: Count=" + NumSubgroups);
+        //out.println("Checking subgroups: Count=" + NumSubgroups);
 
         BitSet trivialSubgroup = SubgroupMasks[0];
         int nextSetBit = trivialSubgroup.nextSetBit(1);

@@ -16,7 +16,7 @@ public class Generate
 {
     private static final int REL_MAX_SIZE = 500;
     private static int iterCount;
-    private static final String[] COLOURS = new String[]{"yellow", "green", "red", "orange"};
+    //private static final String[] COLOURS = new String[]{"white", "cadetblue1", "gold", "chartreuse1"};
 
     public static void main(String[] args)
     {
@@ -58,6 +58,7 @@ public class Generate
                 else title = (arg.endsWith(".in")) ? arg.substring(0, arg.length() - 3) : arg;
             }
 
+            //System.err.println(String.format("Processed args: faithful:%s normal:%s", faithfulOnly, normalOnly));
             if (title == null) throw new RuntimeException("Title not included!");
 
             // read and validate input:
@@ -69,18 +70,13 @@ public class Generate
             RelationSet relations = new RelationSet();
 
             iterCount = 0;
+//            for(long s=0;s<numSubsets;s++) ProcessConjugacyFamily(inputGroup, relations,  s, normalOnly, faithfulOnly);
             long maxIter = numSubsets / 2;
             if (maxIter==0)
-            {
-                // numSubsets is 2 (i.e. Number of conjugacy classes of subgroups is 1) ;
-                ProcessConjugacyFamily(inputGroup, relations, 1, normalOnly);
-            }
+                ProcessConjugacyFamily(inputGroup, relations, 1, normalOnly, faithfulOnly); // only 1 conj-class.
             else
-            {
-                int incr = faithfulOnly ? 2 : 1;
-                for (long s=faithfulOnly?1:0; s<maxIter; s+=incr)
-                    ProcessConjugacyFamily(inputGroup, relations, (maxIter | s), normalOnly);
-            }
+                for (long s=0;s<maxIter;s++)
+                    ProcessConjugacyFamily(inputGroup, relations, (maxIter | s), normalOnly, faithfulOnly);
 
             PrintAllOutput(inputGroup, relations, title, outputAllGraphs, thresholdRelationsBySize);
         }
@@ -92,7 +88,7 @@ public class Generate
     }
 
     // TODO test - somehow?
-    private static void ProcessConjugacyFamily(Group inputGroup, RelationSet relations, long ccMask, boolean normalOnly)
+    private static void ProcessConjugacyFamily(Group inputGroup, RelationSet relations, long ccMask, boolean normalOnly, boolean faithfulOnly)
     {
         BitSet familyMask = GroupUtil.ToSubgroupFamilyBitSet(inputGroup.NumSubgroups, inputGroup.NumConjugacyClasses,
                 ccMask, inputGroup.ConjugacyClasses);
@@ -102,21 +98,25 @@ public class Generate
         boolean isUnionClosed = GroupUtil.isUnionClosed(inputGroup.SubgroupUnions, family, familyMask);
 
         // Note: This is still NOT unique as Union of 3 maybe a subgroup while Union of any two pairs in that 3 are not subgroups!
-        if (isIntersectionClosed && isUnionClosed)
+        //if (isIntersectionClosed && isUnionClosed)
         {
             iterCount++;
             BitSet relation = RelationSet.BuildRelation(inputGroup, familyMask);
             boolean isFaithful = IsFaithful(relation, inputGroup.NumElements);
             boolean isNormal = IsNormal(familyMask, inputGroup.IsSubgroupNormal);
+            String color = isFaithful ?
+                            (isNormal ? "chartreuse1" : "yellow") :
+                            (isNormal ? "cadetblue1" : "gray");
 
-	    if (!normalOnly || isNormal)
-	            relations.Add(relation, familyMask, COLOURS[ (isFaithful?0:1) + (isNormal?2:0) ]);
+	        if ((!normalOnly || isNormal) && (!faithfulOnly || isFaithful))
+	            relations.Add(relation, familyMask, color); //COLOURS[ (isFaithful?0:1) + (isNormal?2:0) ]);
         }
     }
 
     static boolean IsFaithful(BitSet rel, int numElem)
     {
-       return rel.nextSetBit(1) >= numElem;
+       int nextBit = rel.nextSetBit(1);
+       return nextBit >= numElem || nextBit == -1;
     }
 
     static boolean IsNormal(BitSet familyMask, BitSet normalMask)

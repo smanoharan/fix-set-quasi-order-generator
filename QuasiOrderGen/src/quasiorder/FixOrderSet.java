@@ -91,7 +91,6 @@ public class FixOrderSet
         Collections.sort(FixOrders);
     }
 
-
     /**
      * Generates the lattice of fix-set quasi-orders.
      * @return The bitset representing this lattice/relation.

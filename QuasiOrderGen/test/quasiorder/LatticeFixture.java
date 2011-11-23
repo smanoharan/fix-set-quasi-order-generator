@@ -1,8 +1,6 @@
 package quasiorder;
 
-import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -10,11 +8,14 @@ import static quasiorder.FixOrderSet.ToSerialIndex;
 
 public class LatticeFixture extends QuasiOrderGenFixture
 {
-    protected static final String DIH6 = "Dihedral 6";
-    protected static final String EDGE = "Edge Case";
-    protected static final String DIH4F = "Dihedral 4 Faithful Only";
-    protected static final Collection TestLattices =
-            Arrays.asList(new String[]{DIH6}, new String[]{EDGE}, new String[]{DIH4F});
+    protected static final String[][] TestLattices = new String[][]{
+            new String[]{"Dihedral 6"},
+            new String[]{"Edge Case"},
+            new String[]{"Dihedral 4 faithful"},
+            new String[]{"N 5"},
+            new String[]{"N 5 Superset"},
+            new String[]{"Grid lattice"}
+    };
 
     protected BitSet lattice;
     protected int latOrder;
@@ -25,9 +26,12 @@ public class LatticeFixture extends QuasiOrderGenFixture
     public LatticeFixture(String latticeTitle)
     {
         this.title = latticeTitle;
-        if (latticeTitle.equals(DIH6)) SetupDih6();
-        else if (latticeTitle.equals(EDGE)) SetupEdgeCaseLattice();
-        else if (latticeTitle.equals(DIH4F)) SetupDih4FaithfulOnly();
+        if (latticeTitle.equals(TestLattices[0][0])) SetupDih6();
+        else if (latticeTitle.equals(TestLattices[1][0])) SetupEdgeCaseLattice();
+        else if (latticeTitle.equals(TestLattices[2][0])) SetupDih4FaithfulOnly();
+        else if (latticeTitle.equals(TestLattices[3][0])) SetupN5();
+        else if (latticeTitle.equals(TestLattices[4][0])) SetupN5Super();
+        else if (latticeTitle.equals(TestLattices[5][0])) SetupGridLattice();
         else fail("Unknown test case: " + latticeTitle);
     }
 
@@ -37,6 +41,7 @@ public class LatticeFixture extends QuasiOrderGenFixture
             for(int j=0;j<latOrder;j++)
                 assertEquals(String.format("%s[%d,%d]", title, i, j), expected[i][j], actual[i][j]);
     }
+
 
     protected void SetupDih6()
     {
@@ -237,4 +242,214 @@ public class LatticeFixture extends QuasiOrderGenFixture
             lattice.set(ToSerialIndex(7,i,latOrder));
     }
 
+    protected void SetupN5()
+    {
+        // N5:
+        //
+        //          0
+        //         / \
+        //        1   \
+        //        |    2
+        //        3   /
+        //         \ /
+        //          4
+        latOrder = 5;
+        lattice = new BitSet(latOrder*latOrder);
+
+        // expected joins:
+        expectedJoin = new int[][]
+        {
+            new int[] { 0, 0, 0, 0, 0 }, // 0
+            new int[] { 0, 1, 0, 1, 1 }, // 1
+            new int[] { 0, 0, 2, 0, 2 }, // 2
+            new int[] { 0, 1, 0, 3, 3 }, // 3
+            new int[] { 0, 1, 2, 3, 4 }, // 4
+        };
+
+        // expected meets:
+        expectedMeet = new int[][]
+        {
+            new int[] { 0, 1, 2, 3, 4 }, // 0
+            new int[] { 1, 1, 4, 3, 4 }, // 1
+            new int[] { 2, 4, 2, 4, 4 }, // 2
+            new int[] { 3, 3, 4, 3, 4 }, // 3
+            new int[] { 4, 4, 4, 4, 4 }, // 4
+        };
+
+
+        // i <= i for all i;
+        for (int i=0;i<latOrder;i++)
+            lattice.set(ToSerialIndex(i,i,latOrder));
+
+        // all <= 0
+        for (int i=0;i<latOrder;i++)
+            lattice.set(ToSerialIndex(i,0,latOrder));
+
+        // 3 <= 1;
+        lattice.set(ToSerialIndex(3,1,latOrder));
+
+        // 4 <= all
+        for (int i=0;i<latOrder;i++)
+            lattice.set(ToSerialIndex(4,i,latOrder));
+    }
+
+    protected void SetupN5Super()
+    {
+        // N5 Super-set-lattice: (n5 is 1,3,5,6,4 )
+        //
+        //             0
+        //            / \
+        //           /   \
+        //          1     2
+        //         / \   /
+        //        3   \ /
+        //        |    4
+        //        5   / \
+        //         \ /   \
+        //          6     7
+        //           \   /
+        //            \ /
+        //             8
+        latOrder = 9;
+        lattice = new BitSet(latOrder*latOrder);
+
+        // expected joins:
+        expectedJoin = new int[][]
+        {
+            new int[] { 0, 0, 0,   0, 0, 0,   0, 0, 0 }, // 0
+            new int[] { 0, 1, 0,   1, 1, 1,   1, 1, 1 }, // 1
+            new int[] { 0, 0, 2,   0, 2, 0,   2, 2, 2 }, // 2
+
+            new int[] { 0, 1, 0,   3, 1, 3,   3, 1, 3 }, // 3
+            new int[] { 0, 1, 2,   1, 4, 1,   4, 4, 4 }, // 4
+            new int[] { 0, 1, 0,   3, 1, 5,   5, 1, 5 }, // 5
+
+            new int[] { 0, 1, 2,   3, 4, 5,   6, 4, 6 }, // 6
+            new int[] { 0, 1, 2,   1, 4, 1,   4, 7, 7 }, // 7
+            new int[] { 0, 1, 2,   3, 4, 5,   6, 7, 8 }, // 8
+        };
+
+        // expected meets:
+        expectedMeet = new int[][]
+        {
+           new int[] { 0, 1, 2,   3, 4, 5,   6, 7, 8 }, // 0
+           new int[] { 1, 1, 4,   3, 4, 5,   6, 7, 8 }, // 1
+           new int[] { 2, 4, 2,   6, 4, 6,   6, 7, 8 }, // 2
+
+           new int[] { 3, 3, 6,   3, 6, 5,   6, 8, 8 }, // 3
+           new int[] { 4, 4, 4,   6, 4, 6,   6, 7, 8 }, // 4
+           new int[] { 5, 5, 6,   5, 6, 5,   6, 8, 8 }, // 5
+
+           new int[] { 6, 6, 6,   6, 6, 6,   6, 8, 8 }, // 6
+           new int[] { 7, 7, 7,   8, 7, 8,   8, 7, 8 }, // 7
+           new int[] { 8, 8, 8,   8, 8, 8,   8, 8, 8 }, // 8
+       };
+
+        // i <= i for all i;
+        for (int i=0;i<latOrder;i++)
+            lattice.set(ToSerialIndex(i,i,latOrder));
+
+        // all <= 0
+        for (int i=0;i<latOrder;i++)
+            lattice.set(ToSerialIndex(i,0,latOrder));
+
+        // all except 2 <= 1;
+        for (int i=3;i<latOrder;i++)
+            lattice.set(ToSerialIndex(i,1,latOrder));
+
+        // 6 <= 2-5;
+        for (int i=2;i<6;i++)
+            lattice.set(ToSerialIndex(6,i,latOrder));
+
+        // 4 <= 2 ; 5 <= 3 ; 7 <= 1,2,4
+        lattice.set(ToSerialIndex(4,2,latOrder));
+        lattice.set(ToSerialIndex(5,3,latOrder));
+        lattice.set(ToSerialIndex(7,1,latOrder));
+        lattice.set(ToSerialIndex(7,2,latOrder));
+        lattice.set(ToSerialIndex(7,4,latOrder));
+
+        // 8 <= all
+        for (int i=0;i<latOrder;i++)
+            lattice.set(ToSerialIndex(8,i,latOrder));
+    }
+
+    protected void SetupGridLattice()
+    {
+        // Grid
+        //
+        //             0
+        //            / \
+        //           /   \
+        //          1     2
+        //         / \   / \
+        //        /   \ /   \
+        //       3     4     5
+        //        \   / \   /
+        //         \ /   \ /
+        //          6     7
+        //           \   /
+        //            \ /
+        //             8
+        latOrder = 9;
+        lattice = new BitSet(latOrder*latOrder);
+
+        // expected joins:
+        expectedJoin = new int[][]
+        {
+            new int[] { 0, 0, 0,   0, 0, 0,   0, 0, 0 }, // 0
+            new int[] { 0, 1, 0,   1, 1, 0,   1, 1, 1 }, // 1
+            new int[] { 0, 0, 2,   0, 2, 2,   2, 2, 2 }, // 2
+
+            new int[] { 0, 1, 0,   3, 1, 0,   3, 1, 3 }, // 3
+            new int[] { 0, 1, 2,   1, 4, 2,   4, 4, 4 }, // 4
+            new int[] { 0, 0, 2,   0, 2, 5,   2, 5, 5 }, // 5
+
+            new int[] { 0, 1, 2,   3, 4, 2,   6, 4, 6 }, // 6
+            new int[] { 0, 1, 2,   1, 4, 5,   4, 7, 7 }, // 7
+            new int[] { 0, 1, 2,   3, 4, 5,   6, 7, 8 }, // 8
+        };
+
+        // expected meets:
+        expectedMeet = new int[][]
+        {
+           new int[] { 0, 1, 2,   3, 4, 5,   6, 7, 8 }, // 0
+           new int[] { 1, 1, 4,   3, 4, 7,   6, 7, 8 }, // 1
+           new int[] { 2, 4, 2,   6, 4, 5,   6, 7, 8 }, // 2
+
+           new int[] { 3, 3, 6,   3, 6, 8,   6, 8, 8 }, // 3
+           new int[] { 4, 4, 4,   6, 4, 7,   6, 7, 8 }, // 4
+           new int[] { 5, 7, 5,   8, 7, 5,   8, 7, 8 }, // 5
+
+           new int[] { 6, 6, 6,   6, 6, 8,   6, 8, 8 }, // 6
+           new int[] { 7, 7, 7,   8, 7, 7,   8, 7, 8 }, // 7
+           new int[] { 8, 8, 8,   8, 8, 8,   8, 8, 8 }, // 8
+       };
+
+        // i <= i for all i;
+        for (int i=0;i<latOrder;i++)
+            lattice.set(ToSerialIndex(i,i,latOrder));
+
+        // all <= 0
+        for (int i=0;i<latOrder;i++)
+            lattice.set(ToSerialIndex(i,0,latOrder));
+
+        // 3 <= 1 ; 4 <= 1, 2 ; 5 <= 2
+        lattice.set(ToSerialIndex(3,1,latOrder));
+        lattice.set(ToSerialIndex(4,1,latOrder));
+        lattice.set(ToSerialIndex(4,2,latOrder));
+        lattice.set(ToSerialIndex(5,2,latOrder));
+
+        // 6, 7 <= 1-5 ; but not 6 <= 5 and not 7 <= 3
+        for (int i=1;i<6;i++)
+        {
+            lattice.set(ToSerialIndex(6,i,latOrder));
+            lattice.set(ToSerialIndex(7,i,latOrder));
+        }
+        lattice.clear(ToSerialIndex(6,5,latOrder));
+        lattice.clear(ToSerialIndex(7,3,latOrder));
+
+        // 8 <= all
+        for (int i=0;i<latOrder;i++)
+            lattice.set(ToSerialIndex(8,i,latOrder));
+    }
 }

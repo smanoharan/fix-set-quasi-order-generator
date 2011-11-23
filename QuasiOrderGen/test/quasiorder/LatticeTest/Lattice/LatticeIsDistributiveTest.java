@@ -1,9 +1,9 @@
-package quasiorder.Lattice;
+package quasiorder.LatticeTest.Lattice;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import quasiorder.LatticeUtil;
+import quasiorder.Lattice;
 
 import static org.junit.Assert.assertEquals;
 
@@ -16,7 +16,7 @@ public class LatticeIsDistributiveTest extends LatticeFixture
     @Test
     public void assertLatticeDistributivity()
     {
-        LatticeUtil lat = new LatticeUtil(lattice, latOrder);
+        Lattice lat = new Lattice(lattice, latOrder);
         assertEquals(title, isDistributive, lat.IsDistributive());
         assertEquals(title + "-x", NonDistXElem, lat.NonDistXElem);
         assertEquals(title + "-y", NonDistYElem, lat.NonDistYElem);

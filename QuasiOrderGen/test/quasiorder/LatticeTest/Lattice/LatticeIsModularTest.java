@@ -1,9 +1,9 @@
-package quasiorder.Lattice;
+package quasiorder.LatticeTest.Lattice;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import quasiorder.LatticeUtil;
+import quasiorder.Lattice;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,7 +15,7 @@ public class LatticeIsModularTest extends LatticeFixture
     @Test
     public void assertLatticeModularity()
     {
-        LatticeUtil lat = new LatticeUtil(lattice, latOrder);
+        Lattice lat = new Lattice(lattice, latOrder);
         assertEquals(title, isModular, lat.IsModular());
         assertEquals(title + "-x", NonModularXElem, lat.NonModularXElem);
         assertEquals(title + "-a", NonModularAElem, lat.NonModularAElem);

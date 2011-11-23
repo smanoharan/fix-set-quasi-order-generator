@@ -1,4 +1,4 @@
-package quasiorder.Lattice;
+package quasiorder.LatticeTest.Lattice;
 
 import org.junit.runners.Parameterized;
 import quasiorder.QuasiOrderGenFixture;

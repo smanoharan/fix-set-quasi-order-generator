@@ -4,7 +4,7 @@ import java.util.BitSet;
 
 import static quasiorder.FixOrderSet.ToSerialIndex;
 
-public class LatticeUtil
+public class Lattice
 {
     private final BitSet latBit;
     private final int latOrder;
@@ -25,7 +25,7 @@ public class LatticeUtil
     public int NonDistXZJoinElem = -1;
 
 
-    public LatticeUtil(BitSet lattice, int latOrder)
+    public Lattice(BitSet lattice, int latOrder)
     {
         this.latBit = lattice;
         this.latOrder = latOrder;

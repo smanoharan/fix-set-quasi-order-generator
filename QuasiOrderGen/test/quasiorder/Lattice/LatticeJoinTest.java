@@ -1,11 +1,9 @@
-package quasiorder;
+package quasiorder.Lattice;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import java.util.Arrays;
-import java.util.Collection;
+import quasiorder.LatticeUtil;
 
 @RunWith(value = Parameterized.class)
 public class LatticeJoinTest extends LatticeFixture
@@ -15,9 +13,6 @@ public class LatticeJoinTest extends LatticeFixture
     @Test
     public void assertLatticeJoinIsCorrect()
     {
-        assertTableEquals(title, expectedJoin, Lattice.DetermineJoins(lattice, latOrder), latOrder);
+        assertTableEquals(title, expectedJoin, LatticeUtil.DetermineJoins(lattice, latOrder), latOrder);
     }
-
-    @Parameterized.Parameters
-    public static Collection TestCases() { return Arrays.asList(LatticeFixture.TestLattices); }
 }

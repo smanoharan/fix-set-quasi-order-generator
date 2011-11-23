@@ -1,5 +1,9 @@
 package quasiorder;
 
+import com.google.gson.Gson;
+
+import java.io.File;
+import java.io.FileReader;
 import java.util.BitSet;
 
 import static quasiorder.FixOrderSet.ToSerialIndex;
@@ -31,6 +35,46 @@ public class Lattice
         this.latOrder = latOrder;
         this.joinTable = DetermineJoins(lattice, latOrder);
         this.meetTable = DetermineMeets(lattice, latOrder);
+    }
+
+    /**
+     * Check if the lattices of the given JSON files in the directory are modular and/or distributive.
+     * @param args the directory in which the json resides
+     */
+    public static void main(String[] args)
+    {
+        try
+        {
+            if (args.length!=1)
+            {
+                System.err.println("Usage: quasiorder.Lattice directory.");
+                System.err.println("\tAll files in the directory are assumed to be lattices in json format.");
+                System.err.println("\tEach lattice is then checked for modularity and distributivity.");
+                return;
+            }
+
+            File dir = new File(args[0]);
+            if (!dir.isDirectory())
+                throw new RuntimeException("Input: " + args[0] + " is not a directory.");
+
+            for (File f : dir.listFiles())
+            {
+                BitSet latB = (new Gson()).fromJson(new FileReader(f),BitSet.class);
+                int latOrder = (int)Math.sqrt(latB.size());
+
+                if (latOrder*latOrder != latB.size())
+                    throw new RuntimeException(String.format("Logic error. Lattice relation not square. %d^2 != %d", latOrder, latB.size()));
+
+                Lattice lat = new Lattice(latB, latOrder);
+
+                System.out.println(String.format("%s: \t\tModular: %s ; \t Distributive: %s", f, lat.IsModular(), lat.IsDistributive()));
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println("An error occurred:\n\n" + e.getMessage());
+        }
+
     }
 
     /**

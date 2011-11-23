@@ -1,6 +1,10 @@
 package quasiorder;
 
-import java.io.*;
+import com.google.gson.Gson;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -152,7 +156,7 @@ public class Generate
         PrintWriter latFaithfulOutput = new PrintWriter(title + ".faithful.lat");
         PrintWriter latNormalOutput = new PrintWriter(title + ".normal.lat");
         PrintWriter latFaithfulNormalOutput = new PrintWriter(title + ".faithful-normal.lat");
-        //PrintWriter jsonLatOutput = new PrintWriter(title + ".json");
+        PrintWriter jsonLatOutput = new PrintWriter(title + ".json");
 
         int numRels = relations.FixOrders.size();
         String[] relNames = new String[numRels];
@@ -163,28 +167,27 @@ public class Generate
             include[i] = true;
         }
 
+        BitSet overallRelation = relations.GenerateOverallQuasiOrder();
+
         rawOutput.println("\n\n" + "Lattice of all fix set quasi orders: ");
-        latAllOutput.println(RelationFormat.PrintRelationEdges(
-                relations.GenerateOverallQuasiOrder(), relNames, colours, numRels, include));
+        latAllOutput.println(RelationFormat.PrintRelationEdges(overallRelation, relNames, colours, numRels, include));
 
         toFilter(include, true, false, relations.FixOrders, numRels);
-        latFaithfulOutput.println(RelationFormat.PrintRelationEdges(
-                relations.GenerateOverallQuasiOrder(), relNames, colours, numRels, include));
+        latFaithfulOutput.println(RelationFormat.PrintRelationEdges(overallRelation, relNames, colours, numRels, include));
 
         toFilter(include, false, true, relations.FixOrders, numRels);
-        latNormalOutput.println(RelationFormat.PrintRelationEdges(
-                relations.GenerateOverallQuasiOrder(), relNames, colours, numRels, include));
+        latNormalOutput.println(RelationFormat.PrintRelationEdges(overallRelation, relNames, colours, numRels, include));
 
         toFilter(include, true, true, relations.FixOrders, numRels);
-        latFaithfulNormalOutput.println(RelationFormat.PrintRelationEdges(
-                relations.GenerateOverallQuasiOrder(), relNames, colours, numRels, include));
-        //(new Gson()).toJson(fixSetQOLattice, BitSet.class, jsonLatOutput);
+        latFaithfulNormalOutput.println(RelationFormat.PrintRelationEdges(overallRelation, relNames, colours, numRels, include));
+
+        (new Gson()).toJson(overallRelation, BitSet.class, jsonLatOutput);
 
         latAllOutput.close();
         latFaithfulOutput.close();
         latNormalOutput.close();
         latFaithfulNormalOutput.close();
-        //jsonLatOutput.close();
+        jsonLatOutput.close();
     }
 
     private static void toFilter(boolean[] include, boolean faithfulOnly, boolean normalOnly, ArrayList<FixOrder> relations, int numRels)

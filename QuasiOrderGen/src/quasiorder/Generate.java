@@ -2,9 +2,7 @@ package quasiorder;
 
 import com.google.gson.Gson;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -123,12 +121,10 @@ public class Generate
         if (allGraphs)
         {
             curIndex=0;
-            boolean[] include = new boolean[inputGroup.NumElements];
-            for (int i=0;i<inputGroup.NumElements;i++) include[i]=true;
             for(FixOrder b : relations.FixOrders)
             {
                 PrintWriter graphWriter = new PrintWriter(title + ".g" + curIndex++ + ".lat");
-                graphWriter.println(RelationFormat.PrintRelationEdges(b.Relation, inputGroup.ElementNames, colours, inputGroup.NumElements, include));
+                graphWriter.println(RelationFormat.PrintRelationEdges(b.Relation, inputGroup.ElementNames, colours, inputGroup.NumElements));
                 graphWriter.close();
             }
         }
@@ -151,51 +147,28 @@ public class Generate
 
     private static void PrintLatticeOfAllFixSetQuasiOrders(PrintWriter rawOutput, String title, FixOrderSet relations, String[] colours) throws IOException
     {
-        // need to print 4 lattices: { all, faithful, normal, normal-faithful }
-        PrintWriter latAllOutput = new PrintWriter(title + ".all.lat");
-        PrintWriter latFaithfulOutput = new PrintWriter(title + ".faithful.lat");
-        PrintWriter latNormalOutput = new PrintWriter(title + ".normal.lat");
-        PrintWriter latFaithfulNormalOutput = new PrintWriter(title + ".faithful-normal.lat");
-        PrintWriter jsonLatOutput = new PrintWriter(title + ".json");
+        String[] latTypes = new String[] { "all", "faithful", "normal", "faithful-normal"};
+        int numLatTypes = latTypes.length;
 
         int numRels = relations.FixOrders.size();
         String[] relNames = new String[numRels];
-        boolean[] include = new boolean[numRels];
         for (int i=0;i<numRels;i++)
-        {
             relNames[i] = Integer.toString(i);
-            include[i] = true;
-        }
 
         BitSet overallRelation = relations.GenerateOverallQuasiOrder();
 
         rawOutput.println("\n\n" + "Lattice of all fix set quasi orders: ");
-        latAllOutput.println(RelationFormat.PrintRelationEdges(overallRelation, relNames, colours, numRels, include));
-
-        toFilter(include, true, false, relations.FixOrders, numRels);
-        latFaithfulOutput.println(RelationFormat.PrintRelationEdges(overallRelation, relNames, colours, numRels, include));
-
-        toFilter(include, false, true, relations.FixOrders, numRels);
-        latNormalOutput.println(RelationFormat.PrintRelationEdges(overallRelation, relNames, colours, numRels, include));
-
-        toFilter(include, true, true, relations.FixOrders, numRels);
-        latFaithfulNormalOutput.println(RelationFormat.PrintRelationEdges(overallRelation, relNames, colours, numRels, include));
-
-        (new Gson()).toJson(overallRelation, BitSet.class, jsonLatOutput);
-
-        latAllOutput.close();
-        latFaithfulOutput.close();
-        latNormalOutput.close();
-        latFaithfulNormalOutput.close();
-        jsonLatOutput.close();
-    }
-
-    private static void toFilter(boolean[] include, boolean faithfulOnly, boolean normalOnly, ArrayList<FixOrder> relations, int numRels)
-    {
-        for (int i=0;i<numRels;i++)
+        for (int i=0;i<numLatTypes;i++)
         {
-            FixOrder f =  relations.get(i);
-            include[i] = (!faithfulOnly || f.isFaithful) && (!normalOnly || f.isNormal);
+            PartialLattice p = PartialLattice.FilterBy(relations.FixOrders, overallRelation, numRels, ((i & 1)==1) , i >= 2 , relNames, colours);
+
+            PrintWriter latDot = new PrintWriter(String.format("%s.%s.lat", title, latTypes[i]));
+            latDot.println(RelationFormat.PrintRelationEdges(p));
+            latDot.close();
+
+            ObjectOutputStream latObj = new ObjectOutputStream(new FileOutputStream(String.format("%s.%s.obj", title, latTypes[i])));
+            latObj.writeObject(p);
+            latObj.close();
         }
     }
 }

@@ -6,29 +6,31 @@ import java.util.List;
 
 public class RelationFormat
 {
+    public static String PrintRelationEdges(PartialLattice lattice)
+    {
+        return PrintRelationEdges(lattice.relation, lattice.names, lattice.colors, lattice.numRels);
+    }
+
     /**
      * Output this relation as a dot file (for GraphViz), where the edges are spelled out in plaintext.
      *
      * @param relation The relation to output
      * @param elementNames The names of each element in the relation
      * @param numElem The number of elements
-     * @param include A filter, showing whether or not to include each element in the output
      * @return A string representing the relation in DOT form.
      */
-    public static String PrintRelationEdges(BitSet relation, String[] elementNames, String[] colors, int numElem, boolean[] include)
+    public static String PrintRelationEdges(BitSet relation, String[] elementNames, String[] colors, int numElem)
     {
         StringBuilder res = new StringBuilder();
         res.append("strict digraph {\nedge [ arrowhead=\"none\"; arrowtail=\"none\"]\n");
         for (int i=0;i<numElem;i++)
-            if (include[i])
                 res.append(String.format("%s [fillcolor=%s]\n",elementNames[i], colors[i]));
 
         for(int i=relation.nextSetBit(0); i>=0; i=relation.nextSetBit(i + 1))
         {
             int y = i % numElem;
             int x = i / numElem;
-            if (include[x] && include[y])
-                res.append(elementNames[y] + "->" + elementNames[x] + "\n");
+            res.append(elementNames[y] + "->" + elementNames[x] + "\n");
         }
 
         res.append("}\n");

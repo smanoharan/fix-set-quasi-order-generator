@@ -3,8 +3,12 @@ package quasiorder;
 import com.google.gson.Gson;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.ObjectInputStream;
+import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Comparator;
 
 import static quasiorder.FixOrderSet.ToSerialIndex;
 
@@ -48,7 +52,7 @@ public class Lattice
             if (args.length!=1)
             {
                 System.err.println("Usage: quasiorder.Lattice directory.");
-                System.err.println("\tAll files in the directory are assumed to be lattices in json format.");
+                System.err.println("\tAll files in the directory are assumed to be lattices in serialised format.");
                 System.err.println("\tEach lattice is then checked for modularity and distributivity.");
                 return;
             }
@@ -57,22 +61,65 @@ public class Lattice
             if (!dir.isDirectory())
                 throw new RuntimeException("Input: " + args[0] + " is not a directory.");
 
-            for (File f : dir.listFiles())
+            File[] files = dir.listFiles();
+            Arrays.sort(files, new Comparator<File>()
             {
-                BitSet latB = (new Gson()).fromJson(new FileReader(f),BitSet.class);
-                int latOrder = (int)Math.sqrt(latB.size());
+                public int compare(File o1, File o2)
+                {
+                    String[] f1p = o1.getName().split("-");
+                    String[] f2p = o2.getName().split("-");
 
-                if (latOrder*latOrder != latB.size())
-                    throw new RuntimeException(String.format("Logic error. Lattice relation not square. %d^2 != %d", latOrder, latB.size()));
+                    int f1order = Integer.parseInt(f1p[1]);
+                    int f1id = Integer.parseInt((f1p[2].split("\\."))[0]);
+                    int f2order = Integer.parseInt(f2p[1]);
+                    int f2id = Integer.parseInt((f2p[2].split("\\."))[0]);
 
-                Lattice lat = new Lattice(latB, latOrder);
+                    int diff = f1order - f2order;
+                    if (diff == 0) diff = f1id - f2id;
+                    if (diff == 0) diff = f1p.length - f2p.length;
+                    if (diff == 0) diff = f1p[2].length() - f2p[2].length();
+                    return diff;
 
-                System.out.println(String.format("%s: \t\tModular: %s ; \t Distributive: %s", f, lat.IsModular(), lat.IsDistributive()));
+                }
+            });
+
+            for (File f : files)
+            {
+                if (!f.isFile()) continue;
+
+                PartialLattice latP = (PartialLattice)(new ObjectInputStream(new FileInputStream(f))).readObject();
+                int latOrder = latP.numRels;
+                Lattice lat = new Lattice(latP.relation, latOrder);
+
+                boolean isModular = lat.IsModular();
+                boolean isDistributive = lat.IsDistributive();
+
+                StringBuilder output = new StringBuilder(String.format("%1$-30s\t:\tModular: %2$s\tDistributive: %3$s", f.getName(), isModular,  isDistributive));
+
+                if (!isModular)
+                    output.append(String.format("%1$-50s", String.format("\t\tNot-modular: {%s, %s, %s, %s, %s}",
+                            latP.names[lat.NonModularXElem],
+                            latP.names[lat.NonModularAElem],
+                            latP.names[lat.NonModularBElem],
+                            latP.names[lat.NonModularAXJoinElem],
+                            latP.names[lat.NonModularABMeetElem])));
+
+                if (!isDistributive)
+                    output.append(String.format("%1$-50s", String.format("Not-distributive: {%s. %s, %s, %s, %s, %s}\t",
+                            latP.names[lat.NonDistXElem],
+                            latP.names[lat.NonDistYElem],
+                            latP.names[lat.NonDistZElem],
+                            latP.names[lat.NonDistXYJoinElem],
+                            latP.names[lat.NonDistXZJoinElem],
+                            latP.names[lat.NonDistYZMeetElem])));
+
+                System.out.println(output);
             }
         }
         catch (Exception e)
         {
             System.err.println("An error occurred:\n\n" + e.getMessage());
+            e.printStackTrace();
         }
 
     }

@@ -1,6 +1,8 @@
 homedata:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/data/g-";
 homesp:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/spdata/g-";
 homeW:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/wholedata/g-";
+homeR:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/refData/g-";
+homeDih:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/dihData/g-";
 
 ExportGroup:= function(f,g)
 
@@ -47,5 +49,15 @@ ExportAllGroups := function(path, lb, ub)
                 	ExportGroup(Concatenation(path, gid, ".in"), g);
                 	counter:=counter+1;
         	od;
+	od;
+end;
+
+ExportAllDihedralGroups := function(lb, ub)
+	local i, j;
+
+	for i in [ lb .. ub ]
+	do
+		j:=i*2;
+		ExportGroup(Concatenation(homeDih, "D-", String(j), ".in"), DihedralGroup(j)); 
 	od;
 end;

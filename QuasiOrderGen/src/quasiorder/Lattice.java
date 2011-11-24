@@ -1,10 +1,7 @@
 package quasiorder;
 
-import com.google.gson.Gson;
-
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.ObjectInputStream;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -195,6 +192,32 @@ public class Lattice
         NonDistXYJoinElem = -1;
         NonDistXZJoinElem = -1;
         return true;
+    }
+
+    private static BitSet FindReducibles(int latOrder, int[][] opTable)
+    {
+        BitSet reducibles = new BitSet(latOrder);
+
+        // iterate through the op-tables, looking for reducibles:
+        for(int i=0;i<latOrder;i++)
+            for(int j=i+1;j<latOrder;j++)
+            {
+                int k = opTable[i][j];
+                if (k != i && k != j)
+                    reducibles.set(k);
+            }
+
+        return reducibles;
+    }
+
+    public BitSet JoinReducibles()
+    {
+       return FindReducibles(latOrder, joinTable);
+    }
+
+    public BitSet MeetReducibles()
+    {
+        return FindReducibles(latOrder, meetTable);
     }
 
     interface IBinaryOp

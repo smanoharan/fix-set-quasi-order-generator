@@ -15,6 +15,8 @@ public class LatticeFixture extends QuasiOrderGenFixture
 {
     protected BitSet lattice;
     protected int latOrder;
+    protected BitSet joinReducible;
+    protected BitSet meetReducible;
     protected int[][] expectedMeet;
     protected int[][] expectedJoin;
     protected final String title;
@@ -88,6 +90,15 @@ public class LatticeFixture extends QuasiOrderGenFixture
         //
         latOrder = 6;
         lattice = new BitSet(latOrder*latOrder);
+
+        // join & meet reducible:
+        joinReducible = new BitSet(latOrder);
+        joinReducible.set(0);
+        joinReducible.set(1);
+
+        meetReducible = new BitSet(latOrder);
+        meetReducible.set(3);
+        meetReducible.set(5);
 
         // expected joins:
         expectedJoin = new int[][]
@@ -164,6 +175,15 @@ public class LatticeFixture extends QuasiOrderGenFixture
         //
         latOrder = 7;
         lattice = new BitSet(latOrder*latOrder);
+
+        // join & meet reducible:
+        joinReducible = new BitSet(latOrder);
+        joinReducible.set(0);
+        joinReducible.set(3);
+
+        meetReducible = new BitSet(latOrder);
+        meetReducible.set(3);
+        meetReducible.set(6);
 
         // expected joins:
         expectedJoin = new int[][]
@@ -251,6 +271,13 @@ public class LatticeFixture extends QuasiOrderGenFixture
         latOrder = 8;
         lattice = new BitSet(latOrder*latOrder);
 
+        // join & meet reducible:
+        joinReducible = new BitSet(latOrder);
+        joinReducible.set(0, 4);
+
+        meetReducible = new BitSet(latOrder);
+        meetReducible.set(4,8);
+
         // expected joins:
         expectedJoin = new int[][]
         {
@@ -330,6 +357,13 @@ public class LatticeFixture extends QuasiOrderGenFixture
         latOrder = 5;
         lattice = new BitSet(latOrder*latOrder);
 
+        // join & meet reducible:
+        joinReducible = new BitSet(latOrder);
+        joinReducible.set(0);
+
+        meetReducible = new BitSet(latOrder);
+        meetReducible.set(4);
+
         // expected joins:
         expectedJoin = new int[][]
         {
@@ -401,6 +435,18 @@ public class LatticeFixture extends QuasiOrderGenFixture
         //             8
         latOrder = 9;
         lattice = new BitSet(latOrder*latOrder);
+
+        // join & meet reducible:
+        joinReducible = new BitSet(latOrder);
+        joinReducible.set(0);
+        joinReducible.set(1);
+        joinReducible.set(4);
+
+        meetReducible = new BitSet(latOrder);
+        meetReducible.set(4);
+        meetReducible.set(6);
+        meetReducible.set(8);
+
 
         // expected joins:
         expectedJoin = new int[][]
@@ -497,6 +543,21 @@ public class LatticeFixture extends QuasiOrderGenFixture
         latOrder = 9;
         lattice = new BitSet(latOrder*latOrder);
 
+        // join & meet reducible:
+        joinReducible = new BitSet(latOrder);
+        joinReducible.set(0);
+        joinReducible.set(1);
+        joinReducible.set(2);
+        joinReducible.set(4);
+
+        meetReducible = new BitSet(latOrder);
+        meetReducible.set(4);
+        meetReducible.set(6);
+        meetReducible.set(7);
+        meetReducible.set(8);
+
+
+
         // expected joins:
         expectedJoin = new int[][]
         {
@@ -584,6 +645,13 @@ public class LatticeFixture extends QuasiOrderGenFixture
         latOrder = 5;
         lattice = new BitSet(latOrder*latOrder);
 
+        // join & meet reducible:
+        joinReducible = new BitSet(latOrder);
+        joinReducible.set(0);
+
+        meetReducible = new BitSet(latOrder);
+        meetReducible.set(4);
+
         // expected joins:
         expectedJoin = new int[][]
         {
@@ -636,15 +704,24 @@ public class LatticeFixture extends QuasiOrderGenFixture
     {
         // Grid
         //
-        //          0
-        //         /  \
-        //        1    2
+        //           0
+        //          / \
+        //         1   2
         //         \ / | \
         //          3  4  5
         //           \ | /
         //             6
         latOrder = 7;
         lattice = new BitSet(latOrder*latOrder);
+
+        // join & meet reducible:
+        joinReducible = new BitSet(latOrder);
+        joinReducible.set(0);
+        joinReducible.set(2);
+
+        meetReducible = new BitSet(latOrder);
+        meetReducible.set(3);
+        meetReducible.set(6);
 
         // expected joins:
         expectedJoin = new int[][]

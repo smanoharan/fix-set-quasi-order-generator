@@ -1,12 +1,7 @@
 package quasiorder;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Comparator;
 
 import static quasiorder.FixOrderSet.ToSerialIndex;
 
@@ -32,75 +27,40 @@ public class Lattice
     public int NonDistXYJoinElem = -1;
     public int NonDistXZJoinElem = -1;
 
-
-    public Lattice(BitSet lattice, int latOrder, String[] names, String[] nodeAttrs)
+    public Lattice(BitSet lattice, int latOrder, String[] names, String[] colors)
     {
         this.latBit = lattice;
         this.latOrder = latOrder;
         this.names = names;
-        this.nodeAttrs = nodeAttrs;
         this.joinTable = DetermineJoins(lattice, latOrder);
         this.meetTable = DetermineMeets(lattice, latOrder);
+        this.nodeAttrs = DetermineNodeAttributes(colors, JoinReducibles(), MeetReducibles(), latOrder);
     }
 
-    /**
-     * Check if the lattices of the given JSON files in the directory are modular and/or distributive.
-     * @param args the directory in which the json resides
-     */
-    public static void main(String[] args)
+    // TODO test
+    public static String[] DetermineNodeAttributes(String[] colours, BitSet joinReducible, BitSet meetReducible, int latOrder)
     {
-        try
+        String[] nodeAttrs = new String[latOrder];
+        for(int i=0;i<latOrder;i++)
         {
-            if (args.length!=1)
+            boolean isJIr = !joinReducible.get(i);
+            boolean isMIr = !meetReducible.get(i);
+
+            String rest = "";
+            if (isJIr || isMIr)
             {
-                System.err.println("Usage: quasiorder.Lattice directory.");
-                System.err.println("\tAll files in the directory are assumed to be lattices in serialised format.");
-                System.err.println("\tEach lattice is then checked for modularity and distributivity.");
-                return;
+                rest = "peripheries=2; style=\"filled,";
+                if (!isJIr) rest += "dotted";
+                else if (!isMIr) rest += "dashed";
+                else rest += "bold";
             }
 
-            File dir = new File(args[0]);
-            if (!dir.isDirectory())
-                throw new RuntimeException("Input: " + args[0] + " is not a directory.");
-
-            File[] files = dir.listFiles();
-            Arrays.sort(files, new Comparator<File>()
-            {
-                public int compare(File o1, File o2)
-                {
-                    String[] f1p = o1.getName().split("-");
-                    String[] f2p = o2.getName().split("-");
-
-                    int f1order = Integer.parseInt(f1p[1]);
-                    int f1id = Integer.parseInt((f1p[2].split("\\."))[0]);
-                    int f2order = Integer.parseInt(f2p[1]);
-                    int f2id = Integer.parseInt((f2p[2].split("\\."))[0]);
-
-                    int diff = f1order - f2order;
-                    if (diff == 0) diff = f1id - f2id;
-                    if (diff == 0) diff = f1p.length - f2p.length;
-                    if (diff == 0) diff = f1p[2].length() - f2p[2].length();
-                    return diff;
-
-                }
-            });
-
-            for (File f : files)
-            {
-                if (!f.isFile()) continue;
-                Lattice l = (Lattice)(new ObjectInputStream(new FileInputStream(f))).readObject();
-                System.out.println(String.format("%1$-30s\t:\t%s", f.getName(), l.ModDistCheckMessage()));
-            }
+            nodeAttrs[i] = String.format("fillcolor=\"%s\"; %s", colours[i], rest);
         }
-        catch (Exception e)
-        {
-            System.err.println("An error occurred:\n\n" + e.getMessage());
-            e.printStackTrace();
-        }
-
+        return nodeAttrs;
     }
 
-    /**
+     /**
      * Check if the lattice is modular. If not, store which elements 0,x,a,b,1 caused the problem.
      *
      * @return whether the lattice is modular.
@@ -119,22 +79,23 @@ public class Lattice
                 int aMb = meetTable[a][b];
                 if (joinTable[x][aMb] != meetTable[xJa][b])
                 {
-                    NonModularAElem = a;
-                    NonModularBElem = b;
-                    NonModularXElem = x;
-                    NonModularAXJoinElem = xJa;
-                    NonModularABMeetElem = aMb;
+                    SaveModularStatus(a, b, x, xJa, aMb);
                     return false;
                 }
             }
         }
 
-        NonModularAElem = -1;
-        NonModularBElem = -1;
-        NonModularXElem = -1;
-        NonModularAXJoinElem = -1;
-        NonModularABMeetElem = -1;
+        SaveModularStatus(-1, -1, -1, -1, -1);
         return true;
+    }
+
+    private void SaveModularStatus(int a, int b, int x, int ax, int ab)
+    {
+        NonModularAElem = a;
+        NonModularBElem = b;
+        NonModularXElem = x;
+        NonModularAXJoinElem = ax;
+        NonModularABMeetElem = ab;
     }
 
     /**
@@ -154,23 +115,23 @@ public class Lattice
                     int xJz = joinTable[x][z];
                     if (joinTable[x][yMz] != meetTable[xJy][xJz])
                     {
-                        NonDistXElem = x;
-                        NonDistYElem = y;
-                        NonDistZElem = z;
-                        NonDistYZMeetElem = yMz;
-                        NonDistXYJoinElem = xJy;
-                        NonDistXZJoinElem = xJz;
+                        SaveDistStatus(x, y, z, yMz,  xJy, xJz);
                         return false;
                     }
                 }
 
-        NonDistXElem = -1;
-        NonDistYElem = -1;
-        NonDistZElem = -1;
-        NonDistYZMeetElem = -1;
-        NonDistXYJoinElem = -1;
-        NonDistXZJoinElem = -1;
+        SaveDistStatus(-1, -1, -1, -1, -1, -1);
         return true;
+    }
+
+    private void SaveDistStatus(int x, int y, int z, int yz, int xy, int xz)
+    {
+        NonDistXElem = x;
+        NonDistYElem = y;
+        NonDistZElem = z;
+        NonDistYZMeetElem = yz;
+        NonDistXYJoinElem = xy;
+        NonDistXZJoinElem = xz;
     }
 
     private static BitSet FindReducibles(int latOrder, int[][] opTable)

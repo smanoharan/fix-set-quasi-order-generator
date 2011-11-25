@@ -1,18 +1,19 @@
-package quasiorder.LatticeTest.Lattice;
+package quasiorder.LatticeTest;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import quasiorder.Lattice;
+import quasiorder.LatticeTest.TestCases.LatticeTestCase;
 
 @RunWith(value = Parameterized.class)
 public class LatticeMeetTest extends LatticeFixture
 {
-    public LatticeMeetTest(String title) { super(title); }
+    public LatticeMeetTest(LatticeTestCase lat) { super(lat); }
 
     @Test
     public void assertLatticeMeetIsCorrect()
     {
-        assertTableEquals(title, expectedMeet, Lattice.DetermineMeets(lattice, latOrder), latOrder);
+        assertTableEquals(cur.title, cur.expectedMeet, Lattice.DetermineMeets(cur.lattice, cur.latOrder), cur.latOrder);
     }
 }

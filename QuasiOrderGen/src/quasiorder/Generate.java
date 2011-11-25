@@ -135,14 +135,14 @@ public class Generate
         String summaryString = String.format("Found %d unique relations, from %d investigated relations, [ out of 2^%d or 2^%d ]",
                 relations.FixOrderToFamilyMap.keySet().size(), iterCount, inputGroup.NumConjugacyClasses, inputGroup.NumSubgroups);
 
-        rawOutput.println("\n\n"+summaryString);
+        rawOutput.println("\n\n" + summaryString);
         System.err.println(summaryString);
 
         rawOutput.flush();
         rawOutput.close();
     }
 
-    private static void PrintLatticeOfAllFixSetQuasiOrders(PrintWriter rawOutput, String title, FixOrderSet relations, String[] colours) throws IOException
+    private static void PrintLatticeOfAllFixSetQuasiOrders(PrintWriter rawOutput, String title, FixOrderSet relations, String[] colors) throws IOException
     {
         String[] latTypes = new String[] { "all", "faithful", "normal", "faithful-normal"};
         int numLatTypes = latTypes.length;
@@ -157,7 +157,7 @@ public class Generate
         rawOutput.println("\n\n" + "Lattice of all fix set quasi orders: ");
         for (int i=0;i<numLatTypes;i++)
         {
-            Lattice p = Lattice.FilterBy(relations.FixOrders, overallRelation, numRels, ((i & 1)==1) , i >= 2 , relNames, colours);
+            Lattice p = Lattice.FilterBy(relations.FixOrders, overallRelation, numRels, ((i & 1) == 1), i >= 2, relNames, colors);
 
             PrintWriter latDot = new PrintWriter(String.format("%s.%s.lat", title, latTypes[i]));
             latDot.println(RelationFormat.PrintRelationEdges(p));

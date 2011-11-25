@@ -4,7 +4,7 @@ import java.util.BitSet;
 
 // Is a BitSet which is not expected to be modified any further,
 //  so can be used to cache cardinality.
-class FixOrder implements Comparable<FixOrder>
+public class FixOrder implements Comparable<FixOrder>
 {
     public final BitSet Relation;
     public final int Cardinality;

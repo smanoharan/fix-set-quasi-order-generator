@@ -1,8 +1,12 @@
 package quasiorder.LatticeTest.TestCases;
 
+import quasiorder.FixOrder;
+
+import java.util.ArrayList;
 import java.util.BitSet;
 
 import static quasiorder.FixOrderSet.ToSerialIndex;
+import static quasiorder.QuasiOrderGenFixture.StringToBitSet;
 
 public class N5SuperSetTestCase extends LatticeTestCase
 {
@@ -126,6 +130,45 @@ public class N5SuperSetTestCase extends LatticeTestCase
         modDistMessage = "Modular: false\tDistributive: false" +
             String.format("%1$-50s","\t\tNot-modular: {5, 2, 3, 0, 6}") +
             String.format("%1$-50s","\t\tNot-distributive: {5, 2, 3, 0, 3, 6}");
+
+        FilteringRelations = new ArrayList<FixOrder>();
+        FilteringRelations.add(new FixOrder(new BitSet(), false, true)); // 0
+        FilteringRelations.add(new FixOrder(new BitSet(), true, true)); // 1
+        FilteringRelations.add(new FixOrder(new BitSet(), false, true)); // 2
+        FilteringRelations.add(new FixOrder(new BitSet(), true, true)); // 3
+        FilteringRelations.add(new FixOrder(new BitSet(), true, true)); // 4
+        FilteringRelations.add(new FixOrder(new BitSet(), true, true)); // 5
+        FilteringRelations.add(new FixOrder(new BitSet(), true, true)); // 6
+        FilteringRelations.add(new FixOrder(new BitSet(), true, false)); // 7
+        FilteringRelations.add(new FixOrder(new BitSet(), true, false)); // 8
+
+        FilteredFaithfulNormalLatOrder = 5;
+        FilteredFaithfulNormalNames = new String[] { "1", "3", "4", "5", "6" };
+        FilteredFaithfulNormalRelation = StringToBitSet("10000"+"11000"+"10100"+"11010"+"11111");
+
+        FilteredFaithfulLatOrder = 7;
+        FilteredFaithfulNames = new String[] {"1", "3", "4", "5", "6", "7", "8"};
+        FilteredFaithfulRelation = StringToBitSet("1000000"+"1100000"+"1010000"+"1101000"+"1111100"+"1010010"+"1111111");
+
+        FilteredNormalLatOrder = 7;
+        FilteredNormalNames = new String[] {"0", "1", "2", "3", "4", "5", "6"};
+        FilteredNormalRelation = StringToBitSet("1000000"+"1100000"+"1010000"+"1101000"+"1110100"+"1101010"+"1111111");
+
+        //
+        //             0
+        //            / \
+        //           /   \      // top figure-8 is normal
+        //          1     2
+        //         / \   /
+        //        3   \ /       // n5 is normal-faithful
+        //        |    4
+        //        5   / \       // bottom figure-8 is faithful
+        //         \ /   \
+        //          6     7
+        //           \   /
+        //            \ /
+        //             8
+
     }
 
 }

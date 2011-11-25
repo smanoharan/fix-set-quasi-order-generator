@@ -20,7 +20,7 @@ public class QuasiOrderGenFixture
 
     protected BitSet[] elementMasks;
 
-    protected static BitSet StringToBitSet(String BitString)
+    public static BitSet StringToBitSet(String BitString)
     {
         BitSet result = new BitSet(BitString.length());
 
@@ -51,5 +51,11 @@ public class QuasiOrderGenFixture
     static FixOrder ToFixOrder(BitSet b)
     {
         return new FixOrder(b, true, true);
+    }
+
+    public static <T> void assertArrayEquals(String title, T[] expected, T[] actual, int numElem)
+    {
+        for(int i=0;i<numElem;i++)
+            assertEquals(title + "-" + i, expected[i], actual[i]);
     }
 }

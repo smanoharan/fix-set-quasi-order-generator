@@ -1,8 +1,12 @@
 package quasiorder.LatticeTest.TestCases;
 
+import quasiorder.FixOrder;
+
+import java.util.ArrayList;
 import java.util.BitSet;
 
 import static quasiorder.FixOrderSet.ToSerialIndex;
+import static quasiorder.QuasiOrderGenFixture.StringToBitSet;
 
 public class GridTestCase extends LatticeTestCase
 {
@@ -52,7 +56,6 @@ public class GridTestCase extends LatticeTestCase
             toNodeAttrString(7, MeetRed),
             toNodeAttrString(8, MeetRed)
         };
-
 
         // expected joins:
         expectedJoin = new int[][]
@@ -128,6 +131,31 @@ public class GridTestCase extends LatticeTestCase
         NonDistXYJoinElem = -1;
         NonDistXZJoinElem = -1;
         modDistMessage = "Modular: true\tDistributive: true";
+
+        // top-4 normal, bottom-4 faithful.
+        FilteringRelations = new ArrayList<FixOrder>();
+        FilteringRelations.add(new FixOrder(new BitSet(), false, true)); // 0
+        FilteringRelations.add(new FixOrder(new BitSet(), false, true)); // 1
+        FilteringRelations.add(new FixOrder(new BitSet(), false, true)); // 2
+        FilteringRelations.add(new FixOrder(new BitSet(), false, false)); // 3
+        FilteringRelations.add(new FixOrder(new BitSet(), true, true)); // 4
+        FilteringRelations.add(new FixOrder(new BitSet(), false, false)); // 5
+        FilteringRelations.add(new FixOrder(new BitSet(), true, false)); // 6
+        FilteringRelations.add(new FixOrder(new BitSet(), true, false)); // 7
+        FilteringRelations.add(new FixOrder(new BitSet(), true, false)); // 8
+
+        FilteredFaithfulLatOrder = 4;
+        FilteredFaithfulNames = new String[]{"4", "6", "7", "8"};
+        FilteredFaithfulRelation = StringToBitSet("1000"+"1100"+"1010"+"1111");
+
+        FilteredNormalLatOrder = 4;
+        FilteredNormalNames =  new String[]{"0", "1", "2", "4"};
+        FilteredNormalRelation = StringToBitSet("1000"+"1100"+"1010"+"1111");
+
+        FilteredFaithfulNormalLatOrder = 1;
+        FilteredFaithfulNormalNames = new String[] { "4" };
+        FilteredFaithfulNormalRelation = StringToBitSet("1");
+
     }
 
 }

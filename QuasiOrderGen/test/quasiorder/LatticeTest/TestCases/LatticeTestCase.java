@@ -1,5 +1,8 @@
 package quasiorder.LatticeTest.TestCases;
 
+import quasiorder.FixOrder;
+
+import java.util.ArrayList;
 import java.util.BitSet;
 
 public abstract class LatticeTestCase
@@ -37,10 +40,23 @@ public abstract class LatticeTestCase
     public String modDistMessage;
     public String[] nodeAttr;
 
+
+    public ArrayList<FixOrder> FilteringRelations;
+    public int FilteredFaithfulLatOrder;
+    public BitSet FilteredFaithfulRelation;
+    public String[] FilteredFaithfulNames;
+
+    public int FilteredNormalLatOrder;
+    public BitSet FilteredNormalRelation;
+    public String[] FilteredNormalNames;
+
+    public int FilteredFaithfulNormalLatOrder;
+    public BitSet FilteredFaithfulNormalRelation;
+    public String[] FilteredFaithfulNormalNames;
+
     public void SetupAll()
     {
-        SetupTestCase();
-
+        SetupTestCase(); // must be done first, in order init latOrder.
         names = new String[latOrder];
         colors = new String[latOrder];
         for (int i=0;i<latOrder;i++)
@@ -48,10 +64,9 @@ public abstract class LatticeTestCase
             names[i] = ""+i;
             colors[i] = "c-" + i; // arbitrary colour names
         }
-
     }
 
-    public abstract void SetupTestCase();
+    protected abstract void SetupTestCase();
 
     protected String toNodeAttrString(int index, String secondStyle)
     {

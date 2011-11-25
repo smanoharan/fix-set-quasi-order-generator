@@ -1,8 +1,12 @@
 package quasiorder.LatticeTest.TestCases;
 
+import quasiorder.FixOrder;
+
+import java.util.ArrayList;
 import java.util.BitSet;
 
 import static quasiorder.FixOrderSet.ToSerialIndex;
+import static quasiorder.QuasiOrderGenFixture.StringToBitSet;
 
 public class N5TestCase extends LatticeTestCase
 {
@@ -88,5 +92,23 @@ public class N5TestCase extends LatticeTestCase
         modDistMessage = "Modular: false\tDistributive: false" +
             String.format("%1$-50s","\t\tNot-modular: {3, 2, 1, 0, 4}") +
             String.format("%1$-50s","\t\tNot-distributive: {3, 1, 2, 1, 0, 4}");
+
+        // all is faithful-normal
+        FilteringRelations = new ArrayList<FixOrder>();
+
+        for (int i=0;i<latOrder;i++)
+            FilteringRelations.add(new FixOrder(new BitSet(), true, true));
+
+        FilteredFaithfulNormalLatOrder = 5;
+        FilteredFaithfulNormalNames = new String[] { "0", "1", "2", "3", "4" };
+        FilteredFaithfulNormalRelation = StringToBitSet("10000"+"11000"+"10100"+"11010"+"11111");
+
+        FilteredFaithfulLatOrder = FilteredFaithfulNormalLatOrder;
+        FilteredFaithfulNames = FilteredFaithfulNormalNames;
+        FilteredFaithfulRelation = FilteredFaithfulNormalRelation;
+
+        FilteredNormalLatOrder = FilteredFaithfulNormalLatOrder;
+        FilteredNormalNames = FilteredFaithfulNormalNames;
+        FilteredNormalRelation = FilteredFaithfulNormalRelation;
     }
 }

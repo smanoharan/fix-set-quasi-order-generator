@@ -1,5 +1,8 @@
 package quasiorder.LatticeTest.TestCases;
 
+import quasiorder.FixOrder;
+
+import java.util.ArrayList;
 import java.util.BitSet;
 
 import static quasiorder.FixOrderSet.ToSerialIndex;
@@ -106,5 +109,30 @@ public class Dihedral4FaithfulOnlyTestCase extends LatticeTestCase
         NonDistXYJoinElem = -1;
         NonDistXZJoinElem = -1;
         modDistMessage = "Modular: true\tDistributive: true";
+
+        // all relations are faithful and all are normal:
+        FilteringRelations = new ArrayList<FixOrder>();
+        for (int i=0;i<latOrder;i++)
+            FilteringRelations.add(new FixOrder(new BitSet(), true, true));
+
+        FilteredFaithfulLatOrder = latOrder;
+        FilteredFaithfulNames = new String[]{"0", "1", "2", "3", "4", "5", "6", "7"};
+        FilteredFaithfulRelation = lattice;
+        FilteredNormalLatOrder = latOrder;
+        FilteredNormalNames = FilteredFaithfulNames;
+        FilteredNormalRelation = lattice;
+        FilteredFaithfulNormalLatOrder = latOrder;
+        FilteredFaithfulNormalNames = FilteredFaithfulNames;
+        FilteredFaithfulNormalRelation = lattice;
+
+        //
+        //        0
+        //      / | \
+        //     1  2  3
+        //     | X X |
+        //     4  5  6
+        //      \ | /
+        //        7
+        //
     }
 }

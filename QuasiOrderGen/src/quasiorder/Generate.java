@@ -154,19 +154,20 @@ public class Generate
 
         BitSet overallRelation = relations.GenerateOverallQuasiOrder();
 
+        PrintWriter modDistOutput = new PrintWriter(title + ".md");
         rawOutput.println("\n\n" + "Lattice of all fix set quasi orders: ");
         for (int i=0;i<numLatTypes;i++)
         {
-            Lattice p = Lattice.FilterBy(relations.FixOrders, overallRelation, numRels, ((i & 1) == 1), i >= 2, relNames, colors);
+            Lattice lat = Lattice.FilterBy(relations.FixOrders, overallRelation, numRels, ((i & 1) == 1), i >= 2, relNames, colors);
 
             PrintWriter latDot = new PrintWriter(String.format("%s.%s.lat", title, latTypes[i]));
-            latDot.println(RelationFormat.PrintRelationEdges(p));
+            latDot.println(RelationFormat.PrintRelationEdges(lat));
             latDot.close();
 
-            ObjectOutputStream latObj = new ObjectOutputStream(new FileOutputStream(String.format("%s.%s.obj", title, latTypes[i])));
-            latObj.writeObject(p);
-            latObj.close();
+            // determine modularity/distributivity:
+            modDistOutput.println(String.format("%1$-50s %2$s", latTypes[i], lat.ModDistCheckMessage()));
         }
+        modDistOutput.close();
     }
 }
 

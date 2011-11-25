@@ -15,14 +15,14 @@ public class LatticeFixture extends QuasiOrderGenFixture
 
     protected static final LatticeTestCase[][] TestCaseLattices = new LatticeTestCase[][]
     {
-            new LatticeTestCase[]{ new Dihedral6TestCase() },
-            new LatticeTestCase[]{ new Figure8TestCase() },
-            new LatticeTestCase[]{ new Dihedral4FaithfulOnlyTestCase() },
-            new LatticeTestCase[]{ new N5TestCase() },
-            new LatticeTestCase[]{ new N5SuperSetTestCase() },
-            new LatticeTestCase[]{ new GridTestCase() },
-            new LatticeTestCase[]{ new M3TestCase() },
-            new LatticeTestCase[]{ new M3SuperSetTestCase() }
+        new LatticeTestCase[]{ new Dihedral4FaithfulOnlyTestCase() },
+        new LatticeTestCase[]{ new Dihedral6TestCase() },
+        new LatticeTestCase[]{ new Figure8TestCase() },
+        new LatticeTestCase[]{ new GridTestCase() },
+        new LatticeTestCase[]{ new M3SuperSetTestCase() },
+        new LatticeTestCase[]{ new M3TestCase() },
+        new LatticeTestCase[]{ new N5SuperSetTestCase() },
+        new LatticeTestCase[]{ new N5TestCase() }
     };
 
     @Parameterized.Parameters

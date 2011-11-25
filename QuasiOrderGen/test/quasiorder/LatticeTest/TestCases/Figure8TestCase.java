@@ -1,8 +1,12 @@
 package quasiorder.LatticeTest.TestCases;
 
+import quasiorder.FixOrder;
+
+import java.util.ArrayList;
 import java.util.BitSet;
 
 import static quasiorder.FixOrderSet.ToSerialIndex;
+import static quasiorder.QuasiOrderGenFixture.StringToBitSet;
 
 public class Figure8TestCase extends LatticeTestCase
 {
@@ -114,5 +118,28 @@ public class Figure8TestCase extends LatticeTestCase
         NonDistXYJoinElem = -1;
         NonDistXZJoinElem = -1;
         modDistMessage = "Modular: true\tDistributive: true";
+
+        // all normal, but only the top 4 are faithful.
+        FilteringRelations = new ArrayList<FixOrder>();
+        FilteringRelations.add(new FixOrder(new BitSet(), true, true)); // 0
+        FilteringRelations.add(new FixOrder(new BitSet(), true, true)); // 1
+        FilteringRelations.add(new FixOrder(new BitSet(), true, true)); // 2
+        FilteringRelations.add(new FixOrder(new BitSet(), true, true)); // 3
+        FilteringRelations.add(new FixOrder(new BitSet(), false, true)); // 4
+        FilteringRelations.add(new FixOrder(new BitSet(), false, true)); // 5
+        FilteringRelations.add(new FixOrder(new BitSet(), false, true)); // 6
+
+        FilteredFaithfulLatOrder = 4;
+        FilteredFaithfulNames = new String[]{"0", "1", "2", "3"};
+        FilteredFaithfulRelation = StringToBitSet("1000"+"1100"+"1010"+"1111");
+
+        FilteredNormalLatOrder = 7;
+        FilteredNormalNames = new String[]{"0", "1", "2", "3", "4", "5", "6"};
+        FilteredNormalRelation = lattice;
+
+        FilteredFaithfulNormalLatOrder = FilteredFaithfulLatOrder;
+        FilteredFaithfulNormalNames = FilteredFaithfulNames;
+        FilteredFaithfulNormalRelation = FilteredFaithfulRelation;
+
     }
 }

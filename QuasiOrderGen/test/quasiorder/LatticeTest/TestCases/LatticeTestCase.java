@@ -4,6 +4,11 @@ import java.util.BitSet;
 
 public abstract class LatticeTestCase
 {
+    protected static final String BothRed = "-";
+    protected static final String NotRed  = "bold";
+    protected static final String JoinRed = "dotted";
+    protected static final String MeetRed = "dashed";
+
     public BitSet lattice;
     public int latOrder;
     public BitSet joinReducible;
@@ -29,7 +34,8 @@ public abstract class LatticeTestCase
     public int NonDistXZJoinElem;
     public int NonDistYZMeetElem;
 
-    public String expectedModDistMessage;
+    public String modDistMessage;
+    public String[] nodeAttr;
 
     public void SetupAll()
     {
@@ -46,4 +52,10 @@ public abstract class LatticeTestCase
     }
 
     public abstract void SetupTestCase();
+
+    protected String toNodeAttrString(int index, String secondStyle)
+    {
+        return secondStyle.equals(BothRed) ? String.format("fillcolor=\"c-%d\"", index) :
+            String.format("fillcolor=\"c-%d\"; peripheries=2; style=\"filled,%s\"", index, secondStyle);
+    }
 }

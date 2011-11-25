@@ -37,7 +37,14 @@ public class Lattice
         this.nodeAttrs = DetermineNodeAttributes(colors, JoinReducibles(), MeetReducibles(), latOrder);
     }
 
-    // TODO test
+    /**
+     * Determine the node attributes based on the join and meet irreducibility
+     * @param colours The node colours
+     * @param joinReducible The BitSet showing join reducibility
+     * @param meetReducible The BitSet showing meet reducibility
+     * @param latOrder The number of elements
+     * @return A string array showing the node attribute string for each element.
+     */
     public static String[] DetermineNodeAttributes(String[] colours, BitSet joinReducible, BitSet meetReducible, int latOrder)
     {
         String[] nodeAttrs = new String[latOrder];
@@ -46,16 +53,8 @@ public class Lattice
             boolean isJIr = !joinReducible.get(i);
             boolean isMIr = !meetReducible.get(i);
 
-            String rest = "";
-            if (isJIr || isMIr)
-            {
-                rest = "peripheries=2; style=\"filled,";
-                if (!isJIr) rest += "dotted";
-                else if (!isMIr) rest += "dashed";
-                else rest += "bold";
-            }
-
-            nodeAttrs[i] = String.format("fillcolor=\"%s\"; %s", colours[i], rest);
+            String rest = (isJIr || isMIr) ? "; peripheries=2; style=\"filled," + (isJIr ? (isMIr ? "bold" : "dashed") : "dotted") + "\"" : "";
+            nodeAttrs[i] = String.format("fillcolor=\"%s\"%s", colours[i], rest);
         }
         return nodeAttrs;
     }
@@ -208,11 +207,13 @@ public class Lattice
         return output.toString();
     }
 
+    /** @return A BitSet containing all of the join reducible elements */
     public BitSet JoinReducibles()
     {
        return FindReducibles(latOrder, joinTable);
     }
 
+    /** @return A BitSet containing all of the meet reducible elements */
     public BitSet MeetReducibles()
     {
         return FindReducibles(latOrder, meetTable);
@@ -321,5 +322,4 @@ public class Lattice
 
         throw new RuntimeException("Lattice does not have unique meet for " + i + " " + j);
     }
-
 }

@@ -38,7 +38,18 @@ public class N5SuperSetTestCase extends LatticeTestCase
         meetReducible.set(6);
         meetReducible.set(8);
 
-
+        nodeAttr = new String[]
+        {
+            toNodeAttrString(0, JoinRed),
+            toNodeAttrString(1, JoinRed),
+            toNodeAttrString(2, NotRed),
+            toNodeAttrString(3, NotRed),
+            toNodeAttrString(4, BothRed),
+            toNodeAttrString(5, NotRed),
+            toNodeAttrString(6, MeetRed),
+            toNodeAttrString(7, NotRed),
+            toNodeAttrString(8, MeetRed),
+        };
         // expected joins:
         expectedJoin = new int[][]
         {
@@ -112,7 +123,7 @@ public class N5SuperSetTestCase extends LatticeTestCase
         NonDistYZMeetElem = 6;
         NonDistXYJoinElem = 0;
         NonDistXZJoinElem = 3;
-        expectedModDistMessage = "Modular: false\tDistributive: false" +
+        modDistMessage = "Modular: false\tDistributive: false" +
             String.format("%1$-50s","\t\tNot-modular: {5, 2, 3, 0, 6}") +
             String.format("%1$-50s","\t\tNot-distributive: {5, 2, 3, 0, 3, 6}");
     }

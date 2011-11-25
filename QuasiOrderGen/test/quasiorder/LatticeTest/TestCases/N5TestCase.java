@@ -27,6 +27,14 @@ public class N5TestCase extends LatticeTestCase
         meetReducible = new BitSet(latOrder);
         meetReducible.set(4);
 
+        nodeAttr = new String[]
+        {
+            toNodeAttrString(0, JoinRed),
+            toNodeAttrString(1, NotRed),
+            toNodeAttrString(2, NotRed),
+            toNodeAttrString(3, NotRed),
+            toNodeAttrString(4, MeetRed)
+        };
         // expected joins:
         expectedJoin = new int[][]
         {
@@ -77,7 +85,7 @@ public class N5TestCase extends LatticeTestCase
         NonDistYZMeetElem = 4;
         NonDistXYJoinElem = 1;
         NonDistXZJoinElem = 0;
-        expectedModDistMessage = "Modular: false\tDistributive: false" +
+        modDistMessage = "Modular: false\tDistributive: false" +
             String.format("%1$-50s","\t\tNot-modular: {3, 2, 1, 0, 4}") +
             String.format("%1$-50s","\t\tNot-distributive: {3, 1, 2, 1, 0, 4}");
     }

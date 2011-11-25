@@ -9,14 +9,15 @@ import quasiorder.LatticeTest.TestCases.LatticeTestCase;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(value = Parameterized.class)
-public class LatticeModDistCheckMessageTest extends LatticeFixture
+public class LatticeNodeAttributeTest extends LatticeFixture
 {
-    public LatticeModDistCheckMessageTest(LatticeTestCase lat) { super(lat); }
+    public LatticeNodeAttributeTest(LatticeTestCase lat) { super(lat); }
 
     @Test
-    public void assertLatticeModularity()
+    public void assertLatticeNodeAttributes()
     {
         Lattice lat = new Lattice(cur.lattice, cur.latOrder, cur.names, cur.colors);
-        assertEquals(cur.title, cur.modDistMessage, lat.ModDistCheckMessage());
+        for(int i=0;i<cur.latOrder;i++)
+            assertEquals(cur.title + "-" + i, cur.nodeAttr[i], lat.nodeAttrs[i]);
     }
 }

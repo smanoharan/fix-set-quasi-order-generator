@@ -33,6 +33,17 @@ public class Figure8TestCase extends LatticeTestCase
         meetReducible.set(3);
         meetReducible.set(6);
 
+        nodeAttr = new String[]
+        {
+            toNodeAttrString(0, JoinRed),
+            toNodeAttrString(1, NotRed),
+            toNodeAttrString(2, NotRed),
+            toNodeAttrString(3, BothRed),
+            toNodeAttrString(4, NotRed),
+            toNodeAttrString(5, NotRed),
+            toNodeAttrString(6, MeetRed)
+        };
+
         // expected joins:
         expectedJoin = new int[][]
         {
@@ -102,6 +113,6 @@ public class Figure8TestCase extends LatticeTestCase
         NonDistYZMeetElem = -1;
         NonDistXYJoinElem = -1;
         NonDistXZJoinElem = -1;
-        expectedModDistMessage = "Modular: true\tDistributive: true";
+        modDistMessage = "Modular: true\tDistributive: true";
     }
 }

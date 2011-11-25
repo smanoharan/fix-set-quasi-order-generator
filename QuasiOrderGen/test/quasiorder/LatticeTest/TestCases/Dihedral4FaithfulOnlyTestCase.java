@@ -6,6 +6,7 @@ import static quasiorder.FixOrderSet.ToSerialIndex;
 
 public class Dihedral4FaithfulOnlyTestCase extends LatticeTestCase
 {
+
     public void SetupTestCase()
     {
         // Dihedral 4 Faithful:
@@ -22,12 +23,24 @@ public class Dihedral4FaithfulOnlyTestCase extends LatticeTestCase
         latOrder = 8;
         lattice = new BitSet(latOrder*latOrder);
 
-        // join & meet reducible:
+        // join & meet reducible (and thus the node attr):
         joinReducible = new BitSet(latOrder);
         joinReducible.set(0, 4);
 
         meetReducible = new BitSet(latOrder);
         meetReducible.set(4,8);
+
+        nodeAttr = new String[]
+        {
+            toNodeAttrString(0, JoinRed),
+            toNodeAttrString(1, JoinRed),
+            toNodeAttrString(2, JoinRed),
+            toNodeAttrString(3, JoinRed),
+            toNodeAttrString(4, MeetRed),
+            toNodeAttrString(5, MeetRed),
+            toNodeAttrString(6, MeetRed),
+            toNodeAttrString(7, MeetRed)
+        };
 
         // expected joins:
         expectedJoin = new int[][]
@@ -92,6 +105,6 @@ public class Dihedral4FaithfulOnlyTestCase extends LatticeTestCase
         NonDistYZMeetElem = -1;
         NonDistXYJoinElem = -1;
         NonDistXZJoinElem = -1;
-        expectedModDistMessage = "Modular: true\tDistributive: true";
+        modDistMessage = "Modular: true\tDistributive: true";
     }
 }

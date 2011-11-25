@@ -30,6 +30,16 @@ public class M3SuperSetTestCase extends LatticeTestCase
         meetReducible.set(3);
         meetReducible.set(6);
 
+        nodeAttr = new String[]
+        {
+            toNodeAttrString(0, JoinRed),
+            toNodeAttrString(1, NotRed),
+            toNodeAttrString(2, JoinRed),
+            toNodeAttrString(3, MeetRed),
+            toNodeAttrString(4, NotRed),
+            toNodeAttrString(5, NotRed),
+            toNodeAttrString(6, MeetRed)
+        };
         // expected joins:
         expectedJoin = new int[][]
         {
@@ -92,7 +102,7 @@ public class M3SuperSetTestCase extends LatticeTestCase
         NonDistYZMeetElem = 6;
         NonDistXYJoinElem = 0;
         NonDistXZJoinElem = 0;
-        expectedModDistMessage = "Modular: true\tDistributive: false" +
+        modDistMessage = "Modular: true\tDistributive: false" +
                 String.format("%1$-50s","\t\tNot-distributive: {1, 4, 5, 0, 0, 6}");
     }
 }

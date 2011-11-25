@@ -40,6 +40,18 @@ public class GridTestCase extends LatticeTestCase
         meetReducible.set(7);
         meetReducible.set(8);
 
+        nodeAttr = new String[]
+        {
+            toNodeAttrString(0, JoinRed),
+            toNodeAttrString(1, JoinRed),
+            toNodeAttrString(2, JoinRed),
+            toNodeAttrString(3, NotRed),
+            toNodeAttrString(4, BothRed),
+            toNodeAttrString(5, NotRed),
+            toNodeAttrString(6, MeetRed),
+            toNodeAttrString(7, MeetRed),
+            toNodeAttrString(8, MeetRed)
+        };
 
 
         // expected joins:
@@ -115,7 +127,7 @@ public class GridTestCase extends LatticeTestCase
         NonDistYZMeetElem = -1;
         NonDistXYJoinElem = -1;
         NonDistXZJoinElem = -1;
-        expectedModDistMessage = "Modular: true\tDistributive: true";
+        modDistMessage = "Modular: true\tDistributive: true";
     }
 
 }

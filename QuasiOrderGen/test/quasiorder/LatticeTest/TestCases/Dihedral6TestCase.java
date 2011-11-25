@@ -33,6 +33,16 @@ public class Dihedral6TestCase extends LatticeTestCase
         meetReducible.set(3);
         meetReducible.set(5);
 
+        nodeAttr = new String[]
+        {
+            toNodeAttrString(0, JoinRed),
+            toNodeAttrString(1, JoinRed),
+            toNodeAttrString(2, NotRed),
+            toNodeAttrString(3, MeetRed),
+            toNodeAttrString(4, NotRed),
+            toNodeAttrString(5, MeetRed)
+        };
+
         // expected joins:
         expectedJoin = new int[][]
         {
@@ -90,6 +100,6 @@ public class Dihedral6TestCase extends LatticeTestCase
         NonDistXYJoinElem = -1;
         NonDistXZJoinElem = -1;
 
-        expectedModDistMessage = "Modular: true\tDistributive: true";
+        modDistMessage = "Modular: true\tDistributive: true";
     }
 }

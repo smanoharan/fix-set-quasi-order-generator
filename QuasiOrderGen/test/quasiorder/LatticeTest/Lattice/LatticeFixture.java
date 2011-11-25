@@ -20,6 +20,7 @@ public class LatticeFixture extends QuasiOrderGenFixture
     protected int[][] expectedMeet;
     protected int[][] expectedJoin;
     protected final String title;
+    protected final String[] names;
 
     protected boolean isModular;
     protected int NonModularAElem;
@@ -35,6 +36,8 @@ public class LatticeFixture extends QuasiOrderGenFixture
     protected int NonDistXYJoinElem;
     protected int NonDistXZJoinElem;
     protected int NonDistYZMeetElem;
+
+    protected String expectedModDistMessage;
 
     protected static final String[][] TestLattices = new String[][]
     {
@@ -64,6 +67,9 @@ public class LatticeFixture extends QuasiOrderGenFixture
         else if (latticeTitle.equals(TestLattices[6][0])) SetupM5();
         else if (latticeTitle.equals(TestLattices[7][0])) SetupM5Super();
         else fail("Unknown test case: " + latticeTitle);
+
+        names = new String[latOrder];
+        for (int i=0;i<latOrder;i++) names[i] = ""+i;
     }
 
     protected static void assertTableEquals(String title, int[][] expected, int[][] actual, int latOrder)
@@ -122,7 +128,6 @@ public class LatticeFixture extends QuasiOrderGenFixture
             new int[] {5, 5, 5, 5, 5, 5 }  // 5
         };
 
-
         // i <= i for all i;
         for (int i=0;i<latOrder;i++)
             lattice.set(ToSerialIndex(i,i,latOrder));
@@ -157,6 +162,8 @@ public class LatticeFixture extends QuasiOrderGenFixture
         NonDistYZMeetElem = -1;
         NonDistXYJoinElem = -1;
         NonDistXZJoinElem = -1;
+
+        expectedModDistMessage = "Modular: true\tDistributive: true";
     }
 
     protected void SetupEdgeCaseLattice()
@@ -254,6 +261,7 @@ public class LatticeFixture extends QuasiOrderGenFixture
         NonDistYZMeetElem = -1;
         NonDistXYJoinElem = -1;
         NonDistXZJoinElem = -1;
+        expectedModDistMessage = "Modular: true\tDistributive: true";
     }
 
     protected void SetupDih4FaithfulOnly()
@@ -341,6 +349,7 @@ public class LatticeFixture extends QuasiOrderGenFixture
         NonDistYZMeetElem = -1;
         NonDistXYJoinElem = -1;
         NonDistXZJoinElem = -1;
+        expectedModDistMessage = "Modular: true\tDistributive: true";
     }
 
     protected void SetupN5()
@@ -414,6 +423,9 @@ public class LatticeFixture extends QuasiOrderGenFixture
         NonDistYZMeetElem = 4;
         NonDistXYJoinElem = 1;
         NonDistXZJoinElem = 0;
+        expectedModDistMessage = "Modular: false\tDistributive: false" +
+            String.format("%1$-50s","\t\tNot-modular: {3, 2, 1, 0, 4}") +
+            String.format("%1$-50s","\t\tNot-distributive: {3, 1, 2, 1, 0, 4}");
     }
 
     protected void SetupN5Super()
@@ -521,6 +533,9 @@ public class LatticeFixture extends QuasiOrderGenFixture
         NonDistYZMeetElem = 6;
         NonDistXYJoinElem = 0;
         NonDistXZJoinElem = 3;
+        expectedModDistMessage = "Modular: false\tDistributive: false" +
+            String.format("%1$-50s","\t\tNot-modular: {5, 2, 3, 0, 6}") +
+            String.format("%1$-50s","\t\tNot-distributive: {5, 2, 3, 0, 3, 6}");
     }
 
     protected void SetupGridLattice()
@@ -631,6 +646,7 @@ public class LatticeFixture extends QuasiOrderGenFixture
         NonDistYZMeetElem = -1;
         NonDistXYJoinElem = -1;
         NonDistXZJoinElem = -1;
+        expectedModDistMessage = "Modular: true\tDistributive: true";
     }
 
     protected void SetupM5()
@@ -698,6 +714,8 @@ public class LatticeFixture extends QuasiOrderGenFixture
         NonDistYZMeetElem = 4;
         NonDistXYJoinElem = 0;
         NonDistXZJoinElem = 0;
+        expectedModDistMessage = "Modular: true\tDistributive: false" +
+            String.format("%1$-50s","\t\tNot-distributive: {1, 2, 3, 0, 0, 4}");
     }
     
     protected void SetupM5Super()
@@ -786,5 +804,7 @@ public class LatticeFixture extends QuasiOrderGenFixture
         NonDistYZMeetElem = 6;
         NonDistXYJoinElem = 0;
         NonDistXZJoinElem = 0;
+        expectedModDistMessage = "Modular: true\tDistributive: false" +
+                String.format("%1$-50s","\t\tNot-distributive: {1, 4, 5, 0, 0, 6}");
     }
 }

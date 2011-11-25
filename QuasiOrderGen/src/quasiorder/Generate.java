@@ -1,9 +1,6 @@
 package quasiorder;
 
-import com.google.gson.Gson;
-
 import java.io.*;
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
@@ -160,7 +157,7 @@ public class Generate
         rawOutput.println("\n\n" + "Lattice of all fix set quasi orders: ");
         for (int i=0;i<numLatTypes;i++)
         {
-            PartialLattice p = PartialLattice.FilterBy(relations.FixOrders, overallRelation, numRels, ((i & 1)==1) , i >= 2 , relNames, colours);
+            Lattice p = Lattice.FilterBy(relations.FixOrders, overallRelation, numRels, ((i & 1)==1) , i >= 2 , relNames, colours);
 
             PrintWriter latDot = new PrintWriter(String.format("%s.%s.lat", title, latTypes[i]));
             latDot.println(RelationFormat.PrintRelationEdges(p));

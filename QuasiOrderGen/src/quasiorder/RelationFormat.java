@@ -6,9 +6,9 @@ import java.util.List;
 
 public class RelationFormat
 {
-    public static String PrintRelationEdges(PartialLattice lattice)
+    public static String PrintRelationEdges(Lattice lattice)
     {
-        return PrintRelationEdges(lattice.relation, lattice.names, lattice.colors, lattice.numRels);
+        return PrintRelationEdges(lattice.latBit, lattice.names, lattice.nodeAttrs, lattice.latOrder);
     }
 
     /**
@@ -19,12 +19,12 @@ public class RelationFormat
      * @param numElem The number of elements
      * @return A string representing the relation in DOT form.
      */
-    public static String PrintRelationEdges(BitSet relation, String[] elementNames, String[] colors, int numElem)
+    public static String PrintRelationEdges(BitSet relation, String[] elementNames, String[] nodeAttributes, int numElem)
     {
         StringBuilder res = new StringBuilder();
         res.append("strict digraph {\nedge [ arrowhead=\"none\"; arrowtail=\"none\"]\n");
         for (int i=0;i<numElem;i++)
-                res.append(String.format("%s [fillcolor=%s]\n",elementNames[i], colors[i]));
+                res.append(String.format("%s [%s]\n",elementNames[i], nodeAttributes[i]));
 
         for(int i=relation.nextSetBit(0); i>=0; i=relation.nextSetBit(i + 1))
         {

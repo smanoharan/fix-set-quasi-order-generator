@@ -16,7 +16,7 @@ public class LatticeIsDistributiveTest extends LatticeFixture
     @Test
     public void assertLatticeDistributivity()
     {
-        Lattice lat = new Lattice(lattice, latOrder);
+        Lattice lat = new Lattice(lattice, latOrder, names, null);
         assertEquals(title, isDistributive, lat.IsDistributive());
         assertEquals(title + "-x", NonDistXElem, lat.NonDistXElem);
         assertEquals(title + "-y", NonDistYElem, lat.NonDistYElem);

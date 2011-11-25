@@ -15,7 +15,7 @@ public class LatticeIsModularTest extends LatticeFixture
     @Test
     public void assertLatticeModularity()
     {
-        Lattice lat = new Lattice(lattice, latOrder);
+        Lattice lat = new Lattice(lattice, latOrder, names, null);
         assertEquals(title, isModular, lat.IsModular());
         assertEquals(title + "-x", NonModularXElem, lat.NonModularXElem);
         assertEquals(title + "-a", NonModularAElem, lat.NonModularAElem);

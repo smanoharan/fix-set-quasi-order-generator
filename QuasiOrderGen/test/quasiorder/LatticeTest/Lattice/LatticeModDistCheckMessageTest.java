@@ -8,14 +8,14 @@ import quasiorder.Lattice;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(value = Parameterized.class)
-public class LatticeJoinReducibleTest extends LatticeFixture
+public class LatticeModDistCheckMessageTest extends LatticeFixture
 {
-    public LatticeJoinReducibleTest(String latticeTitle) { super(latticeTitle); }
+    public LatticeModDistCheckMessageTest(String latticeTitle) { super(latticeTitle); }
 
     @Test
-    public void assertLatticeJoinReducibility()
+    public void assertLatticeModularity()
     {
         Lattice lat = new Lattice(lattice, latOrder, names, null);
-        assertEquals(title, joinReducible, lat.JoinReducibles());
+        assertEquals(title, expectedModDistMessage, lat.ModDistCheckMessage());
     }
 }

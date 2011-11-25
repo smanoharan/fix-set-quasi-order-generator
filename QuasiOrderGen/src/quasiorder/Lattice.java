@@ -3,6 +3,7 @@ package quasiorder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Comparator;
@@ -11,10 +12,12 @@ import static quasiorder.FixOrderSet.ToSerialIndex;
 
 public class Lattice
 {
-    private final BitSet latBit;
-    private final int latOrder;
+    public final BitSet latBit;
+    public final int latOrder;
     private final int[][] joinTable;
     private final int[][] meetTable;
+    public final String[] names;
+    public final String[] nodeAttrs;
 
     public int NonModularXElem = -1;
     public int NonModularAElem = -1;
@@ -30,10 +33,12 @@ public class Lattice
     public int NonDistXZJoinElem = -1;
 
 
-    public Lattice(BitSet lattice, int latOrder)
+    public Lattice(BitSet lattice, int latOrder, String[] names, String[] nodeAttrs)
     {
         this.latBit = lattice;
         this.latOrder = latOrder;
+        this.names = names;
+        this.nodeAttrs = nodeAttrs;
         this.joinTable = DetermineJoins(lattice, latOrder);
         this.meetTable = DetermineMeets(lattice, latOrder);
     }
@@ -83,34 +88,8 @@ public class Lattice
             for (File f : files)
             {
                 if (!f.isFile()) continue;
-
-                PartialLattice latP = (PartialLattice)(new ObjectInputStream(new FileInputStream(f))).readObject();
-                int latOrder = latP.numRels;
-                Lattice lat = new Lattice(latP.relation, latOrder);
-
-                boolean isModular = lat.IsModular();
-                boolean isDistributive = lat.IsDistributive();
-
-                StringBuilder output = new StringBuilder(String.format("%1$-30s\t:\tModular: %2$s\tDistributive: %3$s", f.getName(), isModular,  isDistributive));
-
-                if (!isModular)
-                    output.append(String.format("%1$-50s", String.format("\t\tNot-modular: {%s, %s, %s, %s, %s}",
-                            latP.names[lat.NonModularXElem],
-                            latP.names[lat.NonModularAElem],
-                            latP.names[lat.NonModularBElem],
-                            latP.names[lat.NonModularAXJoinElem],
-                            latP.names[lat.NonModularABMeetElem])));
-
-                if (!isDistributive)
-                    output.append(String.format("%1$-50s", String.format("Not-distributive: {%s. %s, %s, %s, %s, %s}\t",
-                            latP.names[lat.NonDistXElem],
-                            latP.names[lat.NonDistYElem],
-                            latP.names[lat.NonDistZElem],
-                            latP.names[lat.NonDistXYJoinElem],
-                            latP.names[lat.NonDistXZJoinElem],
-                            latP.names[lat.NonDistYZMeetElem])));
-
-                System.out.println(output);
+                Lattice l = (Lattice)(new ObjectInputStream(new FileInputStream(f))).readObject();
+                System.out.println(String.format("%1$-30s\t:\t%s", f.getName(), l.ModDistCheckMessage()));
             }
         }
         catch (Exception e)
@@ -208,6 +187,64 @@ public class Lattice
             }
 
         return reducibles;
+    }
+
+    // TODO test
+    public static Lattice FilterBy(ArrayList<FixOrder> relations, BitSet fullRelation, int numRels,
+            boolean faithfulOnly, boolean normalOnly, String[] relationNames, String[] nodeAttrs)
+    {
+        ArrayList<Integer> inclElem = new ArrayList<Integer>();
+        for (int i=0;i<numRels;i++)
+        {
+            FixOrder f = relations.get(i);
+            if ((!faithfulOnly || f.isFaithful) && (!normalOnly || f.isNormal))
+                inclElem.add(i);
+        }
+
+        int numInclRels = inclElem.size();
+        String[] partNames = new String[numInclRels];
+        String[] partNodeAttrs = new String[numInclRels];
+        BitSet partRelation = new BitSet(numInclRels*numInclRels);
+
+        // setup part-relations, colors and names.
+        for (int i=0;i<numInclRels;i++)
+        {
+            int oldI = inclElem.get(i);
+            partNames[i] = relationNames[oldI];
+            partNodeAttrs[i] = nodeAttrs[oldI];
+            for (int j=0;j<numInclRels;j++)
+            {
+                int oldJ = inclElem.get(j);
+                if (fullRelation.get(ToSerialIndex(oldI, oldJ, numRels)))
+                    partRelation.set(ToSerialIndex(i, j, numInclRels));
+            }
+        }
+
+        return new Lattice(partRelation, numInclRels, partNames, partNodeAttrs);
+    }
+
+    /**
+     * Compose the message to let the user know that the status of modularity and distributivity of the lattice.
+     * @return The message string.
+     */
+    public String ModDistCheckMessage()
+    {
+        boolean isModular = IsModular();
+        boolean isDistributive = IsDistributive();
+
+        StringBuilder output = new StringBuilder(String.format("Modular: %1$s\tDistributive: %2$s", isModular, isDistributive));
+
+        if (!isModular)
+            output.append(String.format("%1$-50s", String.format("\t\tNot-modular: {%s, %s, %s, %s, %s}",
+                names[NonModularXElem], names[NonModularAElem], names[NonModularBElem],
+                names[NonModularAXJoinElem], names[NonModularABMeetElem])));
+
+        if (!isDistributive)
+            output.append(String.format("%1$-50s", String.format("\t\tNot-distributive: {%s, %s, %s, %s, %s, %s}",
+                names[NonDistXElem], names[NonDistYElem], names[NonDistZElem],
+                names[NonDistXYJoinElem], names[NonDistXZJoinElem], names[NonDistYZMeetElem])));
+
+        return output.toString();
     }
 
     public BitSet JoinReducibles()

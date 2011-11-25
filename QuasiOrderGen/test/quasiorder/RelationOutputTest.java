@@ -10,7 +10,7 @@ public class RelationOutputTest extends QuasiOrderGenFixture
     private static final String OUTPUT_HEADER = "strict digraph {\nedge [ arrowhead=\"none\"; arrowtail=\"none\"]\n";
     private static final String OUTPUT_FOOTER = "\n}\n";
     private static final int MAX_ELEM = 4;
-    private static final String[] COLORS = {"red", "blue", "green", "yellow", "blue_green", "green_yellow"};
+    private static final String[] COLORS = {"fillcolor=red", "fillcolor=blue", "fillcolor=green", "fillcolor=yellow"};
 
     @Test
     public void BuildRelationOfS2()
@@ -25,7 +25,6 @@ public class RelationOutputTest extends QuasiOrderGenFixture
 
         // relation: 11 11
         assertRelationOutputIs("1111", "()->()\n(1,2)->()\n()->(1,2)\n(1,2)->(1,2)", elementHeader, NumElem);
-
     }
 
     @Test

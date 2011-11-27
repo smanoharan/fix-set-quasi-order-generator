@@ -21,11 +21,15 @@ for file in $1/*.lat
 do
 	echo ""
 	echo "Drawing: $file"
-	tred $file | dot | gvcolor | dot -T$2 > ${file%.*}.$2
+	tred $file | dot -T$2 > ${file%.*}.$2
 done
 
+mkdir $1/out
 mv $1/*.$2 $1/out/
-mv $1/*.obj $1/obj/
+mkdir $1/md
+mv $1/*.md $1/md/
+grep false $1/md/* | grep true | wc
+mkdir $1/out/full/
 cp $1/out/*.all.$2 $1/out/full/
 
 

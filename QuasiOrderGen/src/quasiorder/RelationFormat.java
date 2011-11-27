@@ -22,7 +22,7 @@ public class RelationFormat
     public static String PrintRelationEdges(BitSet relation, String[] elementNames, String[] nodeAttributes, int numElem)
     {
         StringBuilder res = new StringBuilder();
-        res.append("strict digraph {\nedge [ arrowhead=\"none\"; arrowtail=\"none\"]\n");
+        res.append("strict digraph {\nedge [ arrowhead=\"none\", arrowtail=\"none\"]\n");
         for (int i=0;i<numElem;i++)
                 res.append(String.format("%s [%s]\n",elementNames[i], nodeAttributes[i]));
 

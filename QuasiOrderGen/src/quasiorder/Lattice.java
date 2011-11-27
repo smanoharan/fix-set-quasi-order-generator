@@ -37,14 +37,25 @@ public class Lattice
         this.nodeAttrs = DetermineNodeAttributes(colors, JoinReducibles(), MeetReducibles(), latOrder);
     }
 
-    // TODO test
-    public static Lattice FilterBy(ArrayList<FixOrder> relations, BitSet fullRelation, int numRels,
-            boolean faithfulOnly, boolean normalOnly, String[] relationNames, String[] colors)
+    /**
+     * Filter the lattice of all fix-orders by certain conditions (i.e. whether to include unfaithful and non-normal ones).
+     *
+     * @param fixOrders The set of all fix-orders
+     * @param fullRelation The bitset showing the lattice formed by all fix orders
+     * @param numFixOrders The number of elements
+     * @param faithfulOnly Whether to include faithful elements only.
+     * @param normalOnly Whether to include normal elements only.
+     * @param fixOrderNames The name of each fix order (for output purposes).
+     * @param colors The color of each fix order (for output purposes).
+     * @return The lattice of the fix orders satisfying the conditions.
+     */
+    public static Lattice FilterBy(ArrayList<FixOrder> fixOrders, BitSet fullRelation, int numFixOrders,
+            boolean faithfulOnly, boolean normalOnly, String[] fixOrderNames, String[] colors)
     {
         ArrayList<Integer> inclElem = new ArrayList<Integer>();
-        for (int i=0;i<numRels;i++)
+        for (int i=0;i<numFixOrders;i++)
         {
-            FixOrder f = relations.get(i);
+            FixOrder f = fixOrders.get(i);
             if ((!faithfulOnly || f.isFaithful) && (!normalOnly || f.isNormal))
                 inclElem.add(i);
         }
@@ -58,12 +69,12 @@ public class Lattice
         for (int i=0;i<numInclRels;i++)
         {
             int oldI = inclElem.get(i);
-            partNames[i] = relationNames[oldI];
+            partNames[i] = fixOrderNames[oldI];
             partNodeAttrs[i] = colors[oldI];
             for (int j=0;j<numInclRels;j++)
             {
                 int oldJ = inclElem.get(j);
-                if (fullRelation.get(ToSerialIndex(oldI, oldJ, numRels)))
+                if (fullRelation.get(ToSerialIndex(oldI, oldJ, numFixOrders)))
                     partRelation.set(ToSerialIndex(i, j, numInclRels));
             }
         }
@@ -87,8 +98,9 @@ public class Lattice
             boolean isJIr = !joinReducible.get(i);
             boolean isMIr = !meetReducible.get(i);
 
-            String rest = (isJIr || isMIr) ? "; peripheries=2; style=\"filled," + (isJIr ? (isMIr ? "bold" : "dashed") : "dotted") + "\"" : "";
-            nodeAttrs[i] = String.format("fillcolor=\"%s\"%s", colours[i], rest);
+            String style =  (isJIr ? (isMIr ? ",solid" : ",dashed") : (isMIr ? ",dotted" : ""));
+            int rings = (isJIr || isMIr) ? 2 : 1;
+            nodeAttrs[i] = String.format("fillcolor=\"%s\"; peripheries=%d; style=\"filled%s\"", colours[i], rings, style);
         }
         return nodeAttrs;
     }

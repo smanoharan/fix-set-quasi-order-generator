@@ -7,7 +7,7 @@ import static junit.framework.Assert.assertEquals;
 public class RelationOutputTest extends QuasiOrderGenFixture
 {
     private String[] ELEMENT_NAMES = new String[]{"()", "(1,2)"};
-    private static final String OUTPUT_HEADER = "strict digraph {\nedge [ arrowhead=\"none\"; arrowtail=\"none\"]\n";
+    private static final String OUTPUT_HEADER = "strict digraph {\nedge [ arrowhead=\"none\", arrowtail=\"none\"]\n";
     private static final String OUTPUT_FOOTER = "\n}\n";
     private static final int MAX_ELEM = 4;
     private static final String[] COLORS = {"fillcolor=red", "fillcolor=blue", "fillcolor=green", "fillcolor=yellow"};

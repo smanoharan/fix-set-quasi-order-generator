@@ -7,10 +7,10 @@ import java.util.BitSet;
 
 public abstract class LatticeTestCase
 {
-    protected static final String BothRed = "-";
-    protected static final String NotRed  = "bold";
-    protected static final String JoinRed = "dotted";
-    protected static final String MeetRed = "dashed";
+    protected static final String BothRed = "";
+    protected static final String NotRed  = ",solid";
+    protected static final String JoinRed = ",dotted";
+    protected static final String MeetRed = ",dashed";
 
     public BitSet lattice;
     public int latOrder;
@@ -70,7 +70,7 @@ public abstract class LatticeTestCase
 
     protected String toNodeAttrString(int index, String secondStyle)
     {
-        return secondStyle.equals(BothRed) ? String.format("fillcolor=\"c-%d\"", index) :
-            String.format("fillcolor=\"c-%d\"; peripheries=2; style=\"filled,%s\"", index, secondStyle);
+        return String.format("fillcolor=\"c-%d\"; peripheries=%d; style=\"filled%s\"",
+                index, (secondStyle.equals(BothRed) ? 1 : 2), secondStyle);
     }
 }

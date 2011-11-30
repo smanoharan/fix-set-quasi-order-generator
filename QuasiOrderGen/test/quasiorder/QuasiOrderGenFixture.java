@@ -53,7 +53,7 @@ public class QuasiOrderGenFixture
         return new FixOrder(b, true, true);
     }
 
-    public static <T> void assertArrayEquals(String title, T[] expected, T[] actual, int numElem)
+    public static <T> void AssertArrayEquals(String title, T[] expected, T[] actual, int numElem)
     {
         for(int i=0;i<numElem;i++)
             assertEquals(title + "-" + i, expected[i], actual[i]);

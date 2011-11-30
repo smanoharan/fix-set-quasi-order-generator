@@ -2,6 +2,8 @@ package quasiorder;
 
 import java.util.BitSet;
 
+import static quasiorder.FixOrderSet.ToSerialIndex;
+
 // Is a BitSet which is not expected to be modified any further,
 //  so can be used to cache cardinality.
 public class FixOrder implements Comparable<FixOrder>
@@ -54,5 +56,29 @@ public class FixOrder implements Comparable<FixOrder>
     public int hashCode()
     {
         return this.Relation.hashCode();
+    }
+
+    // requires i <= j
+    public static void Perform2Swap(BitSet orig, int i, int j, int numElem)
+    {
+
+        // swap the two rows
+        int iS = ToSerialIndex(i, 0, numElem);
+        int jS = ToSerialIndex(j, 0, numElem);
+        for (int x=0;x<numElem;x++)
+            Swap(orig, iS+x, jS+x);
+
+        // swap the two columns
+        iS = ToSerialIndex(0, i, numElem);
+        jS = ToSerialIndex(0, j, numElem);
+        for(int y=0;y<numElem;y++)
+            Swap(orig, y*numElem+iS, y*numElem+jS);
+
+    }
+
+    // Swap the elements at e1 and e2 in b
+    private static void Swap(BitSet b, int e1, int e2)
+    {
+        boolean t = b.get(e1); b.set(e1, b.get(e2)); b.set(e2, t);
     }
 }

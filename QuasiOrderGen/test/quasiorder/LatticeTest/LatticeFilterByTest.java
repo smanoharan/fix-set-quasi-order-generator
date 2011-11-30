@@ -19,7 +19,7 @@ public class LatticeFilterByTest extends LatticeFixture
         Lattice lat = filterBy(false, false, cur);
         assertEquals(testTitle + "latOrder", cur.latOrder, lat.latOrder);
         assertEquals(testTitle + "relation", cur.lattice, lat.latBit);
-        assertArrayEquals(testTitle + "names", cur.names, lat.names, cur.latOrder);
+        AssertArrayEquals(testTitle + "names", cur.names, lat.names, cur.latOrder);
     }
 
     @Test
@@ -29,7 +29,7 @@ public class LatticeFilterByTest extends LatticeFixture
         Lattice lat = filterBy(true, false, cur);
         assertEquals(testTitle + "latOrder", cur.FilteredFaithfulLatOrder, lat.latOrder);
         assertEquals(testTitle + "relation", cur.FilteredFaithfulRelation, lat.latBit);
-        assertArrayEquals(testTitle + "names", cur.FilteredFaithfulNames, lat.names, cur.FilteredFaithfulLatOrder);
+        AssertArrayEquals(testTitle + "names", cur.FilteredFaithfulNames, lat.names, cur.FilteredFaithfulLatOrder);
     }
 
     @Test
@@ -39,7 +39,7 @@ public class LatticeFilterByTest extends LatticeFixture
         Lattice lat = filterBy(false, true, cur);
         assertEquals(testTitle + "latOrder", cur.FilteredNormalLatOrder, lat.latOrder);
         assertEquals(testTitle + "relation", cur.FilteredNormalRelation, lat.latBit);
-        assertArrayEquals(testTitle + "names", cur.FilteredNormalNames, lat.names, cur.FilteredNormalLatOrder);
+        AssertArrayEquals(testTitle + "names", cur.FilteredNormalNames, lat.names, cur.FilteredNormalLatOrder);
     }
 
     @Test
@@ -49,7 +49,7 @@ public class LatticeFilterByTest extends LatticeFixture
         Lattice lat = filterBy(true, true, cur);
         assertEquals(testTitle + "latOrder", cur.FilteredFaithfulNormalLatOrder, lat.latOrder);
         assertEquals(testTitle + "relation", cur.FilteredFaithfulNormalRelation, lat.latBit);
-        assertArrayEquals(testTitle + "names", cur.FilteredFaithfulNormalNames, lat.names, cur.FilteredFaithfulNormalLatOrder);
+        AssertArrayEquals(testTitle + "names", cur.FilteredFaithfulNormalNames, lat.names, cur.FilteredFaithfulNormalLatOrder);
     }
 
     private static Lattice filterBy(boolean faithfulOnly, boolean normalOnly, LatticeTestCase cur)

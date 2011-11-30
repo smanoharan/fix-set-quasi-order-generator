@@ -1,6 +1,7 @@
 package quasiorder;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
@@ -160,14 +161,93 @@ public class Generate
         {
             Lattice lat = Lattice.FilterBy(relations.FixOrders, overallRelation, numRels, ((i & 1) == 1), i >= 2, relNames, colors);
 
-            PrintWriter latDot = new PrintWriter(String.format("%s.%s.lat", title, latTypes[i]));
-            latDot.println(RelationFormat.PrintRelationEdges(lat));
-            latDot.close();
+            // ungrouped lattice
+            RelationFormat.PrintRelationEdges(lat, String.format("%s.%s.lat", title, latTypes[i]));
+            modDistOutput.println(String.format("ungrouped: %1$-50s %2$s", latTypes[i], lat.ModDistCheckMessage()));
 
-            // determine modularity/distributivity:
-            modDistOutput.println(String.format("%1$-50s %2$s", latTypes[i], lat.ModDistCheckMessage()));
+            // grouped lattice
+            // want: RelationFormat.PrintRelationEdges(Lattice.GroupBy(relations.FixOrders, filteredRelation, numRels))
+            // actually: groupings are the same regardless of filtering.. (only removes elements, doesn't change them).
+            // options:
+            //      have a group id array: elem -> group-id; (Quadratic, but it is the fastest since numElem < 10 per size.
+            //      linked list of groups (each is a linked list of elements)
+            // TODO
+
+            // TODO grouped:
+            modDistOutput.println(String.format("grouped: %1$-50s %2$s", latTypes[i], lat.ModDistCheckMessage()));
+
         }
         modDistOutput.close();
     }
+
+    /**
+     * Partition fix-orders by equivalence under automorphisms.
+     *
+     * @param automorphMaps The automorphisms of the group
+     * @param numElem The number of elements in the group
+     * @return A map indexOf(element) -> PartID, where PartID is different for each partition.
+     */
+    public static int[] PartitionBy(ArrayList<FixOrder> fixOrders, ArrayList<Permutation> automorphMaps, int numElem)
+    {
+        int numFixOrders = fixOrders.size();
+
+        // init each element to its own group:
+        int[] res = new int[numFixOrders];
+        for (int i=0;i<numFixOrders;i++)
+            res[i]=i;
+
+        // for each size, for each element of that size, combine elements if automorphism-equivalent
+        int startIndex = 0;
+        while(startIndex<numFixOrders)
+        {
+            int currentSize = fixOrders.get(startIndex).Cardinality;
+            int endIndex = startIndex;
+            while(endIndex<numFixOrders && fixOrders.get(endIndex).Cardinality == currentSize) { endIndex++; }
+
+            for(int i=startIndex;i<endIndex;i++)
+            {
+                // combine relations
+                for (int j=i+1;j<endIndex;j++)
+                {
+                    if (res[i]!=res[j] && isAutomorphismEquivalent(fixOrders.get(i).Relation, fixOrders.get(j).Relation, automorphMaps, numElem))
+                    {
+                        int oldGroup = res[j];
+                        for (int k=j;k<endIndex;k++)
+                            if (res[k]==oldGroup)
+                                res[k]=res[i];
+                    }
+                }
+            }
+            startIndex = endIndex;
+        }
+
+        return res;
+    }
+
+    /**
+     * Check if the first bitSet becomes the second when rotated by any automorphism
+     * @param automorphMaps The automorphisms of the group.
+     * @param numElem The number of elements in the relation.
+     * @return Whether the two BitSets are equivalent via automorphism.
+     */
+    public static boolean isAutomorphismEquivalent(BitSet first, BitSet second, ArrayList<Permutation> automorphMaps, int numElem)
+    {
+        for(Permutation p : automorphMaps)
+            if (isAutomorphismEquivalent(first, second, p, numElem))
+                return true;
+
+        return false;
+    }
+
+    // Check if the two bitsets become the same when rotated by the permutation
+    private static boolean isAutomorphismEquivalent(BitSet first, BitSet second, Permutation p, int numElem)
+    {
+        BitSet c = (BitSet)first.clone();
+        for(TwoSwap t : p.swaps)
+            FixOrder.Perform2Swap(c, t.i, t.j, numElem);
+
+       return (c.equals(second));
+    }
+
 }
 

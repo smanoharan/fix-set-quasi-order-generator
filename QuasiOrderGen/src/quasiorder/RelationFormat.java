@@ -1,11 +1,19 @@
 package quasiorder;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.BitSet;
 import java.util.List;
 
 public class RelationFormat
 {
+    public static void PrintRelationEdges(Lattice lattice, String filename) throws IOException
+    {
+        PrintWriter p = new PrintWriter(filename);
+        p.println(PrintRelationEdges(lattice));
+        p.close();
+    }
+
     public static String PrintRelationEdges(Lattice lattice)
     {
         return PrintRelationEdges(lattice.latBit, lattice.names, lattice.nodeAttrs, lattice.latOrder);

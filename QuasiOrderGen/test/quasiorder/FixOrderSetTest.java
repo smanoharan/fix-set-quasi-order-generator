@@ -9,7 +9,6 @@ public class FixOrderSetTest extends QuasiOrderGenFixture
 {
     private static final int NumElem = 4;
     private FixOrderSet relations;
-    private String Colour = "red";
 
     @Before
     public void Setup()

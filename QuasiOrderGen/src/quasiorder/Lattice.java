@@ -14,6 +14,7 @@ public class Lattice
     private final int[][] meetTable;
     public final String[] names;
     public final String[] groupedNames;
+    public final String[] colours;
     public final String[] nodeAttrs;
     public final LinkedList<ArrayList<Integer>> subgraphs;
 
@@ -38,6 +39,7 @@ public class Lattice
         this.names = names;
         this.groupedNames = groupedNames;
         this.subgraphs = subgraphs;
+        this.colours = colors;
         this.joinTable = DetermineJoins(lattice, latOrder);
         this.meetTable = DetermineMeets(lattice, latOrder);
         this.nodeAttrs = DetermineNodeAttributes(colors, JoinReducibles(), MeetReducibles(), latOrder);

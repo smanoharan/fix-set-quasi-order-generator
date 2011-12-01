@@ -49,7 +49,7 @@ public class Lattice
     {
         String[] colAttr = new String[latOrder];
         for(int i=0;i<latOrder;i++)
-            colAttr[i] = "fillcolor=" + colors[i];
+            colAttr[i] = "style=filled; fillcolor=\"" + colors[i] + "\"";
         return colAttr;
     }
 

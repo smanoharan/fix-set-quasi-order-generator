@@ -93,20 +93,24 @@ public class M3TestCase extends LatticeTestCase
         FilteringRelations.add(new FixOrder(new BitSet(), true, true));
         for (int i=3;i<latOrder;i++) FilteringRelations.add(new FixOrder(new BitSet(), true, false));
 
-        subgraphs = ToList(ToList(0, 4), ToList(1, 2, 3));
+        subGraphs = ToList(ToList(0, 4), ToList(1, 2, 3));
+        groupedNames =  new String[]{"0", "\"_1_2_3\"", "\"_1_2_3\"", "\"_1_2_3\"", "4"};
 
         FilteredFaithfulNormalLatOrder = 1;
         FilteredFaithfulNormalNames = new String[] { "2" };
+        FilteredFaithfulNormalGroupedNames = new String[] { "2" };
         FilteredFaithfulNormalRelation = StringToBitSet("1");
         FilteredFaithfulNormalSubGraphs = ToList(ToList(0));
 
         FilteredFaithfulLatOrder = latOrder;
         FilteredFaithfulNames = new String[] {"0", "1", "2", "3", "4"};
+        FilteredFaithfulGroupedNames = groupedNames;
         FilteredFaithfulRelation = lattice;
-        FilteredFaithfulSubGraphs = subgraphs;
+        FilteredFaithfulSubGraphs = subGraphs;
 
         FilteredNormalLatOrder = FilteredFaithfulNormalLatOrder;
         FilteredNormalNames = FilteredFaithfulNormalNames;
+        FilteredNormalGroupedNames = FilteredFaithfulNormalGroupedNames;
         FilteredNormalRelation = FilteredFaithfulNormalRelation;
         FilteredNormalSubGraphs = FilteredFaithfulNormalSubGraphs;
     }

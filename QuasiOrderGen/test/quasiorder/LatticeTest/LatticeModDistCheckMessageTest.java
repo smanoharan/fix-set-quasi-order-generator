@@ -16,7 +16,7 @@ public class LatticeModDistCheckMessageTest extends LatticeFixture
     @Test
     public void assertLatticeModularity()
     {
-        Lattice lat = new Lattice(cur.lattice, cur.latOrder, cur.names, cur.colors, cur.subgraphs);
+        Lattice lat = new Lattice(cur.lattice, cur.latOrder, cur.names, cur.colors, cur.subGraphs, cur.groupedNames);
         assertEquals(cur.title, cur.modDistMessage, lat.ModDistCheckMessage());
     }
 }

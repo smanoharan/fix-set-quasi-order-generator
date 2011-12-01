@@ -111,24 +111,28 @@ public class Dihedral4FaithfulOnlyTestCase extends LatticeTestCase
         modDistMessage = "Modular: true\tDistributive: true";
 
         // all relations are faithful and all are normal:
-        subgraphs = ToList(ToList(0,1,2), ToList(3,4,5), ToList(6,7));
+        subGraphs = ToList(ToList(0,1,2), ToList(3,4,5), ToList(6,7));
         FilteringRelations = new ArrayList<FixOrder>();
         for (int i=0;i<latOrder;i++)
             FilteringRelations.add(new FixOrder(new BitSet(), true, true));
 
 
+        groupedNames = new String[] {"0", "1", "2", "\"_3_4_5\"", "\"_3_4_5\"","\"_3_4_5\"", "\"_6_7\"","\"_6_7\"" };
         FilteredFaithfulLatOrder = latOrder;
         FilteredFaithfulNames = new String[]{"0", "1", "2", "3", "4", "5", "6", "7"};
+        FilteredFaithfulGroupedNames = groupedNames;
         FilteredFaithfulRelation = lattice;
-        FilteredFaithfulSubGraphs = subgraphs;
+        FilteredFaithfulSubGraphs = subGraphs;
         FilteredNormalLatOrder = latOrder;
         FilteredNormalNames = FilteredFaithfulNames;
+        FilteredNormalGroupedNames = groupedNames;
         FilteredNormalRelation = lattice;
-        FilteredNormalSubGraphs = subgraphs;
+        FilteredNormalSubGraphs = subGraphs;
         FilteredFaithfulNormalLatOrder = latOrder;
         FilteredFaithfulNormalNames = FilteredFaithfulNames;
+        FilteredFaithfulNormalGroupedNames = groupedNames;
         FilteredFaithfulNormalRelation = lattice;
-        FilteredFaithfulNormalSubGraphs = subgraphs;
+        FilteredFaithfulNormalSubGraphs = subGraphs;
 
         //
         //        0

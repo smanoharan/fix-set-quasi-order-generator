@@ -22,8 +22,9 @@ public abstract class LatticeTestCase
     public int[][] expectedJoin;
     public String title;
     public String[] names;
+    public String[] groupedNames;
     public String[] colors;
-    public LinkedList<ArrayList<Integer>> subgraphs;
+    public LinkedList<ArrayList<Integer>> subGraphs;
 
     public boolean isModular;
     public int NonModularAElem;
@@ -47,15 +48,18 @@ public abstract class LatticeTestCase
     public int FilteredFaithfulLatOrder;
     public BitSet FilteredFaithfulRelation;
     public String[] FilteredFaithfulNames;
+    public String[] FilteredFaithfulGroupedNames;
     public LinkedList<ArrayList<Integer>> FilteredFaithfulSubGraphs;
 
     public int FilteredNormalLatOrder;
     public BitSet FilteredNormalRelation;
+    public String[] FilteredNormalGroupedNames;
     public String[] FilteredNormalNames;
     public LinkedList<ArrayList<Integer>> FilteredNormalSubGraphs;
 
     public int FilteredFaithfulNormalLatOrder;
     public BitSet FilteredFaithfulNormalRelation;
+    public String[] FilteredFaithfulNormalGroupedNames;
     public String[] FilteredFaithfulNormalNames;
     public LinkedList<ArrayList<Integer>> FilteredFaithfulNormalSubGraphs;
 

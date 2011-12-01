@@ -117,20 +117,24 @@ public class M3SuperSetTestCase extends LatticeTestCase
         for (int i=2;i<latOrder;i++)
             FilteringRelations.add(new FixOrder(new BitSet(), true, true));
 
-        subgraphs = ToList(ToList(0, 3, 6), ToList(1, 2), ToList(4, 5));
+        subGraphs = ToList(ToList(0, 3, 6), ToList(1, 2), ToList(4, 5));
+        groupedNames =  new String[]{"0", "\"_1_2\"", "\"_1_2\"", "3", "\"_4_5\"", "\"_4_5\"", "6"};
 
         FilteredFaithfulNormalLatOrder = 5;
         FilteredFaithfulNormalNames = new String[] { "2", "3", "4", "5", "6" };
+        FilteredFaithfulNormalGroupedNames = new String[] { "2", "3", "\"_4_5\"", "\"_4_5\"", "6" };
         FilteredFaithfulNormalRelation = StringToBitSet("10000"+"11000"+"10100"+"10010"+"11111");
         FilteredFaithfulNormalSubGraphs = ToList(ToList(1, 4, 0), ToList(2, 3));
 
         FilteredFaithfulLatOrder = FilteredFaithfulNormalLatOrder;
         FilteredFaithfulNames = FilteredFaithfulNormalNames;
+        FilteredFaithfulGroupedNames = FilteredFaithfulNormalGroupedNames;
         FilteredFaithfulRelation = FilteredFaithfulNormalRelation;
         FilteredFaithfulSubGraphs = FilteredFaithfulNormalSubGraphs;
 
         FilteredNormalLatOrder = FilteredFaithfulNormalLatOrder;
         FilteredNormalNames = FilteredFaithfulNormalNames;
+        FilteredNormalGroupedNames = FilteredFaithfulNormalGroupedNames;
         FilteredNormalRelation = FilteredFaithfulNormalRelation;
         FilteredNormalSubGraphs = FilteredFaithfulNormalSubGraphs;
     }

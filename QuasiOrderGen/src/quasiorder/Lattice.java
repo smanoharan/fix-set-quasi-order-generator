@@ -13,6 +13,7 @@ public class Lattice
     private final int[][] joinTable;
     private final int[][] meetTable;
     public final String[] names;
+    public final String[] groupedNames;
     public final String[] nodeAttrs;
     public final LinkedList<ArrayList<Integer>> subgraphs;
 
@@ -29,11 +30,13 @@ public class Lattice
     public int NonDistXYJoinElem = -1;
     public int NonDistXZJoinElem = -1;
 
-    public Lattice(BitSet lattice, int latOrder, String[] names, String[] colors, LinkedList<ArrayList<Integer>> subgraphs)
+    public Lattice(BitSet lattice, int latOrder, String[] names, String[] colors,
+                   LinkedList<ArrayList<Integer>> subgraphs, String[] groupedNames)
     {
         this.latBit = lattice;
         this.latOrder = latOrder;
         this.names = names;
+        this.groupedNames = groupedNames;
         this.subgraphs = subgraphs;
         this.joinTable = DetermineJoins(lattice, latOrder);
         this.meetTable = DetermineMeets(lattice, latOrder);
@@ -108,8 +111,26 @@ public class Lattice
             else if (inclPart.size()==1) singletons.add(inclPart.get(0));
             else if (inclPart.size() > 1) partSubGraphs.add(inclPart);
         }
-        
-        return new Lattice(partRelation, numInclRels, partNames, partNodeAttrs, partSubGraphs);
+
+        // setup grouped names, from partSubgraph:
+        String[] groupedNames = new String[numInclRels];
+        System.arraycopy(partNames, 0, groupedNames, 0, numInclRels);
+
+        first = true;
+        for (ArrayList<Integer> part : partSubGraphs)
+        {
+            if (first) { first = false; continue; } // skip singletons
+
+            StringBuilder newnameSB = new StringBuilder("\"");
+            for(Integer i : part) newnameSB.append("_").append(partNames[i]);
+            newnameSB.append('"');
+
+            String newName = newnameSB.toString();
+            for(Integer i : part)
+                groupedNames[i] = newName;
+        }
+
+        return new Lattice(partRelation, numInclRels, partNames, partNodeAttrs, partSubGraphs, groupedNames);
     }
 
     /**

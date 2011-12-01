@@ -9,16 +9,19 @@ import java.util.List;
 
 public class RelationFormat
 {
-    public static void PrintRelationEdges(Lattice lattice, String filename, boolean partition) throws IOException
+    public static void PrintRelationEdges(Lattice lattice, String filename, boolean partition, boolean groupedNames) throws IOException
     {
         PrintWriter p = new PrintWriter(filename);
-        p.println(PrintRelationEdges(lattice, partition));
+        p.println(PrintRelationEdges(lattice, partition, groupedNames));
         p.close();
     }
 
-    public static String PrintRelationEdges(Lattice lattice, boolean partition)
+    public static String PrintRelationEdges(Lattice lattice, boolean partition, boolean groupedNames)
     {
-        return PrintRelationEdges(lattice.latBit, lattice.names, lattice.nodeAttrs,
+        return PrintRelationEdges(
+                lattice.latBit,
+                (groupedNames ? lattice.groupedNames :lattice.names),
+                lattice.nodeAttrs,
                 (partition ? lattice.subgraphs : new LinkedList<ArrayList<Integer>>()),
                 lattice.latOrder);
     }

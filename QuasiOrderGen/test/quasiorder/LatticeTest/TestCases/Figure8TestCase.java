@@ -130,20 +130,23 @@ public class Figure8TestCase extends LatticeTestCase
         FilteringRelations.add(new FixOrder(new BitSet(), false, true)); // 5
         FilteringRelations.add(new FixOrder(new BitSet(), false, true)); // 6
 
-        subgraphs = ToList(ToList(0, 3, 6), ToList(1, 2), ToList(4, 5));
-
+        subGraphs = ToList(ToList(0, 3, 6), ToList(1, 2), ToList(4, 5));
+        groupedNames = new String[] {"0", "\"_1_2\"", "\"_1_2\"", "3", "\"_4_5\"", "\"_4_5\"", "6" };
         FilteredFaithfulLatOrder = 4;
         FilteredFaithfulNames = new String[]{"0", "1", "2", "3"};
+        FilteredFaithfulGroupedNames = new String[]{"0", "\"_1_2\"", "\"_1_2\"", "3"};
         FilteredFaithfulRelation = StringToBitSet("1000"+"1100"+"1010"+"1111");
         FilteredFaithfulSubGraphs = ToList(ToList(0, 3), ToList(1, 2));
 
         FilteredNormalLatOrder = 7;
         FilteredNormalNames = new String[]{"0", "1", "2", "3", "4", "5", "6"};
+        FilteredNormalGroupedNames = groupedNames;
         FilteredNormalRelation = lattice;
-        FilteredNormalSubGraphs = subgraphs;
+        FilteredNormalSubGraphs = subGraphs;
 
         FilteredFaithfulNormalLatOrder = FilteredFaithfulLatOrder;
         FilteredFaithfulNormalNames = FilteredFaithfulNames;
+        FilteredFaithfulNormalGroupedNames = FilteredFaithfulGroupedNames;
         FilteredFaithfulNormalRelation = FilteredFaithfulRelation;
         FilteredFaithfulNormalSubGraphs = FilteredFaithfulSubGraphs;
 

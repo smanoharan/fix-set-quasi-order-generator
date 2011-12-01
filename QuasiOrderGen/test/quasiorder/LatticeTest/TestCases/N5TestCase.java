@@ -100,20 +100,24 @@ public class N5TestCase extends LatticeTestCase
         for (int i=0;i<latOrder;i++)
             FilteringRelations.add(new FixOrder(new BitSet(), true, true));
 
-        subgraphs = ToList(ToList(0, 1, 2, 3, 4));
+        subGraphs = ToList(ToList(0, 1, 2, 3, 4));
+        groupedNames = new String[] { "0", "1", "2", "3", "4" };
 
         FilteredFaithfulNormalLatOrder = 5;
         FilteredFaithfulNormalNames = new String[] { "0", "1", "2", "3", "4" };
+        FilteredFaithfulNormalGroupedNames = groupedNames;
         FilteredFaithfulNormalRelation = StringToBitSet("10000"+"11000"+"10100"+"11010"+"11111");
-        FilteredFaithfulNormalSubGraphs = subgraphs;
+        FilteredFaithfulNormalSubGraphs = subGraphs;
 
         FilteredFaithfulLatOrder = FilteredFaithfulNormalLatOrder;
         FilteredFaithfulNames = FilteredFaithfulNormalNames;
+        FilteredFaithfulGroupedNames = FilteredFaithfulNormalGroupedNames;
         FilteredFaithfulRelation = FilteredFaithfulNormalRelation;
         FilteredFaithfulSubGraphs = FilteredFaithfulNormalSubGraphs;
 
         FilteredNormalLatOrder = FilteredFaithfulNormalLatOrder;
         FilteredNormalNames = FilteredFaithfulNormalNames;
+        FilteredNormalGroupedNames = FilteredFaithfulNormalGroupedNames;
         FilteredNormalRelation = FilteredFaithfulNormalRelation;
         FilteredNormalSubGraphs = FilteredFaithfulSubGraphs;
     }

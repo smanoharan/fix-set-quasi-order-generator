@@ -143,20 +143,24 @@ public class GridTestCase extends LatticeTestCase
         FilteringRelations.add(new FixOrder(new BitSet(), true, false)); // 6
         FilteringRelations.add(new FixOrder(new BitSet(), true, false)); // 7
         FilteringRelations.add(new FixOrder(new BitSet(), true, false)); // 8
-        subgraphs = ToList(ToList(0, 8), ToList(1, 2), ToList(3, 4, 5), ToList(6, 7));
+        subGraphs = ToList(ToList(0, 8), ToList(1, 2), ToList(3, 4, 5), ToList(6, 7));
+        groupedNames = new String[] {"0", "\"_1_2\"", "\"_1_2\"", "\"_3_4_5\"", "\"_3_4_5\"", "\"_3_4_5\"", "\"_6_7\"", "\"_6_7\"", "8"};
 
         FilteredFaithfulLatOrder = 4;
         FilteredFaithfulNames = new String[]{"4", "6", "7", "8"};
+        FilteredFaithfulGroupedNames = new String[]{"4", "\"_6_7\"", "\"_6_7\"", "8"};
         FilteredFaithfulRelation = StringToBitSet("1000"+"1100"+"1010"+"1111");
         FilteredFaithfulSubGraphs = ToList(ToList(3, 0), ToList(1, 2));
 
         FilteredNormalLatOrder = 4;
         FilteredNormalNames =  new String[]{"0", "1", "2", "4"};
+        FilteredNormalGroupedNames =  new String[]{"0", "\"_1_2\"", "\"_1_2\"", "4"};
         FilteredNormalRelation = StringToBitSet("1000"+"1100"+"1010"+"1111");
         FilteredNormalSubGraphs = ToList(ToList(0, 3), ToList(1, 2));
 
         FilteredFaithfulNormalLatOrder = 1;
         FilteredFaithfulNormalNames = new String[] { "4" };
+        FilteredFaithfulNormalGroupedNames = new String[] { "4" };
         FilteredFaithfulNormalRelation = StringToBitSet("1");
         FilteredFaithfulNormalSubGraphs = ToList(ToList(0));
 

@@ -115,20 +115,24 @@ public class Dihedral6TestCase extends LatticeTestCase
         FilteringRelations.add(new FixOrder(new BitSet(), false, true)); // 4
         FilteringRelations.add(new FixOrder(new BitSet(), false, true)); // 5
 
-        subgraphs = ToList(ToList(0,5), ToList(1,2), ToList(3,4));
+        subGraphs = ToList(ToList(0,5), ToList(1,2), ToList(3,4));
+        groupedNames = new String[] {"0", "\"_1_2\"", "\"_1_2\"", "\"_3_4\"", "\"_3_4\"", "5" };
 
         FilteredFaithfulLatOrder = 4;
         FilteredFaithfulNames = new String[]{"0", "1", "2", "3"};
+        FilteredFaithfulGroupedNames = new String[]{"0", "\"_1_2\"", "\"_1_2\"", "3"};
         FilteredFaithfulRelation = StringToBitSet("1000"+"1100"+"1010"+"1111");
         FilteredFaithfulSubGraphs = ToList(ToList(0, 3), ToList(1, 2));
 
         FilteredNormalLatOrder = 4;
         FilteredNormalNames = new String[]{"1", "3", "4", "5"};
+        FilteredNormalGroupedNames = new String[]{"1", "\"_3_4\"", "\"_3_4\"", "5"};
         FilteredNormalRelation = StringToBitSet("1000"+"1100"+"1010"+"1111");
         FilteredNormalSubGraphs = ToList(ToList(3, 0), ToList(1, 2));
 
         FilteredFaithfulNormalLatOrder = 2;
         FilteredFaithfulNormalNames = new String[]{"1", "3"};
+        FilteredFaithfulNormalGroupedNames = new String[]{"1", "3"};
         FilteredFaithfulNormalRelation = StringToBitSet("1011");
         FilteredFaithfulNormalSubGraphs = ToList(ToList(0, 1));
 

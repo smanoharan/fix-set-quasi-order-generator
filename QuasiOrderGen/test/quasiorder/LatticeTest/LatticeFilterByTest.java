@@ -7,6 +7,7 @@ import quasiorder.Lattice;
 import quasiorder.LatticeTest.TestCases.LatticeTestCase;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.LinkedList;
 
 import static org.junit.Assert.assertEquals;
@@ -19,51 +20,63 @@ public class LatticeFilterByTest extends LatticeFixture
     @Test
     public void assertFilterByAll()
     {
-        String testTitle = cur.title + "-all-";
-        Lattice lat = filterBy(false, false, cur);
-        assertEquals(testTitle + "latOrder", cur.latOrder, lat.latOrder);
-        assertEquals(testTitle + "relation", cur.lattice, lat.latBit);
-        AssertArrayEquals(testTitle + "names", cur.names, lat.names, cur.latOrder);
-        AssertListOfListEquals(testTitle + "subgraphs", cur.subgraphs, lat.subgraphs);
+        AssertLatticeIs("-all-", false, false,
+                cur.latOrder,
+                cur.lattice,
+                cur.names,
+                cur.groupedNames,
+                cur.subGraphs);
     }
 
     @Test
     public void assertFilterByFaithfulOnly()
     {
-        String testTitle = cur.title + "-faithfulOnly-";
-        Lattice lat = filterBy(true, false, cur);
-        assertEquals(testTitle + "latOrder", cur.FilteredFaithfulLatOrder, lat.latOrder);
-        assertEquals(testTitle + "relation", cur.FilteredFaithfulRelation, lat.latBit);
-        AssertArrayEquals(testTitle + "names", cur.FilteredFaithfulNames, lat.names, cur.FilteredFaithfulLatOrder);
-        AssertListOfListEquals(testTitle + "subgraphs", cur.FilteredFaithfulSubGraphs, lat.subgraphs);
+        AssertLatticeIs("-faithfulOnly-", true, false,
+                cur.FilteredFaithfulLatOrder,
+                cur.FilteredFaithfulRelation,
+                cur.FilteredFaithfulNames,
+                cur.FilteredFaithfulGroupedNames,
+                cur.FilteredFaithfulSubGraphs);
     }
 
     @Test
     public void assertFilterByNormalOnly()
     {
-        String testTitle = cur.title + "-normalOnly-";
-        Lattice lat = filterBy(false, true, cur);
-        assertEquals(testTitle + "latOrder", cur.FilteredNormalLatOrder, lat.latOrder);
-        assertEquals(testTitle + "relation", cur.FilteredNormalRelation, lat.latBit);
-        AssertArrayEquals(testTitle + "names", cur.FilteredNormalNames, lat.names, cur.FilteredNormalLatOrder);
-        AssertListOfListEquals(testTitle + "subgraphs", cur.FilteredNormalSubGraphs, lat.subgraphs);
+        AssertLatticeIs("-normalOnly-", false, true,
+                cur.FilteredNormalLatOrder,
+                cur.FilteredNormalRelation,
+                cur.FilteredNormalNames,
+                cur.FilteredNormalGroupedNames,
+                cur.FilteredNormalSubGraphs);
     }
 
     @Test
     public void assertFilterByFaithfulNormalOnly()
     {
-        String testTitle = cur.title + "-faithfulNormalOnly-";
-        Lattice lat = filterBy(true, true, cur);
-        assertEquals(testTitle + "latOrder", cur.FilteredFaithfulNormalLatOrder, lat.latOrder);
-        assertEquals(testTitle + "relation", cur.FilteredFaithfulNormalRelation, lat.latBit);
-        AssertArrayEquals(testTitle + "names", cur.FilteredFaithfulNormalNames, lat.names, cur.FilteredFaithfulNormalLatOrder);
-        AssertListOfListEquals(testTitle + "subgraphs", cur.FilteredFaithfulNormalSubGraphs, lat.subgraphs);
+        AssertLatticeIs("-faithfulNormalOnly-", true, true,
+                cur.FilteredFaithfulNormalLatOrder,
+                cur.FilteredFaithfulNormalRelation,
+                cur.FilteredFaithfulNormalNames,
+                cur.FilteredFaithfulNormalGroupedNames,
+                cur.FilteredFaithfulNormalSubGraphs);
+    }
+
+    private void AssertLatticeIs(String testCaseTitle, boolean faithfulOnly, boolean normalOnly, int latOrder,
+                               BitSet latBit, String[] names, String[] groupedNames, LinkedList<ArrayList<Integer>> subgraphs)
+    {
+        String testTitle = cur.title + testCaseTitle;
+        Lattice lat = filterBy(faithfulOnly, normalOnly, cur);
+        assertEquals(testTitle + "latOrder", latOrder, lat.latOrder);
+        assertEquals(testTitle + "relation", latBit, lat.latBit);
+        AssertArrayEquals(testTitle + "groupedNames", groupedNames, lat.groupedNames, latOrder);
+        AssertArrayEquals(testTitle + "names", names, lat.names, latOrder);
+        AssertListOfListEquals(testTitle + "subgraphs", subgraphs, lat.subgraphs);
     }
 
     private static Lattice filterBy(boolean faithfulOnly, boolean normalOnly, LatticeTestCase cur)
     {
         return Lattice.FilterBy(cur.FilteringRelations, cur.lattice, cur.latOrder,
-                faithfulOnly, normalOnly, cur.names, cur.colors, cur.subgraphs);
+                faithfulOnly, normalOnly, cur.names, cur.colors, cur.subGraphs);
     }
 
     private static void AssertListOfListEquals(String title, LinkedList<ArrayList<Integer>> expected, LinkedList<ArrayList<Integer>> actual)

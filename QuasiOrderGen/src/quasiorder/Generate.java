@@ -1,8 +1,11 @@
 package quasiorder;
 
-import java.io.*;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -65,7 +68,8 @@ public class Generate
             if (maxIter==0) ProcessConjugacyFamily(inputGroup, relations, 1); // only 1 conj-class.
             else for (long s=0;s<maxIter;s++) ProcessConjugacyFamily(inputGroup, relations, (maxIter | s));
 
-            PrintAllOutput(inputGroup, relations, title, outputAllGraphs, thresholdRelationsBySize);
+            ArrayList<Permutation> permutations = Permutation.FromJSON(new FileReader(title + ".auto.in"));
+            PrintAllOutput(inputGroup, relations, title, outputAllGraphs, thresholdRelationsBySize, permutations);
         }
         catch(Exception e)
         {
@@ -92,7 +96,7 @@ public class Generate
         }
     }
 
-    private static void PrintAllOutput(Group inputGroup, FixOrderSet relations, String title, boolean allGraphs, boolean thresholdRelationsBySize) throws IOException
+    private static void PrintAllOutput(Group inputGroup, FixOrderSet relations, String title, boolean allGraphs, boolean thresholdRelationsBySize, ArrayList<Permutation> permutations) throws IOException
     {
         // create the output streams:
         PrintWriter rawOutput = new PrintWriter(title + ".out");
@@ -122,14 +126,14 @@ public class Generate
             for(FixOrder b : relations.FixOrders)
             {
                 PrintWriter graphWriter = new PrintWriter(title + ".g" + curIndex++ + ".lat");
-                graphWriter.println(RelationFormat.PrintRelationEdges(b.Relation, inputGroup.ElementNames, colours, inputGroup.NumElements));
+                graphWriter.println(RelationFormat.PrintRelationEdges(b.Relation, inputGroup.ElementNames, colours, new LinkedList<ArrayList<Integer>>(), inputGroup.NumElements));
                 graphWriter.close();
             }
         }
 
         // print the lattice of all fix-set quasi-orders:
         if (!thresholdRelationsBySize || relations.FixOrders.size() < REL_MAX_SIZE)
-            PrintLatticeOfAllFixSetQuasiOrders(rawOutput, title, relations, colours);
+            PrintLatticeOfAllFixSetQuasiOrders(inputGroup, rawOutput, title, relations, colours, permutations);
         else System.err.println("Skipped lattice: size=" + relations.FixOrderToFamilyMap.keySet().size() + " is too big");
 
         // print summary
@@ -143,7 +147,7 @@ public class Generate
         rawOutput.close();
     }
 
-    private static void PrintLatticeOfAllFixSetQuasiOrders(PrintWriter rawOutput, String title, FixOrderSet relations, String[] colors) throws IOException
+    private static void PrintLatticeOfAllFixSetQuasiOrders(Group inputGroup, PrintWriter rawOutput, String title, FixOrderSet relations, String[] colors, ArrayList<Permutation> permutations) throws IOException
     {
         String[] latTypes = new String[] { "all", "faithful", "normal", "faithful-normal"};
         int numLatTypes = latTypes.length;
@@ -154,27 +158,28 @@ public class Generate
             relNames[i] = Integer.toString(i);
 
         BitSet overallRelation = relations.GenerateOverallQuasiOrder();
+        LinkedList<ArrayList<Integer>> subgraphs = PartitionBy(relations.FixOrders, permutations, inputGroup.NumElements);
 
         PrintWriter modDistOutput = new PrintWriter(title + ".md");
         rawOutput.println("\n\n" + "Lattice of all fix set quasi orders: ");
         for (int i=0;i<numLatTypes;i++)
         {
-            Lattice lat = Lattice.FilterBy(relations.FixOrders, overallRelation, numRels, ((i & 1) == 1), i >= 2, relNames, colors);
+            Lattice lat = Lattice.FilterBy(relations.FixOrders, overallRelation, numRels, ((i & 1) == 1), i >= 2, relNames, colors, subgraphs);
 
             // ungrouped lattice
-            RelationFormat.PrintRelationEdges(lat, String.format("%s.%s.lat", title, latTypes[i]));
+            RelationFormat.PrintRelationEdges(lat, String.format("%s.%s.lat", title, latTypes[i]), false);
             modDistOutput.println(String.format("ungrouped: %1$-50s %2$s", latTypes[i], lat.ModDistCheckMessage()));
 
             // grouped lattice
+            RelationFormat.PrintRelationEdges(lat, String.format("%s.col.%s.lat", title, latTypes[i]), true);
+
             // want: RelationFormat.PrintRelationEdges(Lattice.GroupBy(relations.FixOrders, filteredRelation, numRels))
             // actually: groupings are the same regardless of filtering.. (only removes elements, doesn't change them).
             // options:
             //      have a group id array: elem -> group-id; (Quadratic, but it is the fastest since numElem < 10 per size.
             //      linked list of groups (each is a linked list of elements)
-            // TODO
-
             // TODO grouped:
-            modDistOutput.println(String.format("grouped: %1$-50s %2$s", latTypes[i], lat.ModDistCheckMessage()));
+            // modDistOutput.println(String.format("grouped: %1$-50s %2$s", latTypes[i], lat.ModDistCheckMessage()));
 
         }
         modDistOutput.close();
@@ -185,11 +190,14 @@ public class Generate
      *
      * @param automorphMaps The automorphisms of the group
      * @param numElem The number of elements in the group
-     * @return A map indexOf(element) -> PartID, where PartID is different for each partition.
+     * @return A list of partitions, each of which is a list of integers (indices of elements). The first partition lists all singletons.
      */
-    public static int[] PartitionBy(ArrayList<FixOrder> fixOrders, ArrayList<Permutation> automorphMaps, int numElem)
+    public static LinkedList<ArrayList<Integer>> PartitionBy(ArrayList<FixOrder> fixOrders, ArrayList<Permutation> automorphMaps, int numElem)
     {
         int numFixOrders = fixOrders.size();
+        LinkedList<ArrayList<Integer>> parts = new LinkedList<ArrayList<Integer>>();
+        ArrayList<Integer> singletons = new ArrayList<Integer>();
+        parts.add(singletons);
 
         // init each element to its own group:
         int[] res = new int[numFixOrders];
@@ -218,10 +226,30 @@ public class Generate
                     }
                 }
             }
+
+            // generate the partitions from the numbers
+            for(int i=startIndex;i<endIndex;i++)
+            {
+                if (res[i]==-1) continue; // already checked
+
+                ArrayList<Integer> partition = new ArrayList<Integer>();
+                partition.add(i);
+                for(int j=i+1;j<endIndex;j++)
+                {
+                    if (res[j]==res[i])
+                    {
+                        partition.add(j);
+                        res[j]=-1;
+                    }
+                }
+                if (partition.size() == 1) singletons.add(i);
+                else parts.add(partition);
+            }
+
             startIndex = endIndex;
         }
 
-        return res;
+        return parts;
     }
 
     /**

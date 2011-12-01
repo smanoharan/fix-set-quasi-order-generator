@@ -16,7 +16,7 @@ public class LatticeNodeAttributeTest extends LatticeFixture
     @Test
     public void assertLatticeNodeAttributes()
     {
-        Lattice lat = new Lattice(cur.lattice, cur.latOrder, cur.names, cur.colors);
+        Lattice lat = new Lattice(cur.lattice, cur.latOrder, cur.names, cur.colors, cur.subgraphs);
         for(int i=0;i<cur.latOrder;i++)
             assertEquals(cur.title + "-" + i, cur.nodeAttr[i], lat.nodeAttrs[i]);
     }

@@ -117,16 +117,21 @@ public class M3SuperSetTestCase extends LatticeTestCase
         for (int i=2;i<latOrder;i++)
             FilteringRelations.add(new FixOrder(new BitSet(), true, true));
 
+        subgraphs = ToList(ToList(0, 3, 6), ToList(1, 2), ToList(4, 5));
+
         FilteredFaithfulNormalLatOrder = 5;
         FilteredFaithfulNormalNames = new String[] { "2", "3", "4", "5", "6" };
         FilteredFaithfulNormalRelation = StringToBitSet("10000"+"11000"+"10100"+"10010"+"11111");
+        FilteredFaithfulNormalSubGraphs = ToList(ToList(1, 4, 0), ToList(2, 3));
 
         FilteredFaithfulLatOrder = FilteredFaithfulNormalLatOrder;
         FilteredFaithfulNames = FilteredFaithfulNormalNames;
         FilteredFaithfulRelation = FilteredFaithfulNormalRelation;
+        FilteredFaithfulSubGraphs = FilteredFaithfulNormalSubGraphs;
 
         FilteredNormalLatOrder = FilteredFaithfulNormalLatOrder;
         FilteredNormalNames = FilteredFaithfulNormalNames;
         FilteredNormalRelation = FilteredFaithfulNormalRelation;
+        FilteredNormalSubGraphs = FilteredFaithfulNormalSubGraphs;
     }
 }

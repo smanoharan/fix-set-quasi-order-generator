@@ -3,7 +3,9 @@ package quasiorder.LatticeTest.TestCases;
 import quasiorder.FixOrder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
+import java.util.LinkedList;
 
 public abstract class LatticeTestCase
 {
@@ -21,6 +23,7 @@ public abstract class LatticeTestCase
     public String title;
     public String[] names;
     public String[] colors;
+    public LinkedList<ArrayList<Integer>> subgraphs;
 
     public boolean isModular;
     public int NonModularAElem;
@@ -40,19 +43,21 @@ public abstract class LatticeTestCase
     public String modDistMessage;
     public String[] nodeAttr;
 
-
     public ArrayList<FixOrder> FilteringRelations;
     public int FilteredFaithfulLatOrder;
     public BitSet FilteredFaithfulRelation;
     public String[] FilteredFaithfulNames;
+    public LinkedList<ArrayList<Integer>> FilteredFaithfulSubGraphs;
 
     public int FilteredNormalLatOrder;
     public BitSet FilteredNormalRelation;
     public String[] FilteredNormalNames;
+    public LinkedList<ArrayList<Integer>> FilteredNormalSubGraphs;
 
     public int FilteredFaithfulNormalLatOrder;
     public BitSet FilteredFaithfulNormalRelation;
     public String[] FilteredFaithfulNormalNames;
+    public LinkedList<ArrayList<Integer>> FilteredFaithfulNormalSubGraphs;
 
     public void SetupAll()
     {
@@ -72,5 +77,15 @@ public abstract class LatticeTestCase
     {
         return String.format("fillcolor=\"c-%d\"; peripheries=%d; style=\"filled%s\"",
                 index, (secondStyle.equals(BothRed) ? 1 : 2), secondStyle);
+    }
+
+    protected ArrayList<Integer> ToList(Integer ... parts)
+    {
+        return new ArrayList<Integer>(Arrays.asList(parts));
+    }
+
+    protected LinkedList<ArrayList<Integer>> ToList(ArrayList<Integer> ... parts)
+    {
+        return new LinkedList<ArrayList<Integer>>(Arrays.asList(parts));
     }
 }

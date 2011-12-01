@@ -16,7 +16,7 @@ public class LatticeJoinReducibleTest extends LatticeFixture
     @Test
     public void assertLatticeJoinReducibility()
     {
-        Lattice lat = new Lattice(cur.lattice, cur.latOrder, cur.names, cur.colors);
+        Lattice lat = new Lattice(cur.lattice, cur.latOrder, cur.names, cur.colors, cur.subgraphs);
         assertEquals(cur.title, cur.joinReducible, lat.JoinReducibles());
     }
 }

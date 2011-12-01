@@ -6,10 +6,9 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.LinkedList;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class IsAutomorphismEquivalentTest extends QuasiOrderGenFixture
 {
@@ -87,22 +86,37 @@ public class IsAutomorphismEquivalentTest extends QuasiOrderGenFixture
     @Test
     public void TestGroupByPartitionsAllWhenPermutationsAreEmpty()
     {
-        assertArrayEquals(new int[]{0, 1, 2, 3, 4, 5, 6}, Generate.PartitionBy(fixOrders, new ArrayList<Permutation>(), numElem));
+        AssertPartitionsAre(new ArrayList<Permutation>(), "Empty", new int[] {0, 1, 2, 3, 4, 5, 6});
     }
 
     @Test
     public void TestGroupByPartitionsBySizeWhenPermutationsAreFull()
     {
-        assertArrayEquals(new int[]{0, 0, 0, 0, 4, 4, 4}, Generate.PartitionBy(fixOrders, permutations, numElem));
+        AssertPartitionsAre(permutations, "All", new int[]{}, new int[]{0, 1, 2, 3}, new int[] {4, 5, 6});
     }
 
     @Test
     public void TestGroupByPartitionsWhenPermutationsAreEvenOnly()
     {
-        assertArrayEquals(new int[]{0, 1, 1, 1, 4, 4, 4}, Generate.PartitionBy(fixOrders, evenPermutations, numElem));
+        AssertPartitionsAre(evenPermutations, "Even", new int[]{0}, new int[]{1, 2, 3}, new int[]{4, 5, 6});
     }
 
+    private void AssertPartitionsAre(ArrayList<Permutation> perms, String title, int[] ... expected)
+    {
+        LinkedList<ArrayList<Integer>> actual = Generate.PartitionBy(fixOrders, perms, numElem);
+        assertEquals(title+"-numPartitions", actual.size(), expected.length);
+        int ci = 0;
+        for (ArrayList<Integer> act : actual)
+        {
+            int[] exp = expected[ci];
+            assertEquals(title+"-lengthOfpart-"+ci, exp.length, act.size());
 
+            for(int j=0;j<exp.length;j++)
+                assertEquals(title+"-part-"+ci+"-"+j, exp[j], act.get(j).intValue());
+
+            ci++;
+        }
+    }
 
     @Test
     public void TestThatAllOfG1IsEquivalent()

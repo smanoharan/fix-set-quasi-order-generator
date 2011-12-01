@@ -111,19 +111,24 @@ public class Dihedral4FaithfulOnlyTestCase extends LatticeTestCase
         modDistMessage = "Modular: true\tDistributive: true";
 
         // all relations are faithful and all are normal:
+        subgraphs = ToList(ToList(0,1,2), ToList(3,4,5), ToList(6,7));
         FilteringRelations = new ArrayList<FixOrder>();
         for (int i=0;i<latOrder;i++)
             FilteringRelations.add(new FixOrder(new BitSet(), true, true));
 
+
         FilteredFaithfulLatOrder = latOrder;
         FilteredFaithfulNames = new String[]{"0", "1", "2", "3", "4", "5", "6", "7"};
         FilteredFaithfulRelation = lattice;
+        FilteredFaithfulSubGraphs = subgraphs;
         FilteredNormalLatOrder = latOrder;
         FilteredNormalNames = FilteredFaithfulNames;
         FilteredNormalRelation = lattice;
+        FilteredNormalSubGraphs = subgraphs;
         FilteredFaithfulNormalLatOrder = latOrder;
         FilteredFaithfulNormalNames = FilteredFaithfulNames;
         FilteredFaithfulNormalRelation = lattice;
+        FilteredFaithfulNormalSubGraphs = subgraphs;
 
         //
         //        0

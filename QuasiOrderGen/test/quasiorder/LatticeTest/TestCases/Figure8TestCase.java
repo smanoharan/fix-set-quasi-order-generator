@@ -8,6 +8,7 @@ import java.util.BitSet;
 import static quasiorder.FixOrderSet.ToSerialIndex;
 import static quasiorder.QuasiOrderGenFixture.StringToBitSet;
 
+@SuppressWarnings({"unchecked"})
 public class Figure8TestCase extends LatticeTestCase
 {
     public void SetupTestCase()
@@ -129,17 +130,22 @@ public class Figure8TestCase extends LatticeTestCase
         FilteringRelations.add(new FixOrder(new BitSet(), false, true)); // 5
         FilteringRelations.add(new FixOrder(new BitSet(), false, true)); // 6
 
+        subgraphs = ToList(ToList(0, 3, 6), ToList(1, 2), ToList(4, 5));
+
         FilteredFaithfulLatOrder = 4;
         FilteredFaithfulNames = new String[]{"0", "1", "2", "3"};
         FilteredFaithfulRelation = StringToBitSet("1000"+"1100"+"1010"+"1111");
+        FilteredFaithfulSubGraphs = ToList(ToList(0, 3), ToList(1, 2));
 
         FilteredNormalLatOrder = 7;
         FilteredNormalNames = new String[]{"0", "1", "2", "3", "4", "5", "6"};
         FilteredNormalRelation = lattice;
+        FilteredNormalSubGraphs = subgraphs;
 
         FilteredFaithfulNormalLatOrder = FilteredFaithfulLatOrder;
         FilteredFaithfulNormalNames = FilteredFaithfulNames;
         FilteredFaithfulNormalRelation = FilteredFaithfulRelation;
+        FilteredFaithfulNormalSubGraphs = FilteredFaithfulSubGraphs;
 
     }
 }

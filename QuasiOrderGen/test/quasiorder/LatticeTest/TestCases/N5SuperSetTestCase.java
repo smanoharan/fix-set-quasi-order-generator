@@ -8,6 +8,7 @@ import java.util.BitSet;
 import static quasiorder.FixOrderSet.ToSerialIndex;
 import static quasiorder.QuasiOrderGenFixture.StringToBitSet;
 
+@SuppressWarnings({"unchecked"})
 public class N5SuperSetTestCase extends LatticeTestCase
 {
     public void SetupTestCase()
@@ -142,18 +143,22 @@ public class N5SuperSetTestCase extends LatticeTestCase
         FilteringRelations.add(new FixOrder(new BitSet(), true, false)); // 7
         FilteringRelations.add(new FixOrder(new BitSet(), true, false)); // 8
 
+        subgraphs = ToList(ToList(0, 4, 8), ToList(1, 2), ToList(3, 5), ToList(6, 7));
+
         FilteredFaithfulNormalLatOrder = 5;
         FilteredFaithfulNormalNames = new String[] { "1", "3", "4", "5", "6" };
         FilteredFaithfulNormalRelation = StringToBitSet("10000"+"11000"+"10100"+"11010"+"11111");
+        FilteredFaithfulNormalSubGraphs = ToList(ToList(2, 0, 4), ToList(1, 3));
 
         FilteredFaithfulLatOrder = 7;
         FilteredFaithfulNames = new String[] {"1", "3", "4", "5", "6", "7", "8"};
         FilteredFaithfulRelation = StringToBitSet("1000000"+"1100000"+"1010000"+"1101000"+"1111100"+"1010010"+"1111111");
+        FilteredFaithfulSubGraphs = ToList(ToList(2, 6, 0), ToList(1, 3), ToList(4, 5));
 
         FilteredNormalLatOrder = 7;
         FilteredNormalNames = new String[] {"0", "1", "2", "3", "4", "5", "6"};
         FilteredNormalRelation = StringToBitSet("1000000"+"1100000"+"1010000"+"1101000"+"1110100"+"1101010"+"1111111");
-
+        FilteredNormalSubGraphs = ToList(ToList(0, 4, 6), ToList(1, 2), ToList(3, 5));
         //
         //             0
         //            / \

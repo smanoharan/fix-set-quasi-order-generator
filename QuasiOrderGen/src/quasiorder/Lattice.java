@@ -2,6 +2,7 @@ package quasiorder;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.LinkedList;
 
 import static quasiorder.FixOrderSet.ToSerialIndex;
 
@@ -13,6 +14,7 @@ public class Lattice
     private final int[][] meetTable;
     public final String[] names;
     public final String[] nodeAttrs;
+    public final LinkedList<ArrayList<Integer>> subgraphs;
 
     public int NonModularXElem = -1;
     public int NonModularAElem = -1;
@@ -27,11 +29,12 @@ public class Lattice
     public int NonDistXYJoinElem = -1;
     public int NonDistXZJoinElem = -1;
 
-    public Lattice(BitSet lattice, int latOrder, String[] names, String[] colors)
+    public Lattice(BitSet lattice, int latOrder, String[] names, String[] colors, LinkedList<ArrayList<Integer>> subgraphs)
     {
         this.latBit = lattice;
         this.latOrder = latOrder;
         this.names = names;
+        this.subgraphs = subgraphs;
         this.joinTable = DetermineJoins(lattice, latOrder);
         this.meetTable = DetermineMeets(lattice, latOrder);
         this.nodeAttrs = DetermineNodeAttributes(colors, JoinReducibles(), MeetReducibles(), latOrder);
@@ -50,22 +53,28 @@ public class Lattice
      * @return The lattice of the fix orders satisfying the conditions.
      */
     public static Lattice FilterBy(ArrayList<FixOrder> fixOrders, BitSet fullRelation, int numFixOrders,
-            boolean faithfulOnly, boolean normalOnly, String[] fixOrderNames, String[] colors)
+            boolean faithfulOnly, boolean normalOnly, String[] fixOrderNames, String[] colors, LinkedList<ArrayList<Integer>> subGraphs)
     {
         ArrayList<Integer> inclElem = new ArrayList<Integer>();
+        int[] newIndex = new int[numFixOrders];
         for (int i=0;i<numFixOrders;i++)
         {
             FixOrder f = fixOrders.get(i);
             if ((!faithfulOnly || f.isFaithful) && (!normalOnly || f.isNormal))
+            {
+                newIndex[i] = inclElem.size();
                 inclElem.add(i);
+            }
+            else newIndex[i] = -1;
         }
 
         int numInclRels = inclElem.size();
         String[] partNames = new String[numInclRels];
         String[] partNodeAttrs = new String[numInclRels];
         BitSet partRelation = new BitSet(numInclRels*numInclRels);
+        LinkedList<ArrayList<Integer>> partSubGraphs = new LinkedList<ArrayList<Integer>>();
 
-        // setup part-relations, colors and names.
+        // setup part-relations, colors & names.
         for (int i=0;i<numInclRels;i++)
         {
             int oldI = inclElem.get(i);
@@ -79,7 +88,28 @@ public class Lattice
             }
         }
 
-        return new Lattice(partRelation, numInclRels, partNames, partNodeAttrs);
+        // setup partSubGraphs:
+        ArrayList<Integer> singletons = new ArrayList<Integer>();
+        partSubGraphs.add(singletons);
+
+        boolean first = true;
+        for (ArrayList<Integer> part : subGraphs)
+        {
+            ArrayList<Integer> inclPart = new ArrayList<Integer>();
+            for(Integer i : part)
+                if (newIndex[i] != -1)
+                    inclPart.add(newIndex[i]);
+
+            if (first)
+            {
+                singletons.addAll(inclPart);
+                first = false;
+            }
+            else if (inclPart.size()==1) singletons.add(inclPart.get(0));
+            else if (inclPart.size() > 1) partSubGraphs.add(inclPart);
+        }
+        
+        return new Lattice(partRelation, numInclRels, partNames, partNodeAttrs, partSubGraphs);
     }
 
     /**

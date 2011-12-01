@@ -39,10 +39,18 @@ public class Lattice
         this.names = names;
         this.groupedNames = groupedNames;
         this.subgraphs = subgraphs;
-        this.colours = colors;
+        this.colours = ToColorAttributeStrings(colors, latOrder);
         this.joinTable = DetermineJoins(lattice, latOrder);
         this.meetTable = DetermineMeets(lattice, latOrder);
         this.nodeAttrs = DetermineNodeAttributes(colors, JoinReducibles(), MeetReducibles(), latOrder);
+    }
+
+    private static String[] ToColorAttributeStrings(String[] colors, int latOrder)
+    {
+        String[] colAttr = new String[latOrder];
+        for(int i=0;i<latOrder;i++)
+            colAttr[i] = "fillcolor=" + colors[i];
+        return colAttr;
     }
 
     /**

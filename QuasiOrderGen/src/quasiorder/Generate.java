@@ -68,7 +68,7 @@ public class Generate
             if (maxIter==0) ProcessConjugacyFamily(inputGroup, relations, 1); // only 1 conj-class.
             else for (long s=0;s<maxIter;s++) ProcessConjugacyFamily(inputGroup, relations, (maxIter | s));
 
-            ArrayList<Permutation> permutations = Permutation.FromJSON(new FileReader(title + ".auto.in"));
+            ArrayList<Permutation> permutations = Permutation.From2SwapJSON(new FileReader(title + ".auto.in"));
             PrintAllOutput(inputGroup, relations, title, outputAllGraphs, thresholdRelationsBySize, permutations);
         }
         catch(Exception e)

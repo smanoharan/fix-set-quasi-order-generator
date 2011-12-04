@@ -68,8 +68,7 @@ public class Generate
             if (maxIter==0) ProcessConjugacyFamily(inputGroup, relations, 1); // only 1 conj-class.
             else for (long s=0;s<maxIter;s++) ProcessConjugacyFamily(inputGroup, relations, (maxIter | s));
 
-            ArrayList<Permutation> permutations = Permutation.From2SwapJSON(new FileReader(title + ".auto.in"));
-            PrintAllOutput(inputGroup, relations, title, outputAllGraphs, thresholdRelationsBySize, permutations);
+            PrintAllOutput(inputGroup, relations, title, outputAllGraphs, thresholdRelationsBySize);
         }
         catch(Exception e)
         {
@@ -96,7 +95,7 @@ public class Generate
         }
     }
 
-    private static void PrintAllOutput(Group inputGroup, FixOrderSet relations, String title, boolean allGraphs, boolean thresholdRelationsBySize, ArrayList<Permutation> permutations) throws IOException
+    private static void PrintAllOutput(Group inputGroup, FixOrderSet relations, String title, boolean allGraphs, boolean thresholdRelationsBySize) throws IOException
     {
         // create the output streams:
         PrintWriter rawOutput = new PrintWriter(title + ".out");
@@ -133,7 +132,7 @@ public class Generate
 
         // print the lattice of all fix-set quasi-orders:
         if (!thresholdRelationsBySize || relations.FixOrders.size() < REL_MAX_SIZE)
-            PrintLatticeOfAllFixSetQuasiOrders(inputGroup, rawOutput, title, relations, colours, permutations);
+            PrintLatticeOfAllFixSetQuasiOrders(inputGroup, rawOutput, title, relations, colours);
         else System.err.println("Skipped lattice: size=" + relations.FixOrderToFamilyMap.keySet().size() + " is too big");
 
         // print summary
@@ -147,7 +146,9 @@ public class Generate
         rawOutput.close();
     }
 
-    private static void PrintLatticeOfAllFixSetQuasiOrders(Group inputGroup, PrintWriter rawOutput, String title, FixOrderSet relations, String[] colors, ArrayList<Permutation> permutations) throws IOException
+    private static void PrintLatticeOfAllFixSetQuasiOrders(
+            Group inputGroup, PrintWriter rawOutput, String title,
+            FixOrderSet relations, String[] colors) throws IOException
     {
         String[] latTypes = new String[] { "all", "faithful", "normal", "faithful-normal"};
         int numLatTypes = latTypes.length;
@@ -158,7 +159,7 @@ public class Generate
             relNames[i] = Integer.toString(i);
 
         BitSet overallRelation = relations.GenerateOverallQuasiOrder();
-        LinkedList<ArrayList<Integer>> subgraphs = PartitionBy(relations.FixOrders, permutations, inputGroup.NumElements);
+        LinkedList<ArrayList<Integer>> subgraphs = PartitionBy(relations.FixOrders, inputGroup.Permutations, inputGroup.NumElements);
 
         PrintWriter modDistOutput = new PrintWriter(title + ".md");
         rawOutput.println("\n\n" + "Lattice of all fix set quasi orders: ");

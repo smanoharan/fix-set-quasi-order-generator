@@ -3,6 +3,8 @@ package quasiorder;
 import org.junit.Test;
 
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 
 import static org.junit.Assert.assertEquals;
@@ -12,13 +14,39 @@ public class InputParsingTest extends QuasiOrderGenFixture
     public static final String JSON_STRING = "[\n" +
             "\t[\n" +
             "\t\t[ [ \"()\", \"(1,3)\", \"(1,2,3)\", \"(2,3)\", \"(1,3,2)\", \"(1,2)\" ] ]\n" +
-            "\t] ,\n" +
+            "\t], \n" +
             "\t[\n" +
             "\t\t[ [ \"()\" ] ],\n" +
             "\t\t[ [ \"()\", \"(2,3)\" ], [ \"()\", \"(1,2)\" ], [ \"()\", \"(1,3)\" ] ],\n" +
             "\t\t[ [ \"()\", \"(1,3,2)\", \"(1,2,3)\" ] ],\n" +
             "\t\t[ [ \"()\", \"(1,3,2)\", \"(1,2,3)\", \"(2,3)\", \"(1,3)\", \"(1,2)\" ] ]\n" +
-            "\t]\n" +
+            "\t], \n" +
+            "\t[\n" +
+            "\t\t[ " +
+            "       [ \"()\", \"(1,3)\" ], " +
+            "       [\"(1,3)\" , \"(2,3)\"], " +
+            "       [\"(1,2,3)\", \"(1,3,2)\"], " +
+            "       [\"(2,3)\" , \"()\"], " +
+            "       [\"(1,3,2)\", \"(1,2)\"], " +
+            "       [\"(1,2)\" , \"(1,2,3)\"] " +
+            "   ],\n" +
+            "\t\t[ " +
+            "       [ \"()\", \"(1,3)\" ], " +
+            "       [\"(1,3)\" , \"()\"], " +
+            "       [\"(1,2,3)\", \"(1,2)\"], " +
+            "       [\"(2,3)\" , \"(1,2,3)\"], " +
+            "       [\"(1,3,2)\", \"(1,3,2)\"], " +
+            "       [\"(1,2)\" , \"(2,3)\"] " +
+            "   ],\n" +
+            "\t\t[ " +
+            "       [ \"()\", \"()\" ], " +
+            "       [\"(1,3)\" , \"(1,2,3)\"], " +
+            "       [\"(1,2,3)\", \"(1,3)\"], " +
+            "       [\"(2,3)\" , \"(2,3)\"], " +
+            "       [\"(1,3,2)\", \"(1,2)\"], " +
+            "       [\"(1,2)\" , \"(1,3,2)\"] " +
+            "   ]\n" +
+            "\t], \n" +
             "]";
 
     public static final int NumElem = 6;
@@ -49,11 +77,11 @@ public class InputParsingTest extends QuasiOrderGenFixture
         assertEquals("NumElements:", NumElem, actual.NumElements);
         assertEquals("NumSubgroups:", NumSubgroups, actual.NumSubgroups);
         assertEquals("NumConjugacyClasses:", NumConjClasses, actual.NumConjugacyClasses);
-        assertArraysAreEqual("Element", UNSORTED_ELEMENTS, actual.Elements);
+        AssertArraysAreEqual("Element", UNSORTED_ELEMENTS, actual.Elements);
 
         for(int i=0;i<NumConjClasses;i++)
-            for (int j=0;j< CONJUGACY_CLASSES[i].length;j++)
-                assertArraysAreEqual("Subgroup-" + i + "-" + j, CONJUGACY_CLASSES[i][j], actual.ConjugacyClasses[i][j]);
+            for (int j=0;j<CONJUGACY_CLASSES[i].length;j++)
+                AssertArraysAreEqual("Subgroup-" + i + "-" + j, CONJUGACY_CLASSES[i][j], actual.ConjugacyClasses[i][j]);
     }
 
     @Test
@@ -77,7 +105,18 @@ public class InputParsingTest extends QuasiOrderGenFixture
                     StringToBitSet("101000"),   // () (13)
                     StringToBitSet("100011"),   // () (132) (123)
                     StringToBitSet("111111"),   // Whole Group
-                }
+                },
+                new int[][][]
+                {
+                        toPairs(0, 2, 2, 3, 4, 5, 3, 0, 5, 1, 1, 4), // (0 2 3) (4 5 1)
+                        toPairs(0, 2, 2, 0, 4, 1, 3, 4, 5, 5, 1, 3), // (0 2) (1 3 4) (5)
+                        toPairs(0, 0, 2, 4, 4, 2, 3, 3, 5, 1, 1, 5) // (0) (1 5) (3) (2 4)
+                },
+                toPermutationArr(
+                        ToPermutation(4, 5, 1, 4, 2, 3, 0, 2),
+                        ToPermutation(3, 4, 1, 3, 0, 2),
+                        ToPermutation(2, 4, 1, 5)
+                )
         );
     }
 
@@ -102,12 +141,37 @@ public class InputParsingTest extends QuasiOrderGenFixture
                     StringToBitSet("110000"),   // () (13)
                     StringToBitSet("101010"),   // () (132) (123)
                     StringToBitSet("111111"),   // Whole Group
-                }
-
+                },
+                new int[][][]
+                {
+                    toPairs(0, 1, 1, 3, 2, 4, 3, 0, 4, 5, 5, 2),    // (0 1 3) (2 4 5)
+                    toPairs(0, 1, 1, 0, 2, 5, 3, 2, 4, 4, 5, 3),    // (0 1) (2 5 3) (4)
+                    toPairs(0, 0, 1, 2, 2, 1, 3, 3, 4, 5, 5, 4)    // (0) (1 2) (3) (4 5)
+                },
+                toPermutationArr(
+                    ToPermutation(4, 5, 2, 4, 1, 3, 0, 1),
+                    ToPermutation(3, 5, 2, 5, 0, 1),
+                    ToPermutation(4, 5, 1, 2)
+                )
         );
     }
 
-    private void TestS3IsProcessedCorrectly(boolean sort, String[] elems, BitSet[] elemMasks, BitSet[] subgroupMasks) throws Exception
+    private static int[][] toPairs(int ... es)
+    {
+        int[][] pairs = new int[es.length/2][];
+        for(int i=0;i<pairs.length;i++)
+            pairs[i] = new int[] {es[2*i], es[2*i + 1]};
+        return pairs;
+    }
+
+    private static ArrayList<Permutation> toPermutationArr(Permutation ... ps)
+    {
+        return new ArrayList<Permutation>(Arrays.asList(ps));
+    }
+
+    private void TestS3IsProcessedCorrectly(boolean sort, String[] elems, BitSet[] elemMasks, BitSet[] subgroupMasks,
+                                            int[][][] expectedAutomorphismPermutationTable,
+                                            ArrayList<Permutation> expectedAutomorphismPermutations) throws Exception
     {
         Group.RawGroup rawGroup = Group.FromJSON(new StringReader(JSON_STRING));
         Group actual = Group.FromRawGroup(rawGroup,sort);
@@ -116,10 +180,10 @@ public class InputParsingTest extends QuasiOrderGenFixture
         assertEquals("NumSubgroups:", NumSubgroups, actual.NumSubgroups);
         assertEquals("NumConjugacyClasses:", NumConjClasses, actual.NumConjugacyClasses);
 
-        assertArraysAreEqual("Element", elems, actual.ElementNames);
-        assertArraysAreEqual("Subgroup-Names", SUBGROUP_NAMES, actual.SubgroupNames);
-        assertArraysAreEqual("Element Masks", actual.ElementMasks, elemMasks);
-        assertArraysAreEqual("SubgroupMasks", actual.SubgroupMasks, subgroupMasks);
+        AssertArraysAreEqual("Element", elems, actual.ElementNames);
+        AssertArraysAreEqual("Subgroup-Names", SUBGROUP_NAMES, actual.SubgroupNames);
+        AssertArraysAreEqual("Element Masks", actual.ElementMasks, elemMasks);
+        AssertArraysAreEqual("SubgroupMasks", actual.SubgroupMasks, subgroupMasks);
 
         int[][] subgroupIntersections = new int[][]{
                 new int[] {0, 0, 0, 0, 0, 0},
@@ -150,12 +214,34 @@ public class InputParsingTest extends QuasiOrderGenFixture
             }
         }
 
-        assertArraysAreEqual("Conjugacy Classes", actual.ConjugacyClasses,
+        AssertArraysAreEqual("Conjugacy Classes", actual.ConjugacyClasses,
                 StringToBitSet("100000"),   // type:()
                 StringToBitSet("011100"),   // type:(ab)
                 StringToBitSet("000010"),   // type: (abc)
                 StringToBitSet("000001"));  // type: G
         assertEquals("IsSubgroupNormal", StringToBitSet("100011"), actual.IsSubgroupNormal);
+
+        for(int p=0;p<expectedAutomorphismPermutationTable.length;p++)
+        {
+            int[][] expPermutation = expectedAutomorphismPermutationTable[p];
+            int[][] actPermutation = actual.Automorphisms[p];
+            AssertPermutationTablesAreEqual("Automorphism-permutation-"+p, expPermutation, actPermutation);
+        }
+
+        AssertPermutationListsAreEqual("Automorphism-Permutations", expectedAutomorphismPermutations, actual.Permutations);
+    }
+
+    private static void AssertPermutationTablesAreEqual(String msg, int[][] expected, int[][] actual)
+    {
+        assertEquals(msg + "-length", expected.length, actual.length);
+        for(int i=0;i<expected.length;i++)
+        {
+            int[] exp = expected[i];
+            int[] act = actual[i];
+            assertEquals(String.format("%s-%d-length", msg, i), exp.length, act.length);
+            for(int j=0;j<exp.length;j++)
+                assertEquals(String.format("%s-%d-%d", msg, i, j), exp[j], act[j]);
+        }
     }
 
     @Test
@@ -200,7 +286,7 @@ public class InputParsingTest extends QuasiOrderGenFixture
         assertEquals(msg, expectedIndex, actualIndex);
     }
 
-    private static <T> void assertArraysAreEqual(T arrayName, T[] expected, T... actual)
+    private static <T> void AssertArraysAreEqual(T arrayName, T[] expected, T... actual)
     {
         for (int i=0;i<expected.length;i++)
             assertEquals(arrayName+"-"+i, expected[i], actual[i]);

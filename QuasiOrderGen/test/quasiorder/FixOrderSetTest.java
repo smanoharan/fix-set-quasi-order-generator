@@ -3,6 +3,7 @@ package quasiorder;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 
 public class FixOrderSetTest extends QuasiOrderGenFixture
@@ -35,7 +36,7 @@ public class FixOrderSetTest extends QuasiOrderGenFixture
 
         Group inputGroup = new Group(numElements, numSubgroups, numConjugacyClasses,
                 elementMasks, elementNames, subgroupMasks, subgroupNames, subgroupIntersections,
-                subgroupUnions, conjugacyClasses, isSubgroupNormal);
+                subgroupUnions, conjugacyClasses, isSubgroupNormal, new int[][][]{}, new ArrayList<Permutation>());
 
         // subgroup family: { {()} } ; expected : all but 1<=(12)
         assertRelationEqual(inputGroup, "10", "1011");
@@ -68,7 +69,7 @@ public class FixOrderSetTest extends QuasiOrderGenFixture
 
         Group inputGroup = new Group(numElements, numSubgroups, numConjugacyClasses,
                 elementMasks, elementNames, subgroupMasks, subgroupNames,
-                subgroupIntersections, subgroupUnions, conjugacyClasses, isSubgroupNormal);
+                subgroupIntersections, subgroupUnions, conjugacyClasses, isSubgroupNormal, new int[][][]{}, new ArrayList<Permutation>());
 
         // subgroup family: { {0} } ; expected : all but 0<={1,2,3} ;
         assertRelationEqual(inputGroup, "100", "1000"+"1111"+"1111"+"1111");

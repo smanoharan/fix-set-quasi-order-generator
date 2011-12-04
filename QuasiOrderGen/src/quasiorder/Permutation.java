@@ -1,8 +1,5 @@
 package quasiorder;
 
-import com.google.gson.Gson;
-
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
@@ -16,36 +13,6 @@ class Permutation
         this.swaps = swaps;
     }
 
-    public static void ToTwoSwaps(int[] pTable)
-    {
-        // int [] is of the form: pTable[a] is where a is moved to.
-        // TODO
-    }
-
-    // TODO test
-    public static ArrayList<Permutation> From2SwapJSON(Reader jsonReader)
-    {
-        // for now: input is a set of 2-swaps (in the form: int[][][])
-
-        // parse JSON (which has arrays of arrays of arrays of strings)
-        int[][][] permutations = ( new Gson()).fromJson(jsonReader, int[][][].class);
-
-        // try closing the input-stream. If this fails, nothing we can do.
-        try { jsonReader.close(); } catch (Exception e) {}
-
-        // places to look
-        ArrayList<Permutation> ps = new ArrayList<Permutation>();
-        for(int[][] pi : permutations)
-        {
-            ArrayList<TwoSwap> swaps = new ArrayList<TwoSwap>();
-            for(int[] pii : pi)
-                swaps.add(new TwoSwap(pii[0], pii[1]));
-            ps.add(new Permutation(swaps));
-        }
-
-        return ps;
-    }
-
     // Given an array of int pairs (representing elements) find the list of permutations (by decomposition into TwoSwaps)
     public static ArrayList<Permutation> FromPermutationTable(int[][][] permutationTable)
     {
@@ -56,11 +23,6 @@ class Permutation
 
         return permutations;
     }
-
-    // TODO next step:
-    //  include the json for automorphisms as part of *.in
-    //  create and test a method to convert string[][] to int[][]
-    //  call that method in rawGroup / Generate somewhere.
 
     public static Permutation FromPermutationTable(int[][] permutationTable)
     {

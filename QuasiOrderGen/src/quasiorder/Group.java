@@ -5,10 +5,7 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Reader;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.*;
 
 class Group
 {
@@ -22,11 +19,16 @@ class Group
     public final BitSet[] SubgroupMasks;
     public final int[][] SubgroupIntersections;
     public final int[][] SubgroupUnions;
+    public final int[][][] Automorphisms;
+    public final ArrayList<Permutation> Permutations;
     public final BitSet IsSubgroupNormal;
 
     public Group(
             int numElements, int numSubgroups, int numConjugacyClasses,
-            BitSet[] elementMasks, String[] elementNames, BitSet[] subgroupMasks, String[] subgroupNames, int[][] subgroupIntersections, int[][] subgroupUnions, BitSet[] conjugacyClasses, BitSet conjugacyClassNormal)
+            BitSet[] elementMasks, String[] elementNames, BitSet[] subgroupMasks,
+            String[] subgroupNames, int[][] subgroupIntersections,
+            int[][] subgroupUnions, BitSet[] conjugacyClasses, BitSet conjugacyClassNormal,
+            int[][][] automorphisms, ArrayList<Permutation> permutations)
     {
         NumElements = numElements;
         NumSubgroups = numSubgroups;
@@ -39,6 +41,8 @@ class Group
         SubgroupUnions = subgroupUnions;
         ConjugacyClasses = conjugacyClasses;
         IsSubgroupNormal = conjugacyClassNormal;
+        Automorphisms = automorphisms;
+        Permutations = permutations;
     }
 
     /**
@@ -123,9 +127,26 @@ class Group
         int[][] subgroupIntersections = GroupUtil.GenerateIntersections(numSubgroups, subgroupMasks);
         int[][] subgroupUnions = GroupUtil.GenerateUnions(numSubgroups, subgroupMasks);
 
+        int[][][] automorphisms = new int[rawgroup.Automorphisms.length][][];
+        for(int i=0;i<rawgroup.Automorphisms.length;i++)
+        {
+            String[][] rawAutPerm = rawgroup.Automorphisms[i];
+            automorphisms[i] = new int[rawAutPerm.length][];
+
+            for(int j=0;j<rawAutPerm.length;j++)
+            {
+                int e0 = elementIndexMap.get(rawAutPerm[j][0]);
+                int e1 = elementIndexMap.get(rawAutPerm[j][1]);
+                automorphisms[i][j] = new int[]{e0, e1};
+            }
+        }
+
+        ArrayList<Permutation> automorphismPermutations = Permutation.FromPermutationTable(automorphisms);
+
         return new Group(numElem, numSubgroups, numConjugacyClasses,
                 elementMasks, elementNames, subgroupMasks, subgroupNames,
-                subgroupIntersections, subgroupUnions, conjugacyClasses, isSubgroupNormal);
+                subgroupIntersections, subgroupUnions, conjugacyClasses,
+                isSubgroupNormal, automorphisms, automorphismPermutations);
     }
 
     public static RawGroup FromJSON(Reader jsonReader) throws IOException
@@ -138,16 +159,18 @@ class Group
 
         // places to look:
         String[] elements = groupProp[0][0][0];
-
         int numElements = elements.length;
+
         String[][][] conjugacyClasses = groupProp[1];
         int numConjugacyClasses = conjugacyClasses.length;
+
+        String[][][] automorphismPermutations = groupProp[2];
 
         // calculate number of subgroups
         int NumSubgroups = 0;
         for(String[][] arr : conjugacyClasses) NumSubgroups += arr.length;
 
-        return new RawGroup(numElements, NumSubgroups, numConjugacyClasses, elements, conjugacyClasses);
+        return new RawGroup(numElements, NumSubgroups, numConjugacyClasses, elements, conjugacyClasses, automorphismPermutations);
     }
 
     interface IBitSetOperation
@@ -182,14 +205,16 @@ class Group
         public final int NumConjugacyClasses;
         public final String[] Elements;
         public final String[][][] ConjugacyClasses;
+        public final String[][][] Automorphisms;
 
-        protected RawGroup(int numElements, int numSubgroups, int numConjugacyClasses, String[] elements, String[][][] conjugacyClasses)
+        protected RawGroup(int numElements, int numSubgroups, int numConjugacyClasses, String[] elements, String[][][] conjugacyClasses, String[][][] automorphisms)
         {
             NumElements = numElements;
             NumSubgroups = numSubgroups;
             NumConjugacyClasses = numConjugacyClasses;
             Elements = elements;
             ConjugacyClasses = conjugacyClasses;
+            Automorphisms = automorphisms;
         }
     }
 }

@@ -141,7 +141,7 @@ public class Lattice
             newnameSB.append('"');
 
             String newName = newnameSB.toString();
-            String repName = part.get(0).toString();
+            String repName = partNames[part.get(0)];
             for(Integer i : part)
             {
                 groupedNames[i] = newName;

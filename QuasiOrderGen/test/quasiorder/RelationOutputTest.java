@@ -12,6 +12,7 @@ import static junit.framework.Assert.assertEquals;
 public class RelationOutputTest extends QuasiOrderGenFixture
 {
     private String[] ELEMENT_NAMES = new String[]{"()", "(1,2)"};
+    private String[] SubgraphElementNames = new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8"};
     private static final String OUTPUT_HEADER = "strict digraph {\nedge [ arrowhead=\"none\", arrowtail=\"none\"]\n";
     private static final String OUTPUT_FOOTER = "\n}\n";
     private static final String[] COLORS = {"fillcolor=red", "fillcolor=blue", "fillcolor=green", "fillcolor=yellow"};
@@ -110,7 +111,7 @@ public class RelationOutputTest extends QuasiOrderGenFixture
     {
         StringBuilder actSB = new StringBuilder();
         LinkedList<ArrayList<Integer>> partsList = new LinkedList<ArrayList<Integer>>(Arrays.asList(parts));
-        RelationFormat.AppendSubgraphs(partsList, actSB);
+        RelationFormat.AppendSubgraphs(partsList, SubgraphElementNames, actSB);
         assertEquals(expected, actSB.toString());
     }
 

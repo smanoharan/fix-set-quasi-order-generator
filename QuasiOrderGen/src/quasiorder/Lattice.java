@@ -14,6 +14,7 @@ public class Lattice
     private final int[][] meetTable;
     public final String[] names;
     public final String[] groupedNames;
+    public String[] groupRepNames;
     public final String[] colours;
     public final String[] nodeAttrs;
     public final LinkedList<ArrayList<Integer>> subgraphs;
@@ -32,11 +33,12 @@ public class Lattice
     public int NonDistXZJoinElem = -1;
 
     public Lattice(BitSet lattice, int latOrder, String[] names, String[] colors,
-                   LinkedList<ArrayList<Integer>> subgraphs, String[] groupedNames)
+                   LinkedList<ArrayList<Integer>> subgraphs, String[] groupedNames, String[] groupRepNames)
     {
         this.latBit = lattice;
         this.latOrder = latOrder;
         this.names = names;
+        this.groupRepNames = groupRepNames;
         this.groupedNames = groupedNames;
         this.subgraphs = subgraphs;
         this.colours = ToColorAttributeStrings(colors, latOrder);
@@ -124,7 +126,9 @@ public class Lattice
 
         // setup grouped names, from partSubgraph:
         String[] groupedNames = new String[numInclRels];
+        String[] groupRepNames = new String[numInclRels];
         System.arraycopy(partNames, 0, groupedNames, 0, numInclRels);
+        System.arraycopy(partNames, 0, groupRepNames, 0, numInclRels);
 
         first = true;
         for (ArrayList<Integer> part : partSubGraphs)
@@ -132,15 +136,20 @@ public class Lattice
             if (first) { first = false; continue; } // skip singletons
 
             StringBuilder newnameSB = new StringBuilder("\"");
+
             for(Integer i : part) newnameSB.append("_").append(partNames[i]);
             newnameSB.append('"');
 
             String newName = newnameSB.toString();
+            String repName = part.get(0).toString();
             for(Integer i : part)
+            {
                 groupedNames[i] = newName;
+                groupRepNames[i] = repName;
+            }
         }
 
-        return new Lattice(partRelation, numInclRels, partNames, partNodeAttrs, partSubGraphs, groupedNames);
+        return new Lattice(partRelation, numInclRels, partNames, partNodeAttrs, partSubGraphs, groupedNames, groupRepNames);
     }
 
     /**

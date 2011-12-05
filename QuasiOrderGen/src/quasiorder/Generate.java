@@ -73,6 +73,7 @@ public class Generate
         catch(Exception e)
         {
             System.err.println("An error occurred:\n\n" + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -168,12 +169,14 @@ public class Generate
             Lattice lat = Lattice.FilterBy(relations.FixOrders, overallRelation, numRels, ((i & 1) == 1), i >= 2, relNames, colors, subgraphs);
 
             // ungrouped lattice
-            RelationFormat.PrintRelationEdges(lat, String.format("%s.%s.lat", title, latTypes[i]), false, false, false);
+            RelationFormat.PrintRelationEdges(lat, String.format("%s.%s.lat", title, latTypes[i]), false, RelationFormat.OutputNamingConvention.full, false);
             modDistOutput.println(String.format("ungrouped: %1$-50s %2$s", latTypes[i], lat.ModDistCheckMessage()));
 
             // grouped lattice
-            RelationFormat.PrintRelationEdges(lat, String.format("%s.col1.%s.lat", title, latTypes[i]), true, false, true);
-            RelationFormat.PrintRelationEdges(lat, String.format("%s.col2.%s.lat", title, latTypes[i]), false, true, true);
+            RelationFormat.PrintRelationEdges(lat, String.format("%s.col1.%s.lat", title, latTypes[i]), true, RelationFormat.OutputNamingConvention.full, true);
+            RelationFormat.PrintRelationEdges(lat, String.format("%s.col2.%s.lat", title, latTypes[i]), false, RelationFormat.OutputNamingConvention.grouped, true);
+            RelationFormat.PrintRelationEdges(lat, String.format("%s.col3.%s.lat", title, latTypes[i]), false, RelationFormat.OutputNamingConvention.representative, true);
+
         }
         modDistOutput.close();
     }

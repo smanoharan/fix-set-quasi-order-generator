@@ -62,6 +62,7 @@ public abstract class LatticeTestCase
     public String[] FilteredFaithfulNormalGroupedNames;
     public String[] FilteredFaithfulNormalNames;
     public LinkedList<ArrayList<Integer>> FilteredFaithfulNormalSubGraphs;
+    public String[] groupRepNames; // TODO test
 
     public void SetupAll()
     {

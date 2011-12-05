@@ -5,7 +5,8 @@ do
 	perl -pi -e 's/"<identity> of ..."/"1"/g' $file
 done
 
-egrep "^[[:space:]]+[0-9]+|There" $1/g-names.txt > $1/g-names.txt 
+egrep "^[[:space:]]+[0-9]+|There" $1/g-names.txt > $1/group-names.txt 
+rm $1/g-names.txt
 
 echo "Processing each input file:"
 for file in $1/*.in
@@ -31,6 +32,5 @@ mv $1/*.md $1/md/
 grep false $1/md/* | grep true | wc
 mkdir $1/out/full/
 cp $1/out/*.all.$2 $1/out/full/
-
 
 echo "Done."

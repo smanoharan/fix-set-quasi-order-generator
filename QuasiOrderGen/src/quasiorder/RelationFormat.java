@@ -9,18 +9,26 @@ import java.util.List;
 
 public class RelationFormat
 {
-    public static void PrintRelationEdges(Lattice lattice, String filename, boolean partition, boolean groupedNames, boolean coloursOnly) throws IOException
+    public enum OutputNamingConvention { full, grouped, representative; }
+
+    public static void PrintRelationEdges(Lattice lattice, String filename, boolean partition, OutputNamingConvention naming, boolean coloursOnly) throws IOException
     {
         PrintWriter p = new PrintWriter(filename);
-        p.println(PrintRelationEdges(lattice, partition, groupedNames, coloursOnly));
+        p.println(PrintRelationEdges(lattice, partition, naming, coloursOnly));
         p.close();
     }
 
-    public static String PrintRelationEdges(Lattice lattice, boolean partition, boolean groupedNames, boolean coloursOnly)
+    private static String[] FindNames(Lattice lat, OutputNamingConvention naming)
+    {
+        if (naming.equals(OutputNamingConvention.grouped)) return lat.groupedNames;
+        else if (naming.equals(OutputNamingConvention.representative)) return lat.groupRepNames;
+        else return lat.names;
+    }
+
+    public static String PrintRelationEdges(Lattice lattice, boolean partition, OutputNamingConvention naming, boolean coloursOnly)
     {
         return PrintRelationEdges(
-                lattice.latBit,
-                (groupedNames ? lattice.groupedNames :lattice.names),
+                lattice.latBit, FindNames(lattice, naming),
                 (coloursOnly ? lattice.colours : lattice.nodeAttrs),
                 (partition ? lattice.subgraphs : new LinkedList<ArrayList<Integer>>()),
                 lattice.latOrder);
@@ -42,7 +50,7 @@ public class RelationFormat
         for (int i=0;i<numElem;i++)
                 res.append(String.format("%s [%s]\n",elementNames[i], nodeAttributes[i]));
 
-        AppendSubgraphs(parts, res);
+        AppendSubgraphs(parts, elementNames, res);
 
         for(int i=relation.nextSetBit(0); i>=0; i=relation.nextSetBit(i + 1))
         {
@@ -60,7 +68,7 @@ public class RelationFormat
      * @param parts The partitions of the graph
      * @param res The string builder to append to.
      */
-    public static void AppendSubgraphs(LinkedList<ArrayList<Integer>> parts, StringBuilder res)
+    public static void AppendSubgraphs(LinkedList<ArrayList<Integer>> parts, String[] names, StringBuilder res)
     {
         // partitions become subgraphs:
         int partId = -1;
@@ -69,14 +77,14 @@ public class RelationFormat
             if (partId++ == -1) continue; // skip the singletons
 
             res.append("subgraph cluster_" + partId + " {");
-            for (Integer i : part) res.append(" " + i);
+            for (Integer i : part) res.append(" " + names[i]);
             res.append("; style=filled; color=lightgrey }\n");
         }
     }
 
     public static void PrintRelation(BitSet relation, String[] elementNames, int NE, int index, PrintWriter wOut)
     {
-        wOut.println("\n"+index+">>>");
+        wOut.println("\n"+index+">>>"+relation.cardinality());
         for(int i=0;i<NE;i++)
         {
             wOut.print(String.format("%1$-20s \t:", elementNames[i]));

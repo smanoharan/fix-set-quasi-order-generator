@@ -4,6 +4,39 @@ homeW:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/wholedata/g-";
 homeR:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/refData/g-";
 homeDih:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/dihData/g-";
 
+ImageOf := function(ag, i)
+	return Concatenation("\t\t\t[ \"", String(i), "\", \"", String(Image(ag, i)), "\" ]");
+end; 
+
+ExportTableOf := function(f,g)
+	local Outer, p, gi, firstP, firstG;
+	Outer:=Filtered(AutomorphismGroup(g), i -> not IsInnerAutomorphism(i));
+
+	AppendTo(f,"\t[");	
+	firstP:=true;
+	for p in Outer do
+		if firstP then 
+			firstP:=false;
+		else
+			AppendTo(f,",");
+		fi;
+
+		AppendTo(f,"\n\t\t[\n");
+		
+		firstG:=true;
+		for gi in g do
+			if firstG then 
+				firstG:=false;
+			else
+				AppendTo(f,",\n");	
+			fi;
+			AppendTo(f,ImageOf(p, gi));
+		od;
+		AppendTo(f,"\n\t\t]");
+	od;
+	AppendTo(f,"\n\t]");
+end;
+
 ExportGroup:= function(f,g)
 
 	local csg, first, es, cr, c;
@@ -28,7 +61,9 @@ ExportGroup:= function(f,g)
 		fi;
 	od;
 
-	AppendTo(f,"\n\t]\n]\n");
+	AppendTo(f,"\n\t],\n");
+	ExportTableOf(f,g);
+	AppendTo(f, "\n]\n");
 end;
 
 
@@ -61,3 +96,4 @@ ExportAllDihedralGroups := function(lb, ub)
 		ExportGroup(Concatenation(homeDih, "D-", String(j), ".in"), DihedralGroup(j)); 
 	od;
 end;
+

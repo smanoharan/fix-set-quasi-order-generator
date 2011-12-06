@@ -20,8 +20,8 @@ public class RelationFormat
 
     private static String[] FindNames(Lattice lat, OutputNamingConvention naming)
     {
-        if (naming.equals(OutputNamingConvention.grouped)) return lat.groupedNames;
-        else if (naming.equals(OutputNamingConvention.representative)) return lat.groupRepNames;
+        if (naming.equals(OutputNamingConvention.grouped)) return lat.names; // TODO change
+        else if (naming.equals(OutputNamingConvention.representative)) return lat.names; // TODO change
         else return lat.names;
     }
 
@@ -29,8 +29,8 @@ public class RelationFormat
     {
         return PrintRelationEdges(
                 lattice.latBit, FindNames(lattice, naming),
-                (coloursOnly ? lattice.colours : lattice.nodeAttrs),
-                (partition ? lattice.subgraphs : new LinkedList<ArrayList<Integer>>()),
+                (coloursOnly ? lattice.colours : lattice.colours),
+                (partition ? lattice.subGraphs : new LinkedList<ArrayList<Integer>>()),
                 lattice.latOrder);
     }
 
@@ -70,7 +70,7 @@ public class RelationFormat
      */
     public static void AppendSubgraphs(LinkedList<ArrayList<Integer>> parts, String[] names, StringBuilder res)
     {
-        // partitions become subgraphs:
+        // partitions become subGraphs:
         int partId = -1;
         for(ArrayList<Integer> part : parts)
         {

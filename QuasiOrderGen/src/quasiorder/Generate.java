@@ -211,11 +211,11 @@ public class Generate
         rawOutput.println("\n\n" + "Lattice of all fix set quasi orders: ");
         for (int i=0;i<numLatTypes;i++)
         {
-            Lattice lat = Lattice.FilterBy(relations.FixOrders, overallRelation, numRels, ((i & 1) == 1), i >= 2, relNames, colors, subgraphs);
+            Lattice lat = Lattice.Filter3By(relations.FixOrders, overallRelation, numRels, ((i & 1) == 1), i >= 2, relNames, colors, subgraphs);
 
             // ungrouped lattice
             RelationFormat.PrintRelationEdges(lat, String.format("%s.%s.lat", title, latTypes[i]), false, RelationFormat.OutputNamingConvention.full, false);
-            modDistOutput.println(String.format("ungrouped: %1$-50s %2$s", latTypes[i], lat.ModDistCheckMessage()));
+            // TODO fix modDistOutput.println(String.format("ungrouped: %1$-50s %2$s", latTypes[i], lat.ModDistCheckMessage()));
 
             // grouped lattice
             RelationFormat.PrintRelationEdges(lat, String.format("%s.col1.%s.lat", title, latTypes[i]), true, RelationFormat.OutputNamingConvention.full, true);

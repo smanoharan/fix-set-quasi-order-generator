@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import quasiorder.Lattice;
 import quasiorder.LatticeTest.TestCases.LatticeTestCase;
+import quasiorder.MeetJoinDeterminedLattice;
 
 import static org.junit.Assert.assertEquals;
 
@@ -16,7 +17,8 @@ public class LatticeModDistCheckMessageTest extends LatticeFixture
     @Test
     public void assertLatticeModularity()
     {
-        Lattice lat = new Lattice(cur.lattice, cur.latOrder, cur.names, cur.colors, cur.subGraphs, cur.groupedNames, cur.groupRepNames);
-        assertEquals(cur.title, cur.modDistMessage, lat.ModDistCheckMessage());
+        Lattice lat = new Lattice(cur.lattice, cur.latOrder, cur.names, cur.colors, cur.subGraphs);
+        MeetJoinDeterminedLattice mjdLat = MeetJoinDeterminedLattice.FromLattice(lat);
+        assertEquals(cur.title, cur.modDistMessage, mjdLat.ModDistCheckMessage());
     }
 }

@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import quasiorder.Lattice;
 import quasiorder.LatticeTest.TestCases.LatticeTestCase;
+import quasiorder.MeetJoinDeterminedLattice;
 
 import static org.junit.Assert.assertEquals;
 
@@ -16,12 +17,13 @@ public class LatticeIsModularTest extends LatticeFixture
     @Test
     public void assertLatticeModularity()
     {
-        Lattice lat = new Lattice(cur.lattice, cur.latOrder, cur.names, cur.colors, cur.subGraphs, cur.groupedNames, cur.groupRepNames);
-        assertEquals(cur.title, cur.isModular, lat.IsModular());
-        assertEquals(cur.title + "-x", cur.NonModularXElem, lat.NonModularXElem);
-        assertEquals(cur.title + "-a", cur.NonModularAElem, lat.NonModularAElem);
-        assertEquals(cur.title + "-b", cur.NonModularBElem, lat.NonModularBElem);
-        assertEquals(cur.title + "-xVa", cur.NonModularAXJoinElem, lat.NonModularAXJoinElem);
-        assertEquals(cur.title + "-a^b", cur.NonModularABMeetElem, lat.NonModularABMeetElem);
+        Lattice lat = new Lattice(cur.lattice, cur.latOrder, cur.names, cur.colors, cur.subGraphs);
+        MeetJoinDeterminedLattice mjdLat = MeetJoinDeterminedLattice.FromLattice(lat);
+        assertEquals(cur.title, cur.isModular, mjdLat.IsModular());
+        assertEquals(cur.title + "-x", cur.NonModularXElem, mjdLat.NonModularXElem);
+        assertEquals(cur.title + "-a", cur.NonModularAElem, mjdLat.NonModularAElem);
+        assertEquals(cur.title + "-b", cur.NonModularBElem, mjdLat.NonModularBElem);
+        assertEquals(cur.title + "-xVa", cur.NonModularAXJoinElem, mjdLat.NonModularAXJoinElem);
+        assertEquals(cur.title + "-a^b", cur.NonModularABMeetElem, mjdLat.NonModularABMeetElem);
     }
 }

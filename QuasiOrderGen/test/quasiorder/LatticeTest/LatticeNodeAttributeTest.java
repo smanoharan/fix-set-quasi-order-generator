@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import quasiorder.Lattice;
 import quasiorder.LatticeTest.TestCases.LatticeTestCase;
+import quasiorder.MeetJoinDeterminedLattice;
 
 import static org.junit.Assert.assertEquals;
 
@@ -16,8 +17,9 @@ public class LatticeNodeAttributeTest extends LatticeFixture
     @Test
     public void assertLatticeNodeAttributes()
     {
-        Lattice lat = new Lattice(cur.lattice, cur.latOrder, cur.names, cur.colors, cur.subGraphs, cur.groupedNames, cur.groupRepNames);
+        Lattice lat = new Lattice(cur.lattice, cur.latOrder, cur.names, cur.colors, cur.subGraphs);
+        MeetJoinDeterminedLattice mjdLat = MeetJoinDeterminedLattice.FromLattice(lat);
         for(int i=0;i<cur.latOrder;i++)
-            assertEquals(cur.title + "-" + i, cur.nodeAttr[i], lat.nodeAttrs[i]);
+            assertEquals(cur.title + "-" + i, cur.nodeAttr[i], mjdLat.nodeAttr[i]);
     }
 }

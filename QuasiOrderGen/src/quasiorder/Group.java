@@ -2,8 +2,8 @@ package quasiorder;
 
 import com.google.gson.Gson;
 
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.Reader;
 import java.util.*;
 
@@ -46,12 +46,26 @@ class Group
     }
 
     /**
+     * Create a group by reading from a json input file.
+     * @param inputFile the input reader.
+     * @param sortElem Whether or not to sort the elements.
+     * @throws IllegalArgumentException When the input group is not a valid group. See {@link #Validate()}
+     * @throws IOException When the input file doesn't exist or has invalid JSON.
+     * @return A fully processed group.
+     */
+    public static Group FromFile(String inputFile, boolean sortElem) throws IOException, IllegalArgumentException
+    {
+        return Group.FromRawGroup(RawGroup.FromJSON(new FileReader(inputFile)), sortElem);
+    }
+
+    /**
      * Create a group by processing a RawGroup.
      * @param rawgroup a group which is parsed json, with no processing.
      * @param sortElem Whether or not to sort the elements.
+     * @throws IllegalArgumentException When the input group is not a valid group (see Group.Validate())
      * @return A fully processed group.
      */
-    public static Group FromRawGroup(RawGroup rawgroup, boolean sortElem)
+    public static Group FromRawGroup(RawGroup rawgroup, boolean sortElem) throws IllegalArgumentException
     {
         // counts of each type:
         int numElem = rawgroup.NumElements;
@@ -70,7 +84,7 @@ class Group
                 public int compare(String o1, String o2)
                 {
                     int diff = (o1.length() - o2.length());
-                    return diff == 0 ? diff = o1.compareTo(o2) : diff;
+                    return diff == 0 ? o1.compareTo(o2) : diff;
                 }
             });
         }
@@ -143,34 +157,13 @@ class Group
 
         ArrayList<Permutation> automorphismPermutations = Permutation.FromPermutationTable(automorphisms);
 
-        return new Group(numElem, numSubgroups, numConjugacyClasses,
+        Group group = new Group(numElem, numSubgroups, numConjugacyClasses,
                 elementMasks, elementNames, subgroupMasks, subgroupNames,
                 subgroupIntersections, subgroupUnions, conjugacyClasses,
                 isSubgroupNormal, automorphisms, automorphismPermutations);
-    }
 
-    public static RawGroup FromJSON(Reader jsonReader) throws IOException
-    {
-        // parse JSON (which has arrays of arrays of arrays of strings)
-        String[][][][] groupProp = ( new Gson()).fromJson(jsonReader, String[][][][].class);
-
-        // try closing the input-stream. If this fails, nothing we can do.
-        try { jsonReader.close(); } catch (Exception e) {}
-
-        // places to look:
-        String[] elements = groupProp[0][0][0];
-        int numElements = elements.length;
-
-        String[][][] conjugacyClasses = groupProp[1];
-        int numConjugacyClasses = conjugacyClasses.length;
-
-        String[][][] automorphismPermutations = groupProp[2];
-
-        // calculate number of subgroups
-        int NumSubgroups = 0;
-        for(String[][] arr : conjugacyClasses) NumSubgroups += arr.length;
-
-        return new RawGroup(numElements, NumSubgroups, numConjugacyClasses, elements, conjugacyClasses, automorphismPermutations);
+        group.Validate();
+        return group;
     }
 
     interface IBitSetOperation
@@ -178,24 +171,23 @@ class Group
         void combine(BitSet b1, BitSet b2);
     }
 
-    public void Validate(PrintStream out) throws Exception
+    public void Validate() throws IllegalArgumentException
     {
         // check identity: must be an element of each subgroup.
-        //out.println("Checking identity: \"" + ElementNames[0] + "\"");
         int nextClearBit = ElementMasks[0].nextClearBit(0);
-        if (nextClearBit >= 0 && nextClearBit < NumSubgroups) throw new Exception("Trivial element is not a member of some subgroup(" + nextClearBit + "): " + ElementMasks[0]);
+        if (nextClearBit >= 0 && nextClearBit < NumSubgroups)
+            throw new IllegalArgumentException("Trivial element is not a member of some subgroup(" + nextClearBit + "): " + ElementMasks[0]);
 
         // check subgroups: 1st must be trivial, last must have all subgroups.
-        //out.println("Checking subgroups: Count=" + NumSubgroups);
-
         BitSet trivialSubgroup = SubgroupMasks[0];
         int nextSetBit = trivialSubgroup.nextSetBit(1);
         if (!trivialSubgroup.get(0) || (nextSetBit >= 0 && nextSetBit < NumElements))
-            throw new Exception("1st subgroup is not trivial");
+            throw new IllegalArgumentException("1st subgroup is not trivial");
 
         BitSet fullGroup = SubgroupMasks[SubgroupMasks.length-1];
         nextClearBit = fullGroup.nextClearBit(1);
-        if (nextClearBit >= 0 && nextClearBit < NumElements) throw new Exception("Last subgroup is not the whole group.");
+        if (nextClearBit >= 0 && nextClearBit < NumElements)
+            throw new IllegalArgumentException("Last subgroup is not the whole group.");
     }
 
     public static class RawGroup
@@ -215,6 +207,30 @@ class Group
             Elements = elements;
             ConjugacyClasses = conjugacyClasses;
             Automorphisms = automorphisms;
+        }
+
+        public static RawGroup FromJSON(Reader jsonReader) throws IOException
+        {
+            // parse JSON (which has arrays of arrays of arrays of strings)
+            String[][][][] groupProp = ( new Gson()).fromJson(jsonReader, String[][][][].class);
+
+            // try closing the input-stream. If this fails, nothing we can do.
+            try { jsonReader.close(); } catch (Exception ignored) {}
+
+            // places to look:
+            String[] elements = groupProp[0][0][0];
+            int numElements = elements.length;
+
+            String[][][] conjugacyClasses = groupProp[1];
+            int numConjugacyClasses = conjugacyClasses.length;
+
+            String[][][] automorphismPermutations = groupProp[2];
+
+            // calculate number of subgroups
+            int NumSubgroups = 0;
+            for(String[][] arr : conjugacyClasses) NumSubgroups += arr.length;
+
+            return new RawGroup(numElements, NumSubgroups, numConjugacyClasses, elements, conjugacyClasses, automorphismPermutations);
         }
     }
 }

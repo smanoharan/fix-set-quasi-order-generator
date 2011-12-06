@@ -1,6 +1,5 @@
 package quasiorder;
 
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -16,66 +15,112 @@ import java.util.List;
  */
 public class Generate
 {
+    private static final String INPUT_EXT = ".in";
     private static final int REL_MAX_SIZE = 500;
-    private static int iterCount;
+    private static int iterCount = 0;
 
-    public static void main(String[] args)
+    /** For processing and storing of args */
+    private static class CommandLineArgs
     {
-        Group inputGroup = null;
-        String title = null;
+        private static final int MAX_ARGS = 6;
+        private static final int MIN_ARGS = 1;
 
-        try
+        public final boolean sortElements;
+        public final boolean outputAllGraphs;
+        public final boolean thresholdRelationsBySize;
+        public final String title;
+
+        private CommandLineArgs(boolean sortElements, boolean outputAllGraphs, boolean thresholdRelationsBySize, String title)
         {
-            // parse command line arguments:
-            if (args.length < 1 || args.length > 7)
-            {
-                System.err.println("Error. Incorrect number of arguments. Expected: 1-7.");
-                System.err.println("Usage: java quasiorder.Generate title [-s] [-o] [-t] [-f] [-n]");
-                System.err.println("\t-s means automatically sort the elements");
-                System.err.println("\t-o means include graph files for all quasi-orders (in the file \"<title>.q<N>.lat\"");
-                System.err.println("\t-t means do not output lattices for relations larger than " + REL_MAX_SIZE + " fix-orders.");
-                System.err.println();
-                System.err.println("\tThe title is the name of the group. <prefix>.in will be shortened to <prefix>");
-                System.err.println("\tThe input file is assumed to be \"<title>.in\".");
-                System.err.println("\tThe raw output will be placed in \"<title>.out\".");
-                System.err.println("\tThe lattice of all fix-set quasi-orders will be placed in \"<title>.<type>.lat\" and \"<title>.json\".");
-                return;
-            }
+            this.sortElements = sortElements;
+            this.outputAllGraphs = outputAllGraphs;
+            this.thresholdRelationsBySize = thresholdRelationsBySize;
+            this.title = title;
+        }
+
+        public static CommandLineArgs ParseArguments(String[] args) throws IllegalArgumentException
+        {
+            if (args.length < MIN_ARGS || args.length > MAX_ARGS)
+                throw ExceptionWith("Incorrect number of arguments (%d). Expected %d - %d", args.length, MIN_ARGS, MAX_ARGS);
 
             boolean sortElements = false;
             boolean outputAllGraphs = false;
             boolean thresholdRelationsBySize = false;
+            String title = null;
             for (String arg : args)
             {
                 if (arg.equals("-s")) sortElements = true;
                 else if (arg.equals("-o")) outputAllGraphs = true;
                 else if (arg.equals("-t")) thresholdRelationsBySize = true;
-                else title = (arg.endsWith(".in")) ? arg.substring(0, arg.length() - 3) : arg;
+                else if (arg.startsWith("-")) throw ExceptionWith("Unknown flag: %s", arg);
+                else title = (arg.endsWith(INPUT_EXT)) ? RemoveSuffix(arg, INPUT_EXT) : arg;
             }
 
-            if (title == null) throw new RuntimeException("Title not included!");
+            if (title == null) throw ExceptionWith("Title was not specified.");
 
-            // read and validate input:
-            inputGroup = Group.FromRawGroup(Group.FromJSON(new FileReader(title + ".in")), sortElements);
-            inputGroup.Validate(System.err);
-
-            // process:
-            long numSubsets = (1 << inputGroup.NumConjugacyClasses); // 2^M
-            FixOrderSet relations = new FixOrderSet();
-
-            iterCount = 0;
-            long maxIter = numSubsets / 2;
-            if (maxIter==0) ProcessConjugacyFamily(inputGroup, relations, 1); // only 1 conj-class.
-            else for (long s=0;s<maxIter;s++) ProcessConjugacyFamily(inputGroup, relations, (maxIter | s));
-
-            PrintAllOutput(inputGroup, relations, title, outputAllGraphs, thresholdRelationsBySize);
+            return new CommandLineArgs(sortElements, outputAllGraphs, thresholdRelationsBySize, title);
         }
-        catch(Exception e)
+
+        private static String RemoveSuffix(String orig, String suffix)
+        {
+            return orig.substring(0, orig.length() - suffix.length());
+        }
+
+        private static IllegalArgumentException ExceptionWith(String formatString, Object... args)
+        {
+            return new IllegalArgumentException(String.format(formatString, args));
+        }
+
+        public static void PrintUsageMessage()
+        {
+            System.err.println("Usage: java quasiorder.Generate title [-s] [-o] [-t] [-n]");
+            System.err.println("\t-s means automatically sort the elements");
+            System.err.println("\t-o means include graph files for all quasi-orders (in the file \"<title>.q<N>.lat\"");
+            System.err.println("\t-t means do not output lattices for relations larger than " + REL_MAX_SIZE + " fix-orders.");
+            System.err.println();
+            System.err.println("\tThe title is the name of the group. <prefix>.in will be shortened to <prefix>");
+            System.err.println("\tThe input file is assumed to be \"<title>.in\".");
+            System.err.println("\tThe raw output will be placed in \"<title>.out\".");
+            System.err.println("\tThe lattice of all fix-set quasi-orders will be placed in \"<title>.<type>.lat\" and \"<title>.json\".");
+            return;
+        }
+    }
+
+    public static void main(String[] args)
+    {
+        try
+        {
+            CommandLineArgs parsedArgs = CommandLineArgs.ParseArguments(args);
+            Group inputGroup = Group.FromFile(parsedArgs.title + ".in", parsedArgs.sortElements);
+
+            FixOrderSet fixOrders = GenerateAllFixOrders(inputGroup);
+            PrintAllOutput(inputGroup, fixOrders, parsedArgs);
+        }
+        catch (IllegalArgumentException e)
+        {
+            System.err.println("Error parsing input: " + e.getMessage());
+            CommandLineArgs.PrintUsageMessage();
+        }
+        catch(IOException e)
         {
             System.err.println("An error occurred:\n\n" + e.getMessage());
             e.printStackTrace();
         }
     }
+
+    private static FixOrderSet GenerateAllFixOrders(Group inputGroup)
+    {
+        FixOrderSet relations = new FixOrderSet();
+        long numSubsets = (1 << inputGroup.NumConjugacyClasses);    // 2^M
+
+        long maxIter = numSubsets / 2;
+        if (maxIter==0) ProcessConjugacyFamily(inputGroup, relations, 1); // only 1 conj-class.
+        else for (long s=0;s<maxIter;s++)
+                ProcessConjugacyFamily(inputGroup, relations, (maxIter | s));
+
+        return relations;
+    }
+
 
     // TODO test - somehow?
     private static void ProcessConjugacyFamily(Group inputGroup, FixOrderSet relations, long ccMask)
@@ -96,10 +141,10 @@ public class Generate
         }
     }
 
-    private static void PrintAllOutput(Group inputGroup, FixOrderSet relations, String title, boolean allGraphs, boolean thresholdRelationsBySize) throws IOException
+    private static void PrintAllOutput(Group inputGroup, FixOrderSet relations, CommandLineArgs args) throws IOException
     {
         // create the output streams:
-        PrintWriter rawOutput = new PrintWriter(title + ".out");
+        PrintWriter rawOutput = new PrintWriter(args.title + ".out");
 
         // sort all relations, by cardinality (size).
         relations.SortRelations();
@@ -120,20 +165,20 @@ public class Generate
             RelationFormat.PrintRelation(b.Relation, inputGroup.ElementNames, inputGroup.NumElements, curIndex++, rawOutput);
 
         // output all graphs (if needed)
-        if (allGraphs)
+        if (args.outputAllGraphs)
         {
             curIndex=0;
             for(FixOrder b : relations.FixOrders)
             {
-                PrintWriter graphWriter = new PrintWriter(title + ".g" + curIndex++ + ".lat");
+                PrintWriter graphWriter = new PrintWriter(args.title + ".g" + curIndex++ + ".lat");
                 graphWriter.println(RelationFormat.PrintRelationEdges(b.Relation, inputGroup.ElementNames, colours, new LinkedList<ArrayList<Integer>>(), inputGroup.NumElements));
                 graphWriter.close();
             }
         }
 
         // print the lattice of all fix-set quasi-orders:
-        if (!thresholdRelationsBySize || relations.FixOrders.size() < REL_MAX_SIZE)
-            PrintLatticeOfAllFixSetQuasiOrders(inputGroup, rawOutput, title, relations, colours);
+        if (!args.thresholdRelationsBySize || relations.FixOrders.size() < REL_MAX_SIZE)
+            PrintLatticeOfAllFixSetQuasiOrders(inputGroup, rawOutput, args.title, relations, colours);
         else System.err.println("Skipped lattice: size=" + relations.FixOrderToFamilyMap.keySet().size() + " is too big");
 
         // print summary

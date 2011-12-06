@@ -72,7 +72,7 @@ public class InputParsingTest extends QuasiOrderGenFixture
     @Test
     public void TestJSONOfS3ParsesCorrectly() throws Exception
     {
-        Group.RawGroup actual = Group.FromJSON(new StringReader(JSON_STRING));
+        Group.RawGroup actual = Group.RawGroup.FromJSON(new StringReader(JSON_STRING));
 
         assertEquals("NumElements:", NumElem, actual.NumElements);
         assertEquals("NumSubgroups:", NumSubgroups, actual.NumSubgroups);
@@ -173,7 +173,7 @@ public class InputParsingTest extends QuasiOrderGenFixture
                                             int[][][] expectedAutomorphismPermutationTable,
                                             ArrayList<Permutation> expectedAutomorphismPermutations) throws Exception
     {
-        Group.RawGroup rawGroup = Group.FromJSON(new StringReader(JSON_STRING));
+        Group.RawGroup rawGroup = Group.RawGroup.FromJSON(new StringReader(JSON_STRING));
         Group actual = Group.FromRawGroup(rawGroup,sort);
 
         assertEquals("NumElements:", NumElem, actual.NumElements);

@@ -26,7 +26,7 @@ public class Lattice
         this.nodeAttr = ToColorAttributeStrings(colors, latOrder);
     }
 
-    public static String[] ToColorAttributeStrings(String[] colors, int latOrder)
+    protected static String[] ToColorAttributeStrings(String[] colors, int latOrder)
     {
         String[] colAttr = new String[latOrder];
         for(int i=0;i<latOrder;i++)
@@ -39,7 +39,7 @@ public class Lattice
         public String ChooseName(ArrayList<Integer> part, String[] individualNames);
     }
 
-    public static class FullPartNameSelector implements INameSelector
+    public static INameSelector FullPartNameSelector = new INameSelector()
     {
         public String ChooseName(ArrayList<Integer> part, String[] individualNames)
         {
@@ -49,15 +49,15 @@ public class Lattice
             newnameSB.append('"');
             return newnameSB.toString();
         }
-    }
+    };
 
-    public static class RepNameSelector implements INameSelector
+    public static INameSelector RepNameSelector  = new INameSelector()
     {
         public String ChooseName(ArrayList<Integer> part, String[] individualNames)
         {
             return part.isEmpty() ? "-" : individualNames[part.get(0)];
         }
-    }
+    };
 
     private static class FoldedEntry implements Comparable<FoldedEntry>
     {
@@ -90,7 +90,15 @@ public class Lattice
         }
     }
 
-    // Fold by subGraphs, resulting in one element per subgraph
+    /**
+     * Collapse a lattice by its subgroup equivalence relation.
+     * Name of each element is chosen as per the nameSelector.
+     * The colour/nodeAttributes of a lattice are chosen to be an arbitrary representative's.
+     *
+     * @param lat The lattice to collapse
+     * @param nameSelector A name selector
+     * @return A new, collapsed lattice. (Original is unmodified).
+     */
     public static Lattice CollapseBy(Lattice lat, INameSelector nameSelector)
     {
         // setup grouped names, from subgraph:
@@ -144,11 +152,17 @@ public class Lattice
         return new Lattice(collapsedRelation, collapsedLatOrder, collapsedNames, collapsedColours, collapsedSubGraph);
     }
 
-    public static Lattice FilterBy(Lattice lat, BitSet include)
-    {
-        return FilterBy(lat.latOrder, lat.names, lat.colours, lat.latBit, lat.subGraphs, include);
-    }
-
+    /**
+     * Filter the lattice of all fix-orders as per the include bitmap. The element is kept, if it's index in the bitmap is 1.
+     *
+     * @param latOrder The number of elements
+     * @param names The name of each fix order (for output purposes).
+     * @param colours The color of each fix order (for output purposes).
+     * @param relation The bitset showing the lattice formed by all fix orders
+     * @param subGraphs The set of all subGraphs of the lattice
+     * @param include A bitmap to filter by.
+     * @return The lattice of the fix orders satisfying the conditions.
+     */
     public static Lattice FilterBy(int latOrder, String[] names, String[] colours, BitSet relation,
                                    LinkedList<ArrayList<Integer>> subGraphs, BitSet include)
     {
@@ -203,26 +217,6 @@ public class Lattice
         }
 
         return new Lattice(filteredRelation, filteredLatOrder, filteredNames, filteredColours, filteredSubGraphs);
-    }
-
-    /**
-     * Filter the lattice of all fix-orders by certain conditions (i.e. whether to include unfaithful and non-normal ones).
-     *
-     * @param fixOrders The set of all fix-orders
-     * @param fullRelation The bitset showing the lattice formed by all fix orders
-     * @param numFixOrders The number of elements
-     * @param faithfulOnly Whether to include faithful elements only.
-     * @param normalOnly Whether to include normal elements only.
-     * @param fixOrderNames The name of each fix order (for output purposes).
-     * @param colors The color of each fix order (for output purposes).
-     * @return The lattice of the fix orders satisfying the conditions.
-     */
-    public static Lattice Filter35By(ArrayList<FixOrder> fixOrders, BitSet fullRelation, int numFixOrders,
-                                   boolean faithfulOnly, boolean normalOnly, String[] fixOrderNames, String[] colors, LinkedList<ArrayList<Integer>> subGraphs)
-    {
-        BitSet include = includeBy(fixOrders, faithfulOnly, normalOnly);
-        Lattice lat = new Lattice(fullRelation, numFixOrders, fixOrderNames, colors, subGraphs);
-        return CollapseBy(FilterBy(lat, include), new FullPartNameSelector());
     }
 
     public static BitSet includeBy(ArrayList<FixOrder> fixOrders, boolean faithfulOnly, boolean normalOnly)

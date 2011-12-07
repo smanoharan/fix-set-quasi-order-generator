@@ -40,8 +40,8 @@ public class LatticeCollapseByTest extends LatticeFixture
         BitSet include = Lattice.includeBy(cur.FilteringRelations, faithfulOnly, normalOnly);
         Lattice toCollapse = Lattice.FilterBy(cur.latOrder, cur.names, cur.colours, cur.lattice, cur.subGraphs, include);
 
-        Lattice latFullName = Lattice.CollapseBy(toCollapse, new Lattice.FullPartNameSelector());
-        Lattice latRepName = Lattice.CollapseBy(toCollapse, new Lattice.RepNameSelector());
+        Lattice latFullName = Lattice.CollapseBy(toCollapse, Lattice.FullPartNameSelector);
+        Lattice latRepName = Lattice.CollapseBy(toCollapse, Lattice.RepNameSelector);
 
         assertEquals(testTitle + "-full-latOrder", latOrder, latFullName.latOrder);
         assertEquals(testTitle + "-rep-latOrder", latOrder, latRepName.latOrder);

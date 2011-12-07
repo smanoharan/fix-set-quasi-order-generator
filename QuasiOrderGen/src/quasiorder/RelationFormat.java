@@ -9,29 +9,28 @@ import java.util.List;
 
 public class RelationFormat
 {
-    public enum OutputNamingConvention { full, grouped, representative; }
+    public static void PrintRelationEdgesWithoutSubGraphs(Lattice lat, String filename) throws IOException
+    {
+        PrintRelationEdges(lat, filename, false);
+    }
 
-    public static void PrintRelationEdges(Lattice lattice, String filename, boolean partition, OutputNamingConvention naming, boolean coloursOnly) throws IOException
+    public static void PrintRelationEdgesWithSubGraphs(Lattice lat, String filename) throws IOException
+    {
+        PrintRelationEdges(lat, filename, true);
+    }
+
+    private static void PrintRelationEdges(Lattice lattice, String filename, boolean showSubGraphs) throws IOException
     {
         PrintWriter p = new PrintWriter(filename);
-        p.println(PrintRelationEdges(lattice, partition, naming, coloursOnly));
+        p.println(PrintRelationEdges(lattice, showSubGraphs));
         p.close();
     }
 
-    private static String[] FindNames(Lattice lat, OutputNamingConvention naming)
+    private static LinkedList<ArrayList<Integer>> emptySubgraphList = new LinkedList<ArrayList<Integer>>();
+    private static String PrintRelationEdges(Lattice lattice, boolean showSubGraphs)
     {
-        if (naming.equals(OutputNamingConvention.grouped)) return lat.names; // TODO change
-        else if (naming.equals(OutputNamingConvention.representative)) return lat.names; // TODO change
-        else return lat.names;
-    }
-
-    public static String PrintRelationEdges(Lattice lattice, boolean partition, OutputNamingConvention naming, boolean coloursOnly)
-    {
-        return PrintRelationEdges(
-                lattice.latBit, FindNames(lattice, naming),
-                (coloursOnly ? lattice.colours : lattice.colours),
-                (partition ? lattice.subGraphs : new LinkedList<ArrayList<Integer>>()),
-                lattice.latOrder);
+        return PrintRelationEdges(lattice.latBit, lattice.names, lattice.nodeAttr,
+                (showSubGraphs ? lattice.subGraphs : emptySubgraphList), lattice.latOrder);
     }
 
     /**
@@ -40,23 +39,25 @@ public class RelationFormat
      * @param relation The relation to output
      * @param elementNames The names of each element in the relation
      * @param numElem The number of elements
-     * @param parts The partitions of the groups. The first partition is expected to be a list of all singletons.
+     * @param nodeAttributes The presentation attributes of each node
+     * @param subGraphs The partitions of the groups. The first partition is expected to be a list of all singletons.
      * @return A string representing the relation in DOT form.
      */
-    public static String PrintRelationEdges(BitSet relation, String[] elementNames, String[] nodeAttributes, LinkedList<ArrayList<Integer>> parts, int numElem)
+    public static String PrintRelationEdges(BitSet relation, String[] elementNames, String[] nodeAttributes,
+                                            LinkedList<ArrayList<Integer>> subGraphs, int numElem)
     {
         StringBuilder res = new StringBuilder();
         res.append("strict digraph {\nedge [ arrowhead=\"none\", arrowtail=\"none\"]\n");
         for (int i=0;i<numElem;i++)
                 res.append(String.format("%s [%s]\n",elementNames[i], nodeAttributes[i]));
 
-        AppendSubgraphs(parts, elementNames, res);
+        AppendSubgraphs(subGraphs, elementNames, res);
 
         for(int i=relation.nextSetBit(0); i>=0; i=relation.nextSetBit(i + 1))
         {
             int y = i % numElem;
             int x = i / numElem;
-            res.append(elementNames[y] + "->" + elementNames[x] + "\n");
+            res.append(elementNames[y]).append("->").append(elementNames[x]).append("\n");
         }
 
         res.append("}\n");
@@ -66,6 +67,7 @@ public class RelationFormat
     /**
      * Append the SubGraph description to the string builder
      * @param parts The partitions of the graph
+     * @param names The name of each element
      * @param res The string builder to append to.
      */
     public static void AppendSubgraphs(LinkedList<ArrayList<Integer>> parts, String[] names, StringBuilder res)
@@ -76,8 +78,8 @@ public class RelationFormat
         {
             if (partId++ == -1) continue; // skip the singletons
 
-            res.append("subgraph cluster_" + partId + " {");
-            for (Integer i : part) res.append(" " + names[i]);
+            res.append("subgraph cluster_").append(partId).append(" {");
+            for (Integer i : part) res.append(" ").append(names[i]);
             res.append("; style=filled; color=lightgrey }\n");
         }
     }

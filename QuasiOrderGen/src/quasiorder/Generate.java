@@ -207,21 +207,22 @@ public class Generate
         BitSet overallRelation = relations.GenerateOverallQuasiOrder();
         LinkedList<ArrayList<Integer>> subgraphs = PartitionBy(relations.FixOrders, inputGroup.Permutations, inputGroup.NumElements);
 
-        // TODO fix all this!
         PrintWriter modDistOutput = new PrintWriter(title + ".md");
         rawOutput.println("\n\n" + "Lattice of all fix set quasi orders: ");
         for (int i=0;i<numLatTypes;i++)
         {
-            Lattice lat = Lattice.Filter35By(relations.FixOrders, overallRelation, numRels, ((i & 1) == 1), i >= 2, relNames, colors, subgraphs);
+            BitSet include = Lattice.includeBy(relations.FixOrders, (i & 1) == 1, i >= 2);
+            Lattice lat = Lattice.FilterBy(numRels, relNames, colors, overallRelation, subgraphs, include);
 
-            // ungrouped lattice
-            RelationFormat.PrintRelationEdges(lat, String.format("%s.%s.lat", title, latTypes[i]), false, RelationFormat.OutputNamingConvention.full, false);
-            // TODO fix modDistOutput.println(String.format("ungrouped: %1$-50s %2$s", latTypes[i], lat.ModDistCheckMessage()));
+            // ungrouped lattice - show mjd features.
+            MeetJoinDeterminedLattice mjdLat = MeetJoinDeterminedLattice.FromLattice(lat);
+            RelationFormat.PrintRelationEdgesWithoutSubGraphs(mjdLat, String.format("%s.%s.lat", title, latTypes[i]));
+            modDistOutput.println(String.format("ungrouped: %1$-50s %2$s", latTypes[i], mjdLat.ModDistCheckMessage()));
 
-            // grouped lattice
-            RelationFormat.PrintRelationEdges(lat, String.format("%s.col1.%s.lat", title, latTypes[i]), true, RelationFormat.OutputNamingConvention.full, true);
-            RelationFormat.PrintRelationEdges(lat, String.format("%s.col2.%s.lat", title, latTypes[i]), false, RelationFormat.OutputNamingConvention.grouped, true);
-            RelationFormat.PrintRelationEdges(lat, String.format("%s.col3.%s.lat", title, latTypes[i]), false, RelationFormat.OutputNamingConvention.representative, true);
+            // grouped lattice - show only colours: 1) subgroups only ; 2) collapse + full-names ; 3) collapse + rep-names
+            RelationFormat.PrintRelationEdgesWithSubGraphs(lat, String.format("%s.col1.%s.lat", title, latTypes[i]));
+            RelationFormat.PrintRelationEdgesWithoutSubGraphs(Lattice.CollapseBy(lat, Lattice.FullPartNameSelector), String.format("%s.col2.%s.lat", title, latTypes[i]));
+            RelationFormat.PrintRelationEdgesWithoutSubGraphs(Lattice.CollapseBy(lat, Lattice.RepNameSelector), String.format("%s.col3.%s.lat", title, latTypes[i]));
 
         }
         modDistOutput.close();
@@ -230,6 +231,7 @@ public class Generate
     /**
      * Partition fix-orders by equivalence under automorphisms.
      *
+     * @param fixOrders The list of all fix-orders in this group.
      * @param automorphMaps The automorphisms of the group
      * @param numElem The number of elements in the group
      * @return A list of partitions, each of which is a list of integers (indices of elements). The first partition lists all singletons.
@@ -296,6 +298,8 @@ public class Generate
 
     /**
      * Check if the first bitSet becomes the second when rotated by any automorphism
+     * @param first The first bitSet
+     * @param second The second bitSet
      * @param automorphMaps The automorphisms of the group.
      * @param numElem The number of elements in the relation.
      * @return Whether the two BitSets are equivalent via automorphism.

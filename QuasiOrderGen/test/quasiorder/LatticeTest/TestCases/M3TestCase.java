@@ -98,20 +98,44 @@ public class M3TestCase extends LatticeTestCase
 
         FilteredFaithfulNormalLatOrder = 1;
         FilteredFaithfulNormalNames = new String[] { "2" };
+        FilteredFaithfulNormalColours = new String[] { "c-2" };
         FilteredFaithfulNormalGroupedNames = new String[] { "2" };
         FilteredFaithfulNormalRelation = StringToBitSet("1");
         FilteredFaithfulNormalSubGraphs = ToList(ToList(0));
 
         FilteredFaithfulLatOrder = latOrder;
         FilteredFaithfulNames = new String[] {"0", "1", "2", "3", "4"};
+        FilteredFaithfulColours = new String[] {"c-0", "c-1", "c-2", "c-3", "c-4"};
         FilteredFaithfulGroupedNames = groupedNames;
         FilteredFaithfulRelation = lattice;
         FilteredFaithfulSubGraphs = subGraphs;
 
         FilteredNormalLatOrder = FilteredFaithfulNormalLatOrder;
         FilteredNormalNames = FilteredFaithfulNormalNames;
+        FilteredNormalColours = FilteredFaithfulNormalColours;
         FilteredNormalGroupedNames = FilteredFaithfulNormalGroupedNames;
         FilteredNormalRelation = FilteredFaithfulNormalRelation;
         FilteredNormalSubGraphs = FilteredFaithfulNormalSubGraphs;
+
+        CollapsedLatOrder = 3;
+        CollapsedRelation = StringToBitSet("100110111");
+        CollapsedGroupedNames =  new String[] {"0", "\"_1_2_3\"", "4"};
+        CollapsedRepNames = new String[]{ "0", "1", "4"};
+        CollapsedColours = new String[]{ "c-0", "c-1", "c-4" };
+        CollapsedSubGraphs = ToList(ToList(0,1,2));
+
+        CollapsedFaithfulNormalLatOrder = FilteredFaithfulNormalLatOrder;
+        CollapsedFaithfulNormalRelation = FilteredFaithfulNormalRelation;
+        CollapsedFaithfulNormalGroupedNames = FilteredFaithfulNormalNames;
+        CollapsedFaithfulNormalRepNames = FilteredFaithfulNormalNames;
+        CollapsedFaithfulNormalColours = FilteredFaithfulNormalColours;
+        CollapsedFaithfulNormalSubGraphs = FilteredFaithfulNormalSubGraphs;
+
+        //
+        //             0
+        //           / | \
+        //          1  2  3
+        //           \ | /
+        //             4
     }
 }

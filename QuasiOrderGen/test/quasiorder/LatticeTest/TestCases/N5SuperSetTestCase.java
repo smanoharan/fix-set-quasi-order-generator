@@ -148,22 +148,39 @@ public class N5SuperSetTestCase extends LatticeTestCase
 
         FilteredFaithfulNormalLatOrder = 5;
         FilteredFaithfulNormalNames = new String[] { "1", "3", "4", "5", "6" };
+        FilteredFaithfulNormalColours = new String[] { "c-1", "c-3", "c-4", "c-5", "c-6" };
         FilteredFaithfulNormalGroupedNames = new String[] { "1", "\"_3_5\"", "4", "\"_3_5\"", "6" };
         FilteredFaithfulNormalRelation = StringToBitSet("10000"+"11000"+"10100"+"11010"+"11111");
         FilteredFaithfulNormalSubGraphs = ToList(ToList(2, 0, 4), ToList(1, 3));
 
         FilteredFaithfulLatOrder = 7;
         FilteredFaithfulNames = new String[] {"1", "3", "4", "5", "6", "7", "8"};
+        FilteredFaithfulColours = new String[] {"c-1", "c-3", "c-4", "c-5", "c-6", "c-7", "c-8"};
         FilteredFaithfulGroupedNames = new String[] {"1", "\"_3_5\"", "4", "\"_3_5\"", "\"_6_7\"", "\"_6_7\"", "8"};
         FilteredFaithfulRelation = StringToBitSet("1000000"+"1100000"+"1010000"+"1101000"+"1111100"+"1010010"+"1111111");
         FilteredFaithfulSubGraphs = ToList(ToList(2, 6, 0), ToList(1, 3), ToList(4, 5));
 
         FilteredNormalLatOrder = 7;
         FilteredNormalNames = new String[] {"0", "1", "2", "3", "4", "5", "6"};
+        FilteredNormalColours = new String[] {"c-0", "c-1", "c-2", "c-3", "c-4", "c-5", "c-6"};
         FilteredNormalGroupedNames = new String[] {"0", "\"_1_2\"", "\"_1_2\"", "\"_3_5\"", "4", "\"_3_5\"", "6"};
         FilteredNormalRelation = StringToBitSet("1000000"+"1100000"+"1010000"+"1101000"+"1110100"+"1101010"+"1111111");
         FilteredNormalSubGraphs = ToList(ToList(0, 4, 6), ToList(1, 2), ToList(3, 5));
-        //
+
+        CollapsedLatOrder = 6;
+        CollapsedRelation = StringToBitSet("100000"+"110000"+"111000"+"110100"+"111110"+"111111");
+        CollapsedGroupedNames =  new String[] {"0", "\"_1_2\"", "\"_3_5\"", "4", "\"_6_7\"", "8" };
+        CollapsedRepNames = new String[]{ "0", "1", "3", "4", "6", "8"};
+        CollapsedColours = new String[]{ "c-0", "c-1", "c-3", "c-4", "c-6", "c-8"};
+        CollapsedSubGraphs = ToList(ToList(0,1,2,3,4,5));
+
+        CollapsedFaithfulNormalLatOrder = 4;
+        CollapsedFaithfulNormalRelation = StringToBitSet("1000"+"1100"+"1010"+"1111");
+        CollapsedFaithfulNormalGroupedNames = new String[] { "1", "\"_3_5\"", "4", "6" };
+        CollapsedFaithfulNormalRepNames = new String[]{ "1", "3", "4", "6"};
+        CollapsedFaithfulNormalColours = new String[]{ "c-1", "c-3", "c-4", "c-6"};
+        CollapsedFaithfulNormalSubGraphs =  ToList(ToList(0,1,2,3));
+
         //             0
         //            / \
         //           /   \      // top figure-8 is normal

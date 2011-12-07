@@ -23,7 +23,7 @@ public abstract class LatticeTestCase
     public String title;
     public String[] names;
     public String[] groupedNames;
-    public String[] colors;
+    public String[] colours;
     public LinkedList<ArrayList<Integer>> subGraphs;
 
     public boolean isModular;
@@ -48,6 +48,7 @@ public abstract class LatticeTestCase
     public int FilteredFaithfulLatOrder;
     public BitSet FilteredFaithfulRelation;
     public String[] FilteredFaithfulNames;
+    public String[] FilteredFaithfulColours;
     public String[] FilteredFaithfulGroupedNames;
     public LinkedList<ArrayList<Integer>> FilteredFaithfulSubGraphs;
 
@@ -55,25 +56,43 @@ public abstract class LatticeTestCase
     public BitSet FilteredNormalRelation;
     public String[] FilteredNormalGroupedNames;
     public String[] FilteredNormalNames;
+    public String[] FilteredNormalColours;
     public LinkedList<ArrayList<Integer>> FilteredNormalSubGraphs;
 
     public int FilteredFaithfulNormalLatOrder;
     public BitSet FilteredFaithfulNormalRelation;
     public String[] FilteredFaithfulNormalGroupedNames;
+    public String[] FilteredFaithfulNormalColours;
     public String[] FilteredFaithfulNormalNames;
     public LinkedList<ArrayList<Integer>> FilteredFaithfulNormalSubGraphs;
-    public String[] groupRepNames; // TODO test
+
+    public int CollapsedLatOrder;
+    public BitSet CollapsedRelation;
+    public String[] CollapsedGroupedNames;
+    public String[] CollapsedRepNames;
+    public String[] CollapsedColours;
+    public LinkedList<ArrayList<Integer>> CollapsedSubGraphs;
+
+    public int CollapsedFaithfulNormalLatOrder;
+    public BitSet CollapsedFaithfulNormalRelation;
+    public String[] CollapsedFaithfulNormalGroupedNames;
+    public String[] CollapsedFaithfulNormalRepNames;
+    public String[] CollapsedFaithfulNormalColours;
+    public LinkedList<ArrayList<Integer>> CollapsedFaithfulNormalSubGraphs;
+
 
     public void SetupAll()
     {
         SetupTestCase(); // must be done first, in order init latOrder.
         names = new String[latOrder];
-        colors = new String[latOrder];
+        colours = new String[latOrder];
+
         for (int i=0;i<latOrder;i++)
         {
             names[i] = ""+i;
-            colors[i] = "c-" + i; // arbitrary colour names
+            colours[i] = "c-" + i; // arbitrary colour names
         }
+
     }
 
     protected abstract void SetupTestCase();

@@ -207,11 +207,12 @@ public class Generate
         BitSet overallRelation = relations.GenerateOverallQuasiOrder();
         LinkedList<ArrayList<Integer>> subgraphs = PartitionBy(relations.FixOrders, inputGroup.Permutations, inputGroup.NumElements);
 
+        // TODO fix all this!
         PrintWriter modDistOutput = new PrintWriter(title + ".md");
         rawOutput.println("\n\n" + "Lattice of all fix set quasi orders: ");
         for (int i=0;i<numLatTypes;i++)
         {
-            Lattice lat = Lattice.Filter3By(relations.FixOrders, overallRelation, numRels, ((i & 1) == 1), i >= 2, relNames, colors, subgraphs);
+            Lattice lat = Lattice.Filter35By(relations.FixOrders, overallRelation, numRels, ((i & 1) == 1), i >= 2, relNames, colors, subgraphs);
 
             // ungrouped lattice
             RelationFormat.PrintRelationEdges(lat, String.format("%s.%s.lat", title, latTypes[i]), false, RelationFormat.OutputNamingConvention.full, false);

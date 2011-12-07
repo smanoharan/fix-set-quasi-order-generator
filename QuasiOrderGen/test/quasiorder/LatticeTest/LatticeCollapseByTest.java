@@ -17,67 +17,43 @@ public class LatticeCollapseByTest extends LatticeFixture
 {
     public LatticeCollapseByTest(LatticeTestCase curLat) { super(curLat); }
 
-    // TODO
-
     @Test
-    public void assertFilterByAll()
+    public void TestCollapseAll()
     {
-        AssertLatticeIs("-all-", false, false,
-                cur.latOrder,
-                cur.lattice,
-                cur.names,
-                cur.groupedNames,
-                cur.subGraphs);
+        AssertCollapsedLatticeIs("-all-", false, false, cur.CollapsedLatOrder, cur.CollapsedRelation,
+                cur.CollapsedGroupedNames, cur.CollapsedRepNames, cur.CollapsedSubGraphs);
     }
 
     @Test
-    public void assertFilterByFaithfulOnly()
+    public void TestCollapseWhenFilterByFaithfulNormal()
     {
-        AssertLatticeIs("-faithfulOnly-", true, false,
-                cur.FilteredFaithfulLatOrder,
-                cur.FilteredFaithfulRelation,
-                cur.FilteredFaithfulNames,
-                cur.FilteredFaithfulGroupedNames,
-                cur.FilteredFaithfulSubGraphs);
+        AssertCollapsedLatticeIs("-faithful-normal-", true, true, cur.CollapsedFaithfulNormalLatOrder,
+                cur.CollapsedFaithfulNormalRelation, cur.CollapsedFaithfulNormalGroupedNames,
+                cur.CollapsedFaithfulNormalRepNames, cur.CollapsedFaithfulNormalSubGraphs);
     }
 
-    @Test
-    public void assertFilterByNormalOnly()
-    {
-        AssertLatticeIs("-normalOnly-", false, true,
-                cur.FilteredNormalLatOrder,
-                cur.FilteredNormalRelation,
-                cur.FilteredNormalNames,
-                cur.FilteredNormalGroupedNames,
-                cur.FilteredNormalSubGraphs);
-    }
-
-    @Test
-    public void assertFilterByFaithfulNormalOnly()
-    {
-        AssertLatticeIs("-faithfulNormalOnly-", true, true,
-                cur.FilteredFaithfulNormalLatOrder,
-                cur.FilteredFaithfulNormalRelation,
-                cur.FilteredFaithfulNormalNames,
-                cur.FilteredFaithfulNormalGroupedNames,
-                cur.FilteredFaithfulNormalSubGraphs);
-    }
-
-    private void AssertLatticeIs(String testCaseTitle, boolean faithfulOnly, boolean normalOnly, int latOrder,
-                               BitSet latBit, String[] names, String[] groupedNames, LinkedList<ArrayList<Integer>> subgraphs)
+    private void AssertCollapsedLatticeIs(
+            String testCaseTitle, boolean faithfulOnly, boolean normalOnly, int latOrder, BitSet latBit, String[] fullNames,
+            String[] repNames, LinkedList<ArrayList<Integer>> subgraphs)
     {
         String testTitle = cur.title + testCaseTitle;
-        Lattice lat = filterBy(faithfulOnly, normalOnly, cur);
-        assertEquals(testTitle + "latOrder", latOrder, lat.latOrder);
-        assertEquals(testTitle + "relation", latBit, lat.latBit);
-        AssertArrayEquals(testTitle + "names", names, lat.names, latOrder);
-        AssertListOfListEquals(testTitle + "subGraphs", subgraphs, lat.subGraphs);
-    }
+        BitSet include = Lattice.includeBy(cur.FilteringRelations, faithfulOnly, normalOnly);
+        Lattice toCollapse = Lattice.FilterBy(cur.latOrder, cur.names, cur.colours, cur.lattice, cur.subGraphs, include);
 
-    private static Lattice filterBy(boolean faithfulOnly, boolean normalOnly, LatticeTestCase cur)
-    {
-        return Lattice.Filter3By(cur.FilteringRelations, cur.lattice, cur.latOrder,
-                faithfulOnly, normalOnly, cur.names, cur.colors, cur.subGraphs);
+        Lattice latFullName = Lattice.CollapseBy(toCollapse, new Lattice.FullPartNameSelector());
+        Lattice latRepName = Lattice.CollapseBy(toCollapse, new Lattice.RepNameSelector());
+
+        assertEquals(testTitle + "-full-latOrder", latOrder, latFullName.latOrder);
+        assertEquals(testTitle + "-rep-latOrder", latOrder, latRepName.latOrder);
+
+        assertEquals(testTitle + "-full-relation", latBit, latFullName.latBit);
+        assertEquals(testTitle + "-rep-relation", latBit, latRepName.latBit);
+
+        AssertArrayEquals(testTitle + "-full-names", fullNames, latFullName.names, latOrder);
+        AssertArrayEquals(testTitle + "-rep-names", repNames, latRepName.names, latOrder);
+
+        AssertListOfListEquals(testTitle + "-full-subGraphs", subgraphs, latFullName.subGraphs);
+        AssertListOfListEquals(testTitle + "-rep-subGraphs", subgraphs, latRepName.subGraphs);
     }
 
     private static void AssertListOfListEquals(String title, LinkedList<ArrayList<Integer>> expected, LinkedList<ArrayList<Integer>> actual)

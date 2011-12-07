@@ -18,7 +18,7 @@ public class LatticeIsDistributiveTest extends LatticeFixture
     @Test
     public void assertLatticeDistributivity()
     {
-        Lattice lat = new Lattice(cur.lattice, cur.latOrder, cur.names, cur.colors, cur.subGraphs);
+        Lattice lat = new Lattice(cur.lattice, cur.latOrder, cur.names, cur.colours, cur.subGraphs);
         MeetJoinDeterminedLattice mjdLat = MeetJoinDeterminedLattice.FromLattice(lat);
         assertEquals(cur.title, cur.isDistributive, mjdLat.IsDistributive());
         assertEquals(cur.title + "-x", cur.NonDistXElem, mjdLat.NonDistXElem);

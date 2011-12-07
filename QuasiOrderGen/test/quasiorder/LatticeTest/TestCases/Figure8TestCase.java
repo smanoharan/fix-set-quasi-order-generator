@@ -134,21 +134,48 @@ public class Figure8TestCase extends LatticeTestCase
         groupedNames = new String[] {"0", "\"_1_2\"", "\"_1_2\"", "3", "\"_4_5\"", "\"_4_5\"", "6" };
         FilteredFaithfulLatOrder = 4;
         FilteredFaithfulNames = new String[]{"0", "1", "2", "3"};
+        FilteredFaithfulColours = new String[]{"c-0", "c-1", "c-2", "c-3"};
         FilteredFaithfulGroupedNames = new String[]{"0", "\"_1_2\"", "\"_1_2\"", "3"};
         FilteredFaithfulRelation = StringToBitSet("1000"+"1100"+"1010"+"1111");
         FilteredFaithfulSubGraphs = ToList(ToList(0, 3), ToList(1, 2));
 
         FilteredNormalLatOrder = 7;
         FilteredNormalNames = new String[]{"0", "1", "2", "3", "4", "5", "6"};
+        FilteredNormalColours = new String[]{"c-0", "c-1", "c-2", "c-3", "c-4", "c-5", "c-6"};
         FilteredNormalGroupedNames = groupedNames;
         FilteredNormalRelation = lattice;
         FilteredNormalSubGraphs = subGraphs;
 
         FilteredFaithfulNormalLatOrder = FilteredFaithfulLatOrder;
         FilteredFaithfulNormalNames = FilteredFaithfulNames;
+        FilteredFaithfulNormalColours = FilteredFaithfulColours;
         FilteredFaithfulNormalGroupedNames = FilteredFaithfulGroupedNames;
         FilteredFaithfulNormalRelation = FilteredFaithfulRelation;
         FilteredFaithfulNormalSubGraphs = FilteredFaithfulSubGraphs;
 
+        CollapsedLatOrder = 5;
+        CollapsedRelation = StringToBitSet("10000"+"11000"+"11100"+"11110"+"11111");
+        CollapsedGroupedNames = new String[] {"0", "\"_1_2\"", "3", "\"_4_5\"", "6" };
+        CollapsedRepNames = new String[]{ "0", "1", "3", "4", "6"};
+        CollapsedColours = new String[]{ "c-0", "c-1", "c-3", "c-4", "c-6"};
+        CollapsedSubGraphs = ToList(ToList(0,1,2,3,4));
+
+        CollapsedFaithfulNormalLatOrder = 3;
+        CollapsedFaithfulNormalRelation = StringToBitSet("100110111");
+        CollapsedFaithfulNormalGroupedNames = new String[] {"0", "\"_1_2\"", "3" };
+        CollapsedFaithfulNormalRepNames = new String[] {"0", "1", "3"};
+        CollapsedFaithfulNormalColours = new String[] {"c-0", "c-1", "c-3"};
+        CollapsedFaithfulNormalSubGraphs = ToList(ToList(0,1,2));
+        //
+        //        0
+        //       / \
+        //      1   2
+        //       \ /
+        //        3
+        //       / \
+        //      4   5
+        //       \ /
+        //        6
+        //
     }
 }

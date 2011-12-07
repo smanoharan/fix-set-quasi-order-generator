@@ -148,22 +148,52 @@ public class GridTestCase extends LatticeTestCase
 
         FilteredFaithfulLatOrder = 4;
         FilteredFaithfulNames = new String[]{"4", "6", "7", "8"};
+        FilteredFaithfulColours = new String[]{"c-4", "c-6", "c-7", "c-8"};
         FilteredFaithfulGroupedNames = new String[]{"4", "\"_6_7\"", "\"_6_7\"", "8"};
         FilteredFaithfulRelation = StringToBitSet("1000"+"1100"+"1010"+"1111");
         FilteredFaithfulSubGraphs = ToList(ToList(3, 0), ToList(1, 2));
 
         FilteredNormalLatOrder = 4;
         FilteredNormalNames =  new String[]{"0", "1", "2", "4"};
+        FilteredNormalColours =  new String[]{"c-0", "c-1", "c-2", "c-4"};
         FilteredNormalGroupedNames =  new String[]{"0", "\"_1_2\"", "\"_1_2\"", "4"};
         FilteredNormalRelation = StringToBitSet("1000"+"1100"+"1010"+"1111");
         FilteredNormalSubGraphs = ToList(ToList(0, 3), ToList(1, 2));
 
         FilteredFaithfulNormalLatOrder = 1;
         FilteredFaithfulNormalNames = new String[] { "4" };
+        FilteredFaithfulNormalColours = new String[] { "c-4" };
         FilteredFaithfulNormalGroupedNames = new String[] { "4" };
         FilteredFaithfulNormalRelation = StringToBitSet("1");
         FilteredFaithfulNormalSubGraphs = ToList(ToList(0));
 
+        CollapsedLatOrder = 5;
+        CollapsedRelation = StringToBitSet("10000"+"11000"+"11100"+"11110"+"11111");
+        CollapsedGroupedNames =  new String[] {"0", "\"_1_2\"", "\"_3_4_5\"", "\"_6_7\"", "8" };
+        CollapsedRepNames = new String[]{ "0", "1", "3", "6", "8"};
+        CollapsedColours = new String[]{ "c-0", "c-1", "c-3", "c-4", "c-8"};
+        CollapsedSubGraphs = ToList(ToList(0,1,2,3,4));
+
+        CollapsedFaithfulNormalLatOrder = FilteredFaithfulNormalLatOrder;
+        CollapsedFaithfulNormalRelation = FilteredFaithfulNormalRelation;
+        CollapsedFaithfulNormalGroupedNames = FilteredFaithfulNormalGroupedNames;
+        CollapsedFaithfulNormalRepNames = FilteredFaithfulNormalGroupedNames;
+        CollapsedFaithfulNormalColours = FilteredFaithfulNormalColours;
+        CollapsedFaithfulNormalSubGraphs = FilteredFaithfulNormalSubGraphs;
+        //
+        //             0
+        //            / \
+        //           /   \
+        //          1     2
+        //         / \   / \
+        //        /   \ /   \
+        //       3     4     5
+        //        \   / \   /
+        //         \ /   \ /
+        //          6     7
+        //           \   /
+        //            \ /
+        //             8
     }
 
 }

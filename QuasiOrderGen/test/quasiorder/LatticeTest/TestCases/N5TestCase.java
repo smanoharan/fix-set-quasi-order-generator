@@ -101,24 +101,41 @@ public class N5TestCase extends LatticeTestCase
             FilteringRelations.add(new FixOrder(new BitSet(), true, true));
 
         subGraphs = ToList(ToList(0, 1, 2, 3, 4));
-        groupedNames = new String[] { "0", "1", "2", "3", "4" };
 
         FilteredFaithfulNormalLatOrder = 5;
         FilteredFaithfulNormalNames = new String[] { "0", "1", "2", "3", "4" };
+        FilteredFaithfulNormalColours = new String[] { "c-0", "c-1", "c-2", "c-3", "c-4" };
         FilteredFaithfulNormalGroupedNames = groupedNames;
         FilteredFaithfulNormalRelation = StringToBitSet("10000"+"11000"+"10100"+"11010"+"11111");
         FilteredFaithfulNormalSubGraphs = subGraphs;
 
         FilteredFaithfulLatOrder = FilteredFaithfulNormalLatOrder;
         FilteredFaithfulNames = FilteredFaithfulNormalNames;
+        FilteredFaithfulColours = FilteredFaithfulNormalColours;
         FilteredFaithfulGroupedNames = FilteredFaithfulNormalGroupedNames;
         FilteredFaithfulRelation = FilteredFaithfulNormalRelation;
         FilteredFaithfulSubGraphs = FilteredFaithfulNormalSubGraphs;
 
         FilteredNormalLatOrder = FilteredFaithfulNormalLatOrder;
         FilteredNormalNames = FilteredFaithfulNormalNames;
+        FilteredNormalColours = FilteredFaithfulNormalColours;
         FilteredNormalGroupedNames = FilteredFaithfulNormalGroupedNames;
         FilteredNormalRelation = FilteredFaithfulNormalRelation;
         FilteredNormalSubGraphs = FilteredFaithfulSubGraphs;
+
+        CollapsedLatOrder = latOrder;
+        CollapsedRelation = FilteredFaithfulNormalRelation;
+        CollapsedGroupedNames = new String[] { "0", "1", "2", "3", "4" };
+        CollapsedRepNames = CollapsedGroupedNames;
+        CollapsedColours = new String[]{ "c-0", "c-1", "c-2", "c-3", "c-4"};
+        CollapsedSubGraphs = subGraphs;
+
+        CollapsedFaithfulNormalLatOrder = CollapsedLatOrder;
+        CollapsedFaithfulNormalRelation = CollapsedRelation;
+        CollapsedFaithfulNormalGroupedNames = CollapsedGroupedNames;
+        CollapsedFaithfulNormalRepNames = CollapsedRepNames;
+        CollapsedFaithfulNormalColours = CollapsedColours;
+        CollapsedFaithfulNormalSubGraphs = CollapsedSubGraphs;
+
     }
 }

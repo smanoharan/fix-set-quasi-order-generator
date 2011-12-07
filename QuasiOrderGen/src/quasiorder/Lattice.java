@@ -1,6 +1,7 @@
 package quasiorder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.LinkedList;
 
@@ -33,12 +34,12 @@ public class Lattice
         return colAttr;
     }
 
-    static interface INameSelector
+    public static interface INameSelector
     {
         public String ChooseName(ArrayList<Integer> part, String[] individualNames);
     }
 
-    static class FullPartNameSelector implements INameSelector
+    public static class FullPartNameSelector implements INameSelector
     {
         public String ChooseName(ArrayList<Integer> part, String[] individualNames)
         {
@@ -50,7 +51,7 @@ public class Lattice
         }
     }
 
-    static class RepNameSelector implements INameSelector
+    public static class RepNameSelector implements INameSelector
     {
         public String ChooseName(ArrayList<Integer> part, String[] individualNames)
         {
@@ -58,38 +59,89 @@ public class Lattice
         }
     }
 
-    // Fold by subGraphs, resulting in one element per subgraph
-    public static Lattice CollapseBy(Lattice lat, LinkedList<ArrayList<Integer>> subGraphs, INameSelector nameSelector)
+    private static class FoldedEntry implements Comparable<FoldedEntry>
     {
-        // for now, just change the names, don't collapse the lattice. TODO collapse the lattice.
+        public final String name;
+        public final String colour;
+        public final ArrayList<Integer> oldIndices;
 
+        public FoldedEntry(String name, String colour, int oldIndex)
+        {
+            this(name, colour, SingletonList(oldIndex));
+        }
+
+        private static ArrayList<Integer> SingletonList(int i)
+        {
+            ArrayList<Integer> res = new ArrayList<Integer>();
+            res.add(i);
+            return res;
+        }
+
+        public FoldedEntry(String name, String colour, ArrayList<Integer> oldIndices)
+        {
+            this.name = name;
+            this.colour = colour;
+            this.oldIndices = oldIndices;
+        }
+
+        public int compareTo(FoldedEntry o)
+        {
+            return this.oldIndices.get(0) - o.oldIndices.get(0);
+        }
+    }
+
+    // Fold by subGraphs, resulting in one element per subgraph
+    public static Lattice CollapseBy(Lattice lat, INameSelector nameSelector)
+    {
         // setup grouped names, from subgraph:
-        boolean first = true;
-        String[] collapsedNames = new String[lat.latOrder]; // TODO change to collapsedLatOrder
-        String[] collapsedColours = new String[lat.latOrder]; // TODO change to collapsedLatOrder
-        System.arraycopy(lat.names, 0, collapsedNames, 0, lat.latOrder); // Then this will change as well.
-        System.arraycopy(lat.colours, 0, collapsedColours, 0, lat.latOrder); // Then this will change as well.
+        int collapsedLatOrder = lat.subGraphs.size() - 1 + (lat.subGraphs.get(0).size());
+        FoldedEntry[] foldedEntries = new FoldedEntry[collapsedLatOrder];
 
+        boolean first = true;
+        int cur = 0;
         for (ArrayList<Integer> part : lat.subGraphs)
         {
-            if (first) { first = false; continue; } // skip singletons (TODO may need changing when collapsing)
-
-            String partName = nameSelector.ChooseName(part, lat.names);
-            for(Integer i : part)
+            if (first)
             {
-                collapsedNames[i] = partName;
-                collapsedColours[i] = lat.colours[i]; // TODO change
+                first = false;
+                for (Integer i : part)
+                    foldedEntries[cur++] = new FoldedEntry(lat.names[i], lat.colours[i], i);
             }
+            else
+            {
+                String partName = nameSelector.ChooseName(part, lat.names);
+                foldedEntries[cur++] = new FoldedEntry(partName, lat.colours[part.get(0)], part);
+            }
+        }
+
+        String[] collapsedNames = new String[collapsedLatOrder];
+        String[] collapsedColours = new String[collapsedLatOrder];
+        int[] newIndex = new int[lat.latOrder];
+
+        Arrays.sort(foldedEntries);
+        for(int i=0;i<collapsedLatOrder;i++)
+        {
+            collapsedNames[i] = foldedEntries[i].name;
+            collapsedColours[i] = foldedEntries[i].colour;
+            for (Integer o : foldedEntries[i].oldIndices) newIndex[o] = i;
         }
 
         // now everything is a singleton
         LinkedList<ArrayList<Integer>> collapsedSubGraph = new LinkedList<ArrayList<Integer>>();
         ArrayList<Integer> all = new ArrayList<Integer>();
-        for(int i=0;i<lat.latOrder;i++) all.add(i); // TODO change
+        for(int i=0;i<collapsedLatOrder;i++) all.add(i);
         collapsedSubGraph.add(all);
 
-        //return new Lattice(lat.latBit, lat.latOrder, collapsedNames, collapsedColours, collapsedSubGraph, null, null);
-        return new Lattice(lat.latBit, lat.latOrder, lat.names, lat.colours, lat.subGraphs);
+        // build the collapsed relation:
+        BitSet collapsedRelation = new BitSet(collapsedLatOrder*collapsedLatOrder);
+        for (int k = lat.latBit.nextSetBit(0); k >= 0; k = lat.latBit.nextSetBit(k+1))
+        {
+            int oldI = k / lat.latOrder;
+            int oldJ = k % lat.latOrder;
+            collapsedRelation.set(ToSerialIndex(newIndex[oldI], newIndex[oldJ], collapsedLatOrder));
+        }
+
+        return new Lattice(collapsedRelation, collapsedLatOrder, collapsedNames, collapsedColours, collapsedSubGraph);
     }
 
     public static Lattice FilterBy(Lattice lat, BitSet include)
@@ -97,14 +149,14 @@ public class Lattice
         return FilterBy(lat.latOrder, lat.names, lat.colours, lat.latBit, lat.subGraphs, include);
     }
 
-    public static Lattice FilterBy(int latOrder, String[] names, String[] nodeAttrs, BitSet relation,
+    public static Lattice FilterBy(int latOrder, String[] names, String[] colours, BitSet relation,
                                    LinkedList<ArrayList<Integer>> subGraphs, BitSet include)
     {
         int filteredLatOrder = include.cardinality();
         int[] oldIndex = new int[filteredLatOrder];
         int[] newIndex = new int[latOrder];
         String[] filteredNames = new String[filteredLatOrder];
-        String[] filteredNodeAttrs = new String[filteredLatOrder];
+        String[] filteredColours = new String[filteredLatOrder];
         BitSet filteredRelation = new BitSet(filteredLatOrder*filteredLatOrder);
 
         // create maps  new-index <=> old-index
@@ -119,7 +171,7 @@ public class Lattice
         {
             int oldI = oldIndex[i];
             filteredNames[i] = names[oldI];
-            filteredNodeAttrs[i] = nodeAttrs[oldI];
+            filteredColours[i] = colours[oldI];
         }
 
         // copy over the selected relation elements
@@ -150,14 +202,8 @@ public class Lattice
             else if (inclPart.size()>1) filteredSubGraphs.add(inclPart);
         }
 
-        return new Lattice(filteredRelation, filteredLatOrder, filteredNames, filteredNodeAttrs, filteredSubGraphs);
+        return new Lattice(filteredRelation, filteredLatOrder, filteredNames, filteredColours, filteredSubGraphs);
     }
-
-    public static Lattice FormatBy(Lattice lat) // TODO add some parameters
-    {
-        return null; // TODO
-    }
-
 
     /**
      * Filter the lattice of all fix-orders by certain conditions (i.e. whether to include unfaithful and non-normal ones).
@@ -171,12 +217,12 @@ public class Lattice
      * @param colors The color of each fix order (for output purposes).
      * @return The lattice of the fix orders satisfying the conditions.
      */
-    public static Lattice Filter3By(ArrayList<FixOrder> fixOrders, BitSet fullRelation, int numFixOrders,
+    public static Lattice Filter35By(ArrayList<FixOrder> fixOrders, BitSet fullRelation, int numFixOrders,
                                    boolean faithfulOnly, boolean normalOnly, String[] fixOrderNames, String[] colors, LinkedList<ArrayList<Integer>> subGraphs)
     {
         BitSet include = includeBy(fixOrders, faithfulOnly, normalOnly);
         Lattice lat = new Lattice(fullRelation, numFixOrders, fixOrderNames, colors, subGraphs);
-        return CollapseBy(FilterBy(lat, include), subGraphs, new FullPartNameSelector());
+        return CollapseBy(FilterBy(lat, include), new FullPartNameSelector());
     }
 
     public static BitSet includeBy(ArrayList<FixOrder> fixOrders, boolean faithfulOnly, boolean normalOnly)

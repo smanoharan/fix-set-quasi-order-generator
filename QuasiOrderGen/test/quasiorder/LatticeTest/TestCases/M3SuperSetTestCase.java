@@ -122,20 +122,45 @@ public class M3SuperSetTestCase extends LatticeTestCase
 
         FilteredFaithfulNormalLatOrder = 5;
         FilteredFaithfulNormalNames = new String[] { "2", "3", "4", "5", "6" };
+        FilteredFaithfulNormalColours = new String[] { "c-2", "c-3", "c-4", "c-5", "c-6" };
         FilteredFaithfulNormalGroupedNames = new String[] { "2", "3", "\"_4_5\"", "\"_4_5\"", "6" };
         FilteredFaithfulNormalRelation = StringToBitSet("10000"+"11000"+"10100"+"10010"+"11111");
         FilteredFaithfulNormalSubGraphs = ToList(ToList(1, 4, 0), ToList(2, 3));
 
         FilteredFaithfulLatOrder = FilteredFaithfulNormalLatOrder;
         FilteredFaithfulNames = FilteredFaithfulNormalNames;
+        FilteredFaithfulColours = FilteredFaithfulNormalColours;
         FilteredFaithfulGroupedNames = FilteredFaithfulNormalGroupedNames;
         FilteredFaithfulRelation = FilteredFaithfulNormalRelation;
         FilteredFaithfulSubGraphs = FilteredFaithfulNormalSubGraphs;
 
         FilteredNormalLatOrder = FilteredFaithfulNormalLatOrder;
         FilteredNormalNames = FilteredFaithfulNormalNames;
+        FilteredNormalColours = FilteredFaithfulNormalColours;
         FilteredNormalGroupedNames = FilteredFaithfulNormalGroupedNames;
         FilteredNormalRelation = FilteredFaithfulNormalRelation;
         FilteredNormalSubGraphs = FilteredFaithfulNormalSubGraphs;
+
+        CollapsedLatOrder = 5;
+        CollapsedRelation = StringToBitSet("10000"+"11000"+"11100"+"11010"+"11111");
+        CollapsedGroupedNames =  new String[] {"0", "\"_1_2\"", "3", "\"_4_5\"", "6" };
+        CollapsedRepNames = new String[]{ "0", "1", "3", "4", "6"};
+        CollapsedColours = new String[]{ "c-0", "c-1", "c-3", "c-4", "c-6"};
+        CollapsedSubGraphs = ToList(ToList(0,1,2,3,4));
+
+        CollapsedFaithfulNormalLatOrder = 4;
+        CollapsedFaithfulNormalRelation = StringToBitSet("1000"+"1100"+"1010"+"1111");
+        CollapsedFaithfulNormalGroupedNames = new String[] { "2", "3", "\"_4_5\"", "6" };
+        CollapsedFaithfulNormalRepNames = new String[] { "2", "3", "4", "6"};
+        CollapsedFaithfulNormalColours = new String[] { "c-2", "c-3", "c-4", "c-6"};
+        CollapsedFaithfulNormalSubGraphs = ToList(ToList(0,1,2,3));
+        //
+        //           0
+        //          / \
+        //         1   2
+        //         \ / | \
+        //          3  4  5
+        //           \ | /
+        //             6
     }
 }

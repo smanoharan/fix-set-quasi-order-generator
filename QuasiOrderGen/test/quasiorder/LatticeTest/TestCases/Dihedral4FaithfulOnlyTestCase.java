@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import java.util.BitSet;
 
 import static quasiorder.FixOrderSet.ToSerialIndex;
+import static quasiorder.QuasiOrderGenFixture.StringToBitSet;
 
 public class Dihedral4FaithfulOnlyTestCase extends LatticeTestCase
 {
-
     public void SetupTestCase()
     {
         // Dihedral 4 Faithful:
@@ -73,7 +73,6 @@ public class Dihedral4FaithfulOnlyTestCase extends LatticeTestCase
             new int[] { 7, 7, 7, 7,     7, 7, 7, 7 }, // 7
         };
 
-
         // i <= i for all i;
         for (int i=0;i<latOrder;i++)
             lattice.set(ToSerialIndex(i,i,latOrder));
@@ -116,23 +115,38 @@ public class Dihedral4FaithfulOnlyTestCase extends LatticeTestCase
         for (int i=0;i<latOrder;i++)
             FilteringRelations.add(new FixOrder(new BitSet(), true, true));
 
-
-        groupedNames = new String[] {"0", "1", "2", "\"_3_4_5\"", "\"_3_4_5\"","\"_3_4_5\"", "\"_6_7\"","\"_6_7\"" };
         FilteredFaithfulLatOrder = latOrder;
         FilteredFaithfulNames = new String[]{"0", "1", "2", "3", "4", "5", "6", "7"};
+        FilteredFaithfulColours = new String[]{"c-0", "c-1", "c-2", "c-3", "c-4", "c-5", "c-6", "c-7"};
         FilteredFaithfulGroupedNames = groupedNames;
         FilteredFaithfulRelation = lattice;
         FilteredFaithfulSubGraphs = subGraphs;
         FilteredNormalLatOrder = latOrder;
         FilteredNormalNames = FilteredFaithfulNames;
+        FilteredNormalColours = FilteredFaithfulColours;
         FilteredNormalGroupedNames = groupedNames;
         FilteredNormalRelation = lattice;
         FilteredNormalSubGraphs = subGraphs;
         FilteredFaithfulNormalLatOrder = latOrder;
         FilteredFaithfulNormalNames = FilteredFaithfulNames;
+        FilteredFaithfulNormalColours = FilteredFaithfulColours;
         FilteredFaithfulNormalGroupedNames = groupedNames;
         FilteredFaithfulNormalRelation = lattice;
         FilteredFaithfulNormalSubGraphs = subGraphs;
+
+        CollapsedLatOrder = 5;
+        CollapsedRelation = StringToBitSet("10000"+"11000"+"10100"+"11110"+"11111");
+        CollapsedGroupedNames =  new String[] {"0", "1", "2", "\"_3_4_5\"", "\"_6_7\"" };
+        CollapsedRepNames = new String[]{ "0", "1", "2", "3", "6"};
+        CollapsedColours = new String[]{ "c-0", "c-1", "c-2", "c-3", "c-6"};
+        CollapsedSubGraphs = ToList(ToList(0,1,2,3,4));
+
+        CollapsedFaithfulNormalLatOrder = CollapsedLatOrder;
+        CollapsedFaithfulNormalRelation = CollapsedRelation;
+        CollapsedFaithfulNormalGroupedNames = CollapsedGroupedNames;
+        CollapsedFaithfulNormalRepNames = CollapsedRepNames;
+        CollapsedFaithfulNormalColours = CollapsedColours;
+        CollapsedFaithfulNormalSubGraphs = CollapsedSubGraphs;
 
         //
         //        0

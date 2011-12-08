@@ -24,6 +24,11 @@ public class MeetJoinDeterminedLattice extends Lattice
     public int NonDistXYJoinElem = -1;
     public int NonDistXZJoinElem = -1;
 
+    public static int NotLatI = -1;
+    public static int NotLatJ = -1;
+    public static int NotLatK = -1;
+    public static int NotLatM = -1;
+
     private MeetJoinDeterminedLattice(
             BitSet lattice, int latOrder, String[] names, String[] colors,
             LinkedList<ArrayList<Integer>> subGraphs, int[][] joinTable, int[][] meetTable)
@@ -41,6 +46,21 @@ public class MeetJoinDeterminedLattice extends Lattice
         return new MeetJoinDeterminedLattice(lat.latBit, lat.latOrder, lat.names, lat.colours, lat.subGraphs, joinTable, meetTable);
     }
 
+    // TODO idea
+    //  For each pair of elements, not related:
+    //      Determine meet:
+    //          find all elements less than both elements.
+    //          find the largest cardinality:
+    //              if multiple, then fail; (same card, diff elem means not comparable)
+    //              else (then single), check against all others
+    //
+    //  Refined:
+    //      IsUniqueMeet(A,B):
+    //          start at MIN-INDEX(A,B) { if A<=B or B<=A return true; }
+    //          iterate <C> downwards till C <= A and C <= B
+    //          iterate <D> downwards till end
+    //              if D <= A and D <= B then if D is not <= C, return false;
+    //          return true;
 
     /**
      * Determine the node attributes based on the join and meet irreducibility
@@ -190,6 +210,7 @@ public class MeetJoinDeterminedLattice extends Lattice
         return FindReducibles(latOrder, meetTable);
     }
 
+
     interface IBinaryOp
     {
         int DetermineResult(BitSet lattice, int latOrder, int i, int j);
@@ -254,21 +275,26 @@ public class MeetJoinDeterminedLattice extends Lattice
         });
     }
 
+    private static boolean isRel(BitSet b, int latOrder, int i, int j)
+    {
+        return b.get(ToSerialIndex(i,j,latOrder));
+    }
+
     /**
      * Determine the join of the elements i and j (i V j)
      *
      * Assumes i < j
      *
-     * @param lattice The lattice in which i and j reside
+     * @param lat The lattice in which i and j reside
      * @param latOrder The number of elements in the lattice
      * @param i The index of the first element
      * @param j The index of the second element
      * @return index-of(elem[i] V elem[j])
      */
-    private static int DetermineJoin(BitSet lattice, int latOrder, int i, int j)
+    private static int DetermineJoin(BitSet lat, int latOrder, int i, int j)
     {
         for (int k=i;k>=0;k--)
-            if (lattice.get(ToSerialIndex(i,k,latOrder)) && lattice.get(ToSerialIndex(j,k,latOrder)))
+            if (isRel(lat, latOrder, i, k) && isRel(lat, latOrder, j, k))
                 return k;
 
         throw new RuntimeException("Lattice does not have unique join for " + i + " " + j);
@@ -279,18 +305,109 @@ public class MeetJoinDeterminedLattice extends Lattice
      *
      * Assumes i < j
      *
-     * @param lattice The lattice in which i and j reside
+     * @param lat The lattice in which i and j reside
      * @param latOrder The number of elements in the lattice
      * @param i The index of the first element
      * @param j The index of the second element
      * @return index-of(elem[i] ^ elem[j])
      */
-    private static int DetermineMeet(BitSet lattice, int latOrder, int i, int j)
+    private static int DetermineMeet(BitSet lat, int latOrder, int i, int j)
     {
         for (int k=j;k<latOrder;k++)
-            if (lattice.get(ToSerialIndex(k,i,latOrder)) && lattice.get(ToSerialIndex(k,j,latOrder)))
+            if (isRel(lat, latOrder, k, i) && isRel(lat, latOrder, k, j))
                 return k;
 
         throw new RuntimeException("Lattice does not have unique meet for " + i + " " + j);
+    }
+
+    private static boolean IsMeetUnique(BitSet poset, int latOrder, int i, int j)
+    {
+        int k = DetermineMeet(poset, latOrder, i, j);
+        for(int m=k;m<latOrder;m++)
+            if (isRel(poset, latOrder, m, i) && isRel(poset, latOrder, m, j) && !isRel(poset, latOrder, m, k))
+                return SaveIsNotALattice(i, j, k, m);
+
+        return true;
+    }
+
+    private static boolean IsJoinUnique(BitSet poset, int latOrder, int i, int j)
+    {
+        int k = DetermineJoin(poset, latOrder, i, j);
+        for(int m=k;m>=0;m--)
+            if (isRel(poset, latOrder, i, m) && isRel(poset, latOrder, j, m) && !isRel(poset, latOrder, k, m))
+                return SaveIsNotALattice(i, j, k, m);
+
+        return true;
+    }
+
+    interface IBinFilter
+    {
+        boolean IsOpUnique(BitSet poset, int latOrder, int i, int j);
+    }
+
+    private static boolean IsOpUnique(BitSet poset, int latOrder, IBinFilter binFilter)
+    {
+        for(int i=0;i<latOrder;i++)
+            for(int j=i+1;j<latOrder;j++)
+               if (!isRel(poset, latOrder, i, j) && !binFilter.IsOpUnique(poset, latOrder, i, j))
+                   return false;
+
+        return SaveIsALattice();
+    }
+
+    private static boolean SaveIsALattice() { return !SaveIsNotALattice(-1, -1, -1, -1); }
+
+    private static boolean SaveIsNotALattice(int i, int j, int k, int m)
+    {
+        NotLatI = i;
+        NotLatJ = j;
+        NotLatK = k;
+        NotLatM = m;
+        return false;
+    }
+
+    // TODO test
+    public static boolean IsMeetUnique(BitSet poset, int latOrder)
+    {
+        return IsOpUnique(poset, latOrder, new IBinFilter()
+        {
+            public boolean IsOpUnique(BitSet poset, int latOrder, int i, int j)
+            {
+                return IsMeetUnique(poset, latOrder, i, j);
+            }
+        });
+    }
+
+    // TODO test
+    public static boolean IsJoinUnique(BitSet poset, int latOrder)
+    {
+        return IsOpUnique(poset, latOrder, new IBinFilter() {
+            public boolean IsOpUnique(BitSet poset, int latOrder, int i, int j) {
+                return IsJoinUnique(poset, latOrder, i, j);
+            }
+        });
+    }
+
+    // TODO test
+    public static boolean IsALattice(BitSet poset, int latOrder)
+    {
+        return IsMeetUnique(poset, latOrder) && IsJoinUnique(poset, latOrder);
+    }
+
+    // TODO test
+    public static String LatCheckMessage(BitSet poset, int latOrder, String[] names)
+    {
+        boolean isLattice = IsALattice(poset, latOrder);
+        StringBuilder output = new StringBuilder("Lattice: " + isLattice);
+
+        if (!isLattice)
+            output.append(String.format("\t\t {%s, %s, %s, %s}", names[NotLatI], names[NotLatJ], names[NotLatK], names[NotLatM]));
+
+        return output.toString();
+    }
+
+    public static String LatCheckMessage(Lattice lat)
+    {
+        return LatCheckMessage(lat.latBit, lat.latOrder, lat.names);
     }
 }

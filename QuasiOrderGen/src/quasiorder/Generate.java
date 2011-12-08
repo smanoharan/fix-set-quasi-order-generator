@@ -208,6 +208,7 @@ public class Generate
         LinkedList<ArrayList<Integer>> subgraphs = PartitionBy(relations.FixOrders, inputGroup.Permutations, inputGroup.NumElements);
 
         PrintWriter modDistOutput = new PrintWriter(title + ".md");
+        PrintWriter isLatOutput = new PrintWriter(title + ".isl");
         rawOutput.println("\n\n" + "Lattice of all fix set quasi orders: ");
         for (int i=0;i<numLatTypes;i++)
         {
@@ -217,15 +218,21 @@ public class Generate
             // ungrouped lattice - show mjd features.
             MeetJoinDeterminedLattice mjdLat = MeetJoinDeterminedLattice.FromLattice(lat);
             RelationFormat.PrintRelationEdgesWithoutSubGraphs(mjdLat, String.format("%s.%s.lat", title, latTypes[i]));
-            modDistOutput.println(String.format("ungrouped: %1$-50s %2$s", latTypes[i], mjdLat.ModDistCheckMessage()));
+            modDistOutput.println(String.format("%1$-50s %2$s", latTypes[i], mjdLat.ModDistCheckMessage()));
 
             // grouped lattice - show only colours: 1) subgroups only ; 2) collapse + full-names ; 3) collapse + rep-names
             RelationFormat.PrintRelationEdgesWithSubGraphs(lat, String.format("%s.col1.%s.lat", title, latTypes[i]));
-            RelationFormat.PrintRelationEdgesWithoutSubGraphs(Lattice.CollapseBy(lat, Lattice.FullPartNameSelector), String.format("%s.col2.%s.lat", title, latTypes[i]));
-            RelationFormat.PrintRelationEdgesWithoutSubGraphs(Lattice.CollapseBy(lat, Lattice.RepNameSelector), String.format("%s.col3.%s.lat", title, latTypes[i]));
 
+            Lattice colFull = Lattice.CollapseBy(lat, Lattice.FullPartNameSelector);
+            RelationFormat.PrintRelationEdgesWithoutSubGraphs(colFull, String.format("%s.col2.%s.lat", title, latTypes[i]));
+            isLatOutput.println(String.format("full: %1$-20s %2$s", latTypes[i], MeetJoinDeterminedLattice.LatCheckMessage(colFull)));
+
+            Lattice colRep = Lattice.CollapseBy(lat, Lattice.RepNameSelector);
+            RelationFormat.PrintRelationEdgesWithoutSubGraphs(colRep, String.format("%s.col3.%s.lat", title, latTypes[i]));
+            isLatOutput.println(String.format("rep : %1$-20s %2$s", latTypes[i], MeetJoinDeterminedLattice.LatCheckMessage(colRep)));
         }
         modDistOutput.close();
+        isLatOutput.close();
     }
 
     /**

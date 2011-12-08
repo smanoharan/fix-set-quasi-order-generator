@@ -73,6 +73,13 @@ public abstract class LatticeTestCase
     public String[] CollapsedColours;
     public LinkedList<ArrayList<Integer>> CollapsedSubGraphs;
 
+    public boolean isCollapsedALattice;
+    public int wholeNotLatI;
+    public int wholeNotLatJ;
+    public int wholeNotLatK;
+    public int wholeNotLatM;
+    public String wholeIsLatMessage;
+
     public int CollapsedFaithfulNormalLatOrder;
     public BitSet CollapsedFaithfulNormalRelation;
     public String[] CollapsedFaithfulNormalGroupedNames;
@@ -80,6 +87,12 @@ public abstract class LatticeTestCase
     public String[] CollapsedFaithfulNormalColours;
     public LinkedList<ArrayList<Integer>> CollapsedFaithfulNormalSubGraphs;
 
+    public boolean isFaithfulNormalCollapsedALattice;
+    public int faithfulNormalNotLatI;
+    public int faithfulNormalNotLatJ;
+    public int faithfulNormalNotLatK;
+    public int faithfulNormalNotLatM;
+    public String faithfulNormalIsLatMessage;
 
     public void SetupAll()
     {

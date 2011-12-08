@@ -154,6 +154,21 @@ public class M3SuperSetTestCase extends LatticeTestCase
         CollapsedFaithfulNormalRepNames = new String[] { "2", "3", "4", "6"};
         CollapsedFaithfulNormalColours = new String[] { "c-2", "c-3", "c-4", "c-6"};
         CollapsedFaithfulNormalSubGraphs = ToList(ToList(0,1,2,3));
+
+        isCollapsedALattice = true;
+        wholeNotLatI = -1;
+        wholeNotLatJ = -1;
+        wholeNotLatK = -1;
+        wholeNotLatM = -1;
+        wholeIsLatMessage = "Lattice: true";
+
+        faithfulNormalIsLatMessage = "Lattice: true";
+        isFaithfulNormalCollapsedALattice = true;
+        faithfulNormalNotLatI = -1;
+        faithfulNormalNotLatJ = -1;
+        faithfulNormalNotLatK = -1;
+        faithfulNormalNotLatM = -1;
+
         //
         //           0
         //          / \

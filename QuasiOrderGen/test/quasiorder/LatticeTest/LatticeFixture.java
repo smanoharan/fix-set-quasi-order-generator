@@ -22,7 +22,8 @@ public class LatticeFixture extends QuasiOrderGenFixture
         new LatticeTestCase[]{ new M3SuperSetTestCase() },
         new LatticeTestCase[]{ new M3TestCase() },
         new LatticeTestCase[]{ new N5SuperSetTestCase() },
-        new LatticeTestCase[]{ new N5TestCase() }
+        new LatticeTestCase[]{ new N5TestCase() },
+        new LatticeTestCase[]{ new CubeTestCase() }
     };
 
     @Parameterized.Parameters

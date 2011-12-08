@@ -8,12 +8,11 @@ import java.util.BitSet;
 import static quasiorder.FixOrderSet.ToSerialIndex;
 import static quasiorder.QuasiOrderGenFixture.StringToBitSet;
 
-public class Dihedral4FaithfulOnlyTestCase extends LatticeTestCase
+public class CubeTestCase extends LatticeTestCase
 {
     public void SetupTestCase()
     {
-        // Dihedral 4 Faithful:
-        title = "Dih 4 Faithful";
+        title = "Cube Lattice"; // a copy of dihedral 4, with different subgroups.
         //
         //        0
         //      / | \
@@ -110,7 +109,7 @@ public class Dihedral4FaithfulOnlyTestCase extends LatticeTestCase
         modDistMessage = "Modular: true\tDistributive: true";
 
         // all relations are faithful and all are normal:
-        subGraphs = ToList(ToList(0,1,2), ToList(3,4,5), ToList(6,7));
+        subGraphs = ToList(ToList(0,3,6,7), ToList(1,2), ToList(4,5));
         FilteringRelations = new ArrayList<FixOrder>();
         for (int i=0;i<latOrder;i++)
             FilteringRelations.add(new FixOrder(new BitSet(), true, true));
@@ -134,12 +133,12 @@ public class Dihedral4FaithfulOnlyTestCase extends LatticeTestCase
         FilteredFaithfulNormalRelation = lattice;
         FilteredFaithfulNormalSubGraphs = subGraphs;
 
-        CollapsedLatOrder = 5;
-        CollapsedRelation = StringToBitSet("10000"+"11000"+"10100"+"11110"+"11111");
-        CollapsedGroupedNames =  new String[] {"0", "1", "2", "\"_3_4_5\"", "\"_6_7\"" };
-        CollapsedRepNames = new String[]{ "0", "1", "2", "3", "6"};
-        CollapsedColours = new String[]{ "c-0", "c-1", "c-2", "c-3", "c-6"};
-        CollapsedSubGraphs = ToList(ToList(0,1,2,3,4));
+        CollapsedLatOrder = 6;
+        CollapsedRelation = StringToBitSet("100000"+"110000"+"101000"+"111100"+"111010"+"111111");
+        CollapsedGroupedNames =  new String[] {"0", "\"_1_2\"", "3", "\"_4_5\"", "6", "7" };
+        CollapsedRepNames = new String[]{ "0", "1", "3", "4", "6", "7"};
+        CollapsedColours = new String[]{ "c-0", "c-1", "c-3", "c-4", "c-6", "c-7"};
+        CollapsedSubGraphs = ToList(ToList(0,1,2,3,4,5));
 
         CollapsedFaithfulNormalLatOrder = CollapsedLatOrder;
         CollapsedFaithfulNormalRelation = CollapsedRelation;
@@ -148,18 +147,19 @@ public class Dihedral4FaithfulOnlyTestCase extends LatticeTestCase
         CollapsedFaithfulNormalColours = CollapsedColours;
         CollapsedFaithfulNormalSubGraphs = CollapsedSubGraphs;
 
-        isCollapsedALattice = true;
-        wholeNotLatI = -1;
-        wholeNotLatJ = -1;
-        wholeNotLatK = -1;
-        wholeNotLatM = -1;
-        wholeIsLatMessage = "Lattice: true";
-        faithfulNormalIsLatMessage = "Lattice: true";
-        isFaithfulNormalCollapsedALattice = true;
-        faithfulNormalNotLatI = -1;
-        faithfulNormalNotLatJ = -1;
-        faithfulNormalNotLatK = -1;
-        faithfulNormalNotLatM = -1;
+        isCollapsedALattice = false;
+        wholeNotLatI = 1;
+        wholeNotLatJ = 2;
+        wholeNotLatK = 3;
+        wholeNotLatM = 4;
+        wholeIsLatMessage = "Lattice: false\t\t {1, 2, 3, 4}";
+
+        faithfulNormalIsLatMessage = wholeIsLatMessage;
+        isFaithfulNormalCollapsedALattice = isCollapsedALattice;
+        faithfulNormalNotLatI = wholeNotLatI;
+        faithfulNormalNotLatJ = wholeNotLatJ;
+        faithfulNormalNotLatK = wholeNotLatK;
+        faithfulNormalNotLatM = wholeNotLatM;
 
         //
         //        0

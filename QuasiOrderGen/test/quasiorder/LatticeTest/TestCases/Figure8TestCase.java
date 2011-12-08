@@ -166,6 +166,21 @@ public class Figure8TestCase extends LatticeTestCase
         CollapsedFaithfulNormalRepNames = new String[] {"0", "1", "3"};
         CollapsedFaithfulNormalColours = new String[] {"c-0", "c-1", "c-3"};
         CollapsedFaithfulNormalSubGraphs = ToList(ToList(0,1,2));
+
+        isCollapsedALattice = true;
+        wholeNotLatI = -1;
+        wholeNotLatJ = -1;
+        wholeNotLatK = -1;
+        wholeNotLatM = -1;
+        wholeIsLatMessage = "Lattice: true";
+
+        faithfulNormalIsLatMessage = "Lattice: true";
+        isFaithfulNormalCollapsedALattice = true;
+        faithfulNormalNotLatI = -1;
+        faithfulNormalNotLatJ = -1;
+        faithfulNormalNotLatK = -1;
+        faithfulNormalNotLatM = -1;
+
         //
         //        0
         //       / \

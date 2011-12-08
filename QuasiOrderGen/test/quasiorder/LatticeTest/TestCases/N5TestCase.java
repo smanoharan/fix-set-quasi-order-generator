@@ -137,5 +137,19 @@ public class N5TestCase extends LatticeTestCase
         CollapsedFaithfulNormalColours = CollapsedColours;
         CollapsedFaithfulNormalSubGraphs = CollapsedSubGraphs;
 
+        isCollapsedALattice = true;
+        wholeNotLatI = -1;
+        wholeNotLatJ = -1;
+        wholeNotLatK = -1;
+        wholeNotLatM = -1;
+        wholeIsLatMessage = "Lattice: true";
+
+        faithfulNormalIsLatMessage = "Lattice: true";
+        isFaithfulNormalCollapsedALattice = true;
+        faithfulNormalNotLatI = -1;
+        faithfulNormalNotLatJ = -1;
+        faithfulNormalNotLatK = -1;
+        faithfulNormalNotLatM = -1;
+
     }
 }

@@ -1,5 +1,7 @@
 package quasiorder;
 
+import sun.security.rsa.RSASignature;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.LinkedList;
@@ -24,10 +26,25 @@ public class MeetJoinDeterminedLattice extends Lattice
     public int NonDistXYJoinElem = -1;
     public int NonDistXZJoinElem = -1;
 
+    public int M5XElem = -1;
+    public int M5YElem = -1;
+    public int M5ZElem = -1;
+    public int M5XYZJoin = -1;
+    public int M5XYZMeet = -1;
+
+
     public static int NotLatI = -1;
     public static int NotLatJ = -1;
     public static int NotLatK = -1;
     public static int NotLatM = -1;
+
+    public int CMSx = -1;
+    public int CMSy = -1;
+    public int CMSz = -1;
+    public int CMSxMy = -1;
+    public int CMSxMz = -1;
+    public int CMSyJZ = -1;
+    public int CMSxMyJz = -1;
 
     private MeetJoinDeterminedLattice(
             BitSet lattice, int latOrder, String[] names, String[] colors,
@@ -148,6 +165,82 @@ public class MeetJoinDeterminedLattice extends Lattice
         return true;
     }
 
+    // TODO test
+    public boolean hasM5AsASublattice()
+    {
+        for (int x=0;x<latOrder;x++)
+            for(int y=0;y<latOrder;y++)
+                for (int z=0;z<latOrder;z++)
+                    if (x != y && y != z && z != x && hasSameOp(x, y, z, joinTable) && hasSameOp(x, y, z, meetTable))
+                            return hasM5(x, y, z, joinTable[x][y], meetTable[x][y]);
+        return false;
+    }
+
+    private boolean hasM5(int x, int y, int z, int J, int M)
+    {
+        M5XElem = x;
+        M5YElem = y;
+        M5ZElem = z;
+        M5XYZJoin = J;
+        M5XYZMeet = M;
+        return true;
+    }
+
+        private boolean doesNotHaveM5()
+    {
+        return !hasM5(-1, -1, -1, -1, -1);
+    }
+
+    public String isCongMeetSemiDistMsg()
+    {
+        return "isCongruentMeetSemiDistributive: " + (!isCongMeetSemiDistributive() ?
+            String.format("false { %s, %s, %s, (%s, %s, %s) }",
+                    names[CMSx], names[CMSy], names[CMSz], names[CMSxMy], names[CMSxMz], names[CMSxMyJz])
+                : "true");
+    }
+
+    public boolean isCongMeetSemiDistributive()
+    {
+        for (int x=0;x<latOrder;x++)
+            for(int y=0;y<latOrder;y++)
+                for (int z=0;z<latOrder;z++)
+                {
+                    int xMy = meetTable[x][y];
+                    int xMz = meetTable[x][z];
+                    int yJz = joinTable[y][z];
+                    int xMyJz = meetTable[x][yJz];
+                    if (xMy == xMz && xMyJz != xMy)
+                        return isNotCongMeetSemiDistributive(x, y, z, xMy, xMz, yJz);
+                }
+
+        return isSaveCongMeetSemiDistributive();
+    }
+
+    private boolean isNotCongMeetSemiDistributive(int x, int y, int z, int xMy, int xMz, int xMyJz)
+    {
+        CMSx = x;
+        CMSy = y;
+        CMSz = z;
+        CMSxMy = xMy;
+        CMSxMz = xMz;
+        CMSxMyJz = xMyJz;
+        return false;
+    }
+
+    private boolean isSaveCongMeetSemiDistributive()
+    {
+        return !isNotCongMeetSemiDistributive(-1, -1, -1, -1, -1, -1);
+    }
+
+
+    private static boolean hasSameOp(int x, int y, int z, int[][] opTable)
+    {
+        int xJy = opTable[x][y];
+        int yJz = opTable[y][z];
+        int xJz = opTable[x][z];
+        return (xJy == yJz && yJz == xJz);
+    }
+
     private void SaveDistStatus(int x, int y, int z, int yz, int xy, int xz)
     {
         NonDistXElem = x;
@@ -174,28 +267,39 @@ public class MeetJoinDeterminedLattice extends Lattice
         return reducibles;
     }
 
-    /**
-     * Compose the message to let the user know that the status of modularity and distributivity of the lattice.
-     * @return The message string.
-     */
+    public String ModDistCheckMessage(FlagMessagePair isMod, FlagMessagePair isDist)
+    {
+        return String.format("Modular: %1$s\tDistributive: %2$s%3$s%4$s", isMod.flag, isDist.flag, isMod.message, isDist.message);
+    }
+
+
     public String ModDistCheckMessage()
     {
+        return ModDistCheckMessage(ModularCheckMessage(), DistributiveCheckMessage());
+    }
+
+    /**
+     * Compose the message to let the user know that the status of modularity of the lattice.
+     * @return The message string.
+     */
+    public FlagMessagePair ModularCheckMessage()
+    {
         boolean isModular = IsModular();
-        boolean isDistributive = IsDistributive();
-
-        StringBuilder output = new StringBuilder(String.format("Modular: %1$s\tDistributive: %2$s", isModular, isDistributive));
-
-        if (!isModular)
-            output.append(String.format("%1$-50s", String.format("\t\tNot-modular: {%s, %s, %s, %s, %s}",
+        return new FlagMessagePair(isModular, isModular ? "" : String.format("%1$-50s", String.format("\t\tNot-modular: {%s, %s, %s, %s, %s}",
                 names[NonModularXElem], names[NonModularAElem], names[NonModularBElem],
                 names[NonModularAXJoinElem], names[NonModularABMeetElem])));
+    }
 
-        if (!isDistributive)
-            output.append(String.format("%1$-50s", String.format("\t\tNot-distributive: {%s, %s, %s, %s, %s, %s}",
+    /**
+     * Compose the message to let the user know that the status of distributivity of the lattice.
+     * @return The message string.
+     */
+    public FlagMessagePair DistributiveCheckMessage()
+    {
+        boolean isDistributive = IsDistributive();
+        return new FlagMessagePair(isDistributive, isDistributive ? "" : String.format("%1$-50s", String.format("\t\tNot-distributive: {%s, %s, %s, %s, %s, %s}",
                 names[NonDistXElem], names[NonDistYElem], names[NonDistZElem],
                 names[NonDistXYJoinElem], names[NonDistXZJoinElem], names[NonDistYZMeetElem])));
-
-        return output.toString();
     }
 
     /** @return A BitSet containing all of the join reducible elements */
@@ -208,6 +312,14 @@ public class MeetJoinDeterminedLattice extends Lattice
     public BitSet MeetReducibles()
     {
         return FindReducibles(latOrder, meetTable);
+    }
+
+    public String M5Message()
+    {
+        return "Contains M5: " + (hasM5AsASublattice() ?
+            String.format("true { (%s), %s, %s, %s, (%s) }",
+                    names[M5XYZJoin], names[M5XElem], names[M5YElem], names[M5ZElem], names[M5XYZMeet])
+                : "false");
     }
 
 
@@ -394,8 +506,7 @@ public class MeetJoinDeterminedLattice extends Lattice
         return IsMeetUnique(poset, latOrder) && IsJoinUnique(poset, latOrder);
     }
 
-    // TODO test
-    public static String LatCheckMessage(BitSet poset, int latOrder, String[] names)
+    public static FlagMessagePair LatCheckMessage(BitSet poset, int latOrder, String[] names)
     {
         boolean isLattice = IsALattice(poset, latOrder);
         StringBuilder output = new StringBuilder("Lattice: " + isLattice);
@@ -403,10 +514,10 @@ public class MeetJoinDeterminedLattice extends Lattice
         if (!isLattice)
             output.append(String.format("\t\t {%s, %s, %s, %s}", names[NotLatI], names[NotLatJ], names[NotLatK], names[NotLatM]));
 
-        return output.toString();
+        return new FlagMessagePair(isLattice, output.toString());
     }
 
-    public static String LatCheckMessage(Lattice lat)
+    public static FlagMessagePair LatCheckMessage(Lattice lat)
     {
         return LatCheckMessage(lat.latBit, lat.latOrder, lat.names);
     }

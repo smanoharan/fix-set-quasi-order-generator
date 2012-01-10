@@ -46,6 +46,6 @@ public class IsALatticeTest extends LatticeFixture
                 MeetJoinDeterminedLattice.NotLatK, MeetJoinDeterminedLattice.NotLatM);
         assertTrue(testTitle + "exp <= act", actual.containsAll(expected));
         assertTrue(testTitle + "act <= exp", expected.containsAll(actual));
-        assertEquals(testTitle + "-isLat-message", expMsg, MeetJoinDeterminedLattice.LatCheckMessage(poset, latOrder, names));
+        assertEquals(testTitle + "-isLat-message", expMsg, MeetJoinDeterminedLattice.LatCheckMessage(poset, latOrder, names).message);
     }
 }

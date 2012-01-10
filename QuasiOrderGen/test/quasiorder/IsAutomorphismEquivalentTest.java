@@ -103,7 +103,7 @@ public class IsAutomorphismEquivalentTest extends QuasiOrderGenFixture
 
     private void AssertPartitionsAre(ArrayList<Permutation> perms, String title, int[] ... expected)
     {
-        LinkedList<ArrayList<Integer>> actual = Generate.PartitionBy(fixOrders, perms, numElem);
+        LinkedList<ArrayList<Integer>> actual = Generate.AutomorphismHandler.PartitionBy(fixOrders, perms, numElem);
         assertEquals(title+"-numPartitions", actual.size(), expected.length);
         int ci = 0;
         for (ArrayList<Integer> act : actual)
@@ -125,7 +125,7 @@ public class IsAutomorphismEquivalentTest extends QuasiOrderGenFixture
 
         // G1 is unrelated to anything else by even
         for(int i=1;i<G1SIZE;i++) 
-            assertFalse("Group1:[0][" + i + "]:even", Generate.isAutomorphismEquivalent(G1[0], G1[i], evenPermutations, numElem));
+            assertFalse("Group1:[0][" + i + "]:even", Generate.AutomorphismHandler.isAutomorphismEquivalent(G1[0], G1[i], evenPermutations, numElem));
 
         // all others are related together by even:
         assertAllOfArrayIsEquivalent("Group1:<0", evenPermutations, G1[1], G1[2], G1[3]);
@@ -144,7 +144,7 @@ public class IsAutomorphismEquivalentTest extends QuasiOrderGenFixture
         for(int i=0;i<size;i++)
             for(int j=i+1;j<size;j++)
                 assertTrue(String.format("%s[%d][%d]:all", name, i, j),
-                        Generate.isAutomorphismEquivalent(arr[i], arr[j], ps, numElem));
+                        Generate.AutomorphismHandler.isAutomorphismEquivalent(arr[i], arr[j], ps, numElem));
     }
 
     @Test
@@ -154,8 +154,8 @@ public class IsAutomorphismEquivalentTest extends QuasiOrderGenFixture
         {
             for(int j=0;j<G2SIZE;j++)
             {
-                assertFalse(String.format("G1[%d]:G2[%d]:all", i, j), Generate.isAutomorphismEquivalent(G1[i], G2[j], permutations, numElem));
-                assertFalse(String.format("G1[%d]:G2[%d]:even", i, j), Generate.isAutomorphismEquivalent(G1[i], G2[j], evenPermutations, numElem));
+                assertFalse(String.format("G1[%d]:G2[%d]:all", i, j), Generate.AutomorphismHandler.isAutomorphismEquivalent(G1[i], G2[j], permutations, numElem));
+                assertFalse(String.format("G1[%d]:G2[%d]:even", i, j), Generate.AutomorphismHandler.isAutomorphismEquivalent(G1[i], G2[j], evenPermutations, numElem));
             }
         }
     }

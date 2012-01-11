@@ -4,6 +4,8 @@ homeW:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/wholedata/g-";
 homeR:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/refData/g-";
 homeRS:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/refData/skip/g-";
 homeDih:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/dihData/g-";
+homeCSV:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/csvdata/g-";
+
 
 ImageOf := function(ag, i)
 	return Concatenation("\t\t\t[ \"", String(i), "\", \"", String(Image(ag, i)), "\" ]");
@@ -76,8 +78,8 @@ ExportWithGroup:= function(f,g,h,i)
 end;
 
 ExportGroup:=function(f,g)
-	# ExportWithGroup(f, g, ExportTableOf, csg -> false );
-	ExportWithGroup(f, g, EmptyAuto, csg -> Length(csg) <= 20);
+	ExportWithGroup(f, g, ExportTableOf, csg -> false );
+	# ExportWithGroup(f, g, EmptyAuto, csg -> Length(csg) <= 20);
 end;
 
 CountExportAllGroups := function(lb, ub)

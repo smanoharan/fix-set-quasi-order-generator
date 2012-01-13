@@ -123,10 +123,10 @@
 		for($i=1;$i<count($props);$i++) $props[$i] = trueFalseToYesNo($props[$i]);
 		unset($i);
 
-		$latLink = "<a href='latDiag/$id.html'>View Diagrams</a>\n";
-		buildLatDiagPage($id);
-		array_splice($counts, 1, 0, array($latLink));		
-		array_splice($props, 1, 0, array($latLink));		
+		$latLink_c = "<a href='latdiag.html?$id?count'>View Diagrams</a>\n";
+		$latLink_p = "<a href='latdiag.html?$id?props'>View Diagrams</a>\n";
+		array_splice($counts, 1, 0, array($latLink_c));		
+		array_splice($props, 1, 0, array($latLink_p));		
 
 		return array($counts, $props); 
 	}
@@ -147,54 +147,4 @@
 	{
 		return "Table of Results - $type groups of order upto $max";
 	}
-
-	function buildLatDiagPage($id)
-	{
-		$filename = "latDiag/$id.html";
-		$file = fopen($filename, 'w') or die("Cannot open $filename");
-		$pgtitle = "Lattice diagrams of Group $id";
-		fwrite($file, "<!DOCTYPE html><html><head><title>$pgtitle</title></head><body>");
-		fwrite($file, "<h1>$pgtitle</h1>");
-		// TODO: Echo the needed content:  {a/f/n/fn}*{ungrouped/auto-col1/auto-col3
-		fwrite($file, "</body></html>");
-		fclose($file);
-	}
-	
-	$title = getPageTitle($groupType, $maxOrder);
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-	<title><?php echo $title; ?></title>
-	<link rel="stylesheet" type="text/css" href="table.css" />
-</head>
-<body>
-<?php
-	echo "<h1>$title</h1>\n<hr>\n";
-	echo "<h2>Index:</h2>\n<ul>\n";
-	
-	echo"<h4><li><a href='#Count'>Number of fix-orders</a><ul>\n";
-	echoIndex($startID, $maxOrder, $groupType, "count");
-	echo "</ul></li></h4>\n<h4><li><a href='#Props'>Properties of fix-orders</a><ul>\n";
-	echoIndex($startID, $maxOrder, $groupType, "props");
-	echo "</ul></li></h4>\n</ul>\n<hr>\n";
-
-	$file = fopen($argv[1], "r");
-	$tables = processCSV($file);
-	fclose($file);
-	
-	echo "<a name='Count'><h2>Number of Fix-Orders:</h2></a>\n<br/>\n";
-
-	$headers = buildCountTableHeaders();
-	foreach ($tables as $id => $table) 
-		echoTable($table, $id, $groupType, $headers, 0, "count");
-
-	echo "<hr>\n<a name='Props'><h2>Properties of Fix-Orders:</h2></a>\n<br/>\n";
-
-	$headers = buildPropTableHeaders();
-	foreach($tables as $id => $table)
-		echoTable($table, $id, $groupType, $headers, 1, "props");
-	unset($table);
-?>
-</body>
-</html>

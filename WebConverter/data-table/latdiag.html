@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Fix-Orders</title>
+	<link rel="stylesheet" type="text/css" href="table.css" />
+	<script type="text/javascript">
+		
+	function processURL() 
+	{
+		var params = document.URL.split("?");
+		
+		if (params.length < 2) alert("No group specified for lattice diagrams");		
+		else 
+		{
+			var gID = params[1];
+			var order = gID.split("-")[0];
+			document.getElementById("return-top").href = "index.html#" + params[2] + order;
+			document.getElementById("return-bot").href = "index.html#" + params[2] + order;
+			
+			var title = "Fix-orders of group " + gID;
+			document.title = title;
+			document.getElementById("titleH1").innerHTML = title;
+		
+			var cells = document.getElementsByTagName("td");
+			for (var i=0;i<cells.length;i++)
+			{
+				var ci = cells[i];
+				var imgElem = document.createElement('img');
+				imgElem.src = "img/g-" + gID + "." + ci.id;
+				ci.appendChild(imgElem);
+			}
+		}
+	}
+
+	window.onload = processURL;
+	</script>
+</head>
+<body>
+<h1 id="titleH1">Fix Orders</h1>
+<hr>
+<a name='latdiagTable'><h3 class='tableTitle'>Lattice Diagrams:</h3></a>
+<a class='floatRight' id='return-top' href="index.html"><h3 style="display:inline;">Back to index</h3></a>
+<table>
+<thead class="hasRowHeaders"><tr>
+	<th colspan="2">Type</th>
+	<th>All</th><th>Faithful only</th><th>Normal only</th><th>Faithful Normal only</th></tr></thead>
+<tbody>
+		<tr><th colspan='2'>Distinct fix-orders</th><td id='all.svg'></td><td id='faithful.svg'></td><td id='normal.svg'></td><td id='faithful-normal.svg'></td></tr>
+	<tr><th rowspan=2>Automorphism collapsed</th><th>Before Collapsing</th><td id='col1.all.svg'></td><td id='col1.faithful.svg'></td><td id='col1.normal.svg'></td><td id='col1.faithful-normal.svg'></td></tr>
+	<tr><th>After Collapsing</th><td id='col3.all.svg'></td><td id='col3.faithful.svg'></td><td id='col3.normal.svg'></td><td id='col3.faithful-normal.svg'></td></tr>
+</tbody>
+</table>
+<hr>
+<a id='return-bot' href="index.html">Back to index</a>
+</body>
+</html>

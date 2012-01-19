@@ -22,6 +22,11 @@ body
 	float: right; 
 }
 
+hr
+{
+	float: none;
+}
+
 table 
 {
 	border-collapse: collapse;

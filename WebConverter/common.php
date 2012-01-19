@@ -1,8 +1,4 @@
 <?php
-	$groupType = "All";
-	$maxOrder = 15;
-	$startID = 1;
-
 	function echoIndex($start, $end, $type, $aTarget)
 	{
 		for ($i=$start;$i<=$end;$i++)
@@ -13,11 +9,15 @@
 		unset($i);
 	}
 
-	function echoTable($data, $id, $type, $headers, $rowGroupID, $aTarget)
+	function echoTable($data, $id, $type, $headers, $rowGroupID, $aTarget, $showHeader)
 	{
-		$tableName = tableIdToName($type, $id);
-		echo "<a name='$aTarget$id'><h3 class='tableTitle'>$tableName:</h3></a>\n<table>";
 
+		$groupProp = "http://groupprops.subwiki.org/wiki/Groups_of_order_";
+		$tableName = tableIdToName($type, $id);
+		if ($showHeader) echo "<a name='$aTarget$id'><h3 class='tableTitle'>$tableName:</h3></a>\n";
+		echo "<span class='floatRight'><strong>Go to:</strong> ";
+		if ($showHeader) echo "<a href='$groupProp$id'>Group Names</a> | ";
+		echo "<a href='#top'>Top</a> | <a href='index.html'>Home</a> </span><table>\n";
 		echoHeaders($headers);
 
 		foreach ($data as $row)
@@ -46,14 +46,16 @@
 		$result = array();
 		$lastTableID = 1; // This assumes that all datasets have a table with id=1 as the first.
 		$curTable = array();
-		
+	
+		$first = true;	
 		while( ($row = fgetcsv($file)) !== FALSE)
 		{
 			$data = processRow($row);
 			$curID = gapIDtoOrder($row[0]);
 			if ($lastTableID != $curID)
 			{
-				$result[$lastTableID] = $curTable;
+				if ($first) $first = false;
+				else $result[$lastTableID] = $curTable;
 				$curTable = array($data);
 				$lastTableID = $curID;
 			} 
@@ -67,14 +69,14 @@
 		return $result;
 	}
 
-	function buildCountTableHeaders()
+	function buildCountTableHeaders($showIndex)
 	{
 		$overall = array( 
 			"Group" => 4, "Number of distinct fix-orders" => 4, 
 			"Number of fix-orders when collapsed by group automorphisms" => 4);
 
 		$normal = array(
-			"GAP-ID", "Lattice Diagrams", "subgroups", "conjugacy classes of subgroups", 
+			getGroupIDName($showIndex), "Lattice Diagrams", "subgroups", "conjugacy classes of subgroups", 
 			"all", "faithful only", "normal only", "faithful-normal only", 	// distinct
 			"all", "faithful only", "normal only", "faithful-normal only" 	// automorphism
 			);
@@ -82,17 +84,22 @@
 		return array($overall, $normal);
 	}
 	
-	function buildPropTableHeaders()
+	function buildPropTableHeaders($showIndex)
 	{
 		$overall = array(
 			"Group" => 2, "All fix-orders" => 2, "Faithful only fix-orders" => 2, 
 			"Normal only fix-orders" => 2, "Faithful-normal only fix-orders" => 2 ); 
 
-		$normal = array("GAP-ID", "Lattice Diagrams");
+		$normal = array(getGroupIDName($showIndex), "Lattice Diagrams");
 		for ($i=0;$i<4;$i++) { $normal[] = "Modular?"; $normal[] = "Distributive?"; }
 		unset($i);
 
 		return array($overall, $normal);
+	}
+
+	function getGroupIDName($showIndex)
+	{
+		return ($showIndex ? "GAP-ID" : "Group-ID");
 	}
 	
 	function echoHeaders($headers)
@@ -123,8 +130,8 @@
 		for($i=1;$i<count($props);$i++) $props[$i] = trueFalseToYesNo($props[$i]);
 		unset($i);
 
-		$latLink_c = "<a href='latdiag.html?$id?count'>View Diagrams</a>\n";
-		$latLink_p = "<a href='latdiag.html?$id?props'>View Diagrams</a>\n";
+		$latLink_c = "<a href='latdiag.html?$id?count?all15'>View Diagrams</a>\n";
+		$latLink_p = "<a href='latdiag.html?$id?props?all15'>View Diagrams</a>\n";
 		array_splice($counts, 1, 0, array($latLink_c));		
 		array_splice($props, 1, 0, array($latLink_p));		
 

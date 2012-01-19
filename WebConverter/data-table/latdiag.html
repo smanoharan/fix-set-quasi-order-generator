@@ -3,51 +3,38 @@
 <head>
 	<title>Fix-Orders</title>
 	<link rel="stylesheet" type="text/css" href="table.css" />
-	<script type="text/javascript">
-		
-	function processURL() 
-	{
-		var params = document.URL.split("?");
-		
-		if (params.length < 2) alert("No group specified for lattice diagrams");		
-		else 
-		{
-			var gID = params[1];
-			var order = gID.split("-")[0];
-			document.getElementById("return-top").href = "index.html#" + params[2] + order;
-			document.getElementById("return-bot").href = "index.html#" + params[2] + order;
-			
-			var title = "Fix-orders of group " + gID;
-			document.title = title;
-			document.getElementById("titleH1").innerHTML = title;
-		
-			var cells = document.getElementsByTagName("td");
-			for (var i=0;i<cells.length;i++)
-			{
-				var ci = cells[i];
-				var imgElem = document.createElement('img');
-				imgElem.src = "img/g-" + gID + "." + ci.id;
-				ci.appendChild(imgElem);
-			}
-		}
-	}
-
-	window.onload = processURL;
-	</script>
+	<script type="text/javascript" src="jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="lat.js"></script>
 </head>
 <body>
 <h1 id="titleH1">Fix Orders</h1>
+<hr>
+<h3>Display options:</h3>
+<form name="display">
+<table>
+<tr>
+	<th>Show columns:</th>
+	<td>
+	<input type=checkbox name='ccol0' id='col0' onclick="setVis()" checked> All <input type=checkbox name='ccol1' id='col1' onclick="setVis()" checked> Faithful only <input type=checkbox name='ccol2' id='col2' onclick="setVis()" checked> Normal only <input type=checkbox name='ccol3' id='col3' onclick="setVis()" checked> Faithful Normal only 	</td>
+</tr>
+<tr>
+	<th>Show rows:</th>
+	<td>	
+		<input type=checkbox name='crow0' id='row0' onclick="setVis()" checked> Distinct fix-orders <input type=checkbox name='crow1' id='row1' onclick="setVis()" checked> Before collapsing <input type=checkbox name='crow2' id='row2' onclick="setVis()" checked> After collapsing 	</td>
+</tr>
+</table>
+</form>
 <hr>
 <a name='latdiagTable'><h3 class='tableTitle'>Lattice Diagrams:</h3></a>
 <a class='floatRight' id='return-top' href="index.html"><h3 style="display:inline;">Back to index</h3></a>
 <table>
 <thead class="hasRowHeaders"><tr>
 	<th colspan="2">Type</th>
-	<th>All</th><th>Faithful only</th><th>Normal only</th><th>Faithful Normal only</th></tr></thead>
+	<th class='col0'>All</th><th class='col1'>Faithful only</th><th class='col2'>Normal only</th><th class='col3'>Faithful Normal only</th></tr></thead>
 <tbody>
-		<tr><th colspan='2'>Distinct fix-orders</th><td id='all.svg'></td><td id='faithful.svg'></td><td id='normal.svg'></td><td id='faithful-normal.svg'></td></tr>
-	<tr><th rowspan=2>Automorphism collapsed</th><th>Before Collapsing</th><td id='col1.all.svg'></td><td id='col1.faithful.svg'></td><td id='col1.normal.svg'></td><td id='col1.faithful-normal.svg'></td></tr>
-	<tr><th>After Collapsing</th><td id='col3.all.svg'></td><td id='col3.faithful.svg'></td><td id='col3.normal.svg'></td><td id='col3.faithful-normal.svg'></td></tr>
+		<tr><th colspan='2' class='row0'>Distinct fix-orders</th><td id='all.svg' class='row0 col0'></td><td id='faithful.svg' class='row0 col1'></td><td id='normal.svg' class='row0 col2'></td><td id='faithful-normal.svg' class='row0 col3'></td></tr>
+	<tr><th rowspan=2 id='autoH'>Automorphism collapsed</th><th class='row1'>Before Collapsing</th><td id='col1.all.svg' class='row1 col0'></td><td id='col1.faithful.svg' class='row1 col1'></td><td id='col1.normal.svg' class='row1 col2'></td><td id='col1.faithful-normal.svg' class='row1 col3'></td></tr>
+	<tr><th class='row2'>After Collapsing</th><td id='col3.all.svg' class='row2 col0'></td><td id='col3.faithful.svg' class='row2 col1'></td><td id='col3.normal.svg' class='row2 col2'></td><td id='col3.faithful-normal.svg' class='row2 col3'></td></tr>
 </tbody>
 </table>
 <hr>

@@ -14,8 +14,9 @@
 
 		$groupProp = "http://groupprops.subwiki.org/wiki/Groups_of_order_";
 		$tableName = tableIdToName($type, $id);
-		if ($showHeader) echo "<a name='$aTarget$id'><h3 class='tableTitle'>$tableName:</h3></a>\n";
-		echo "<span class='floatRight'><strong>Go to:</strong> ";
+		echo "<a name='$aTarget$id'>";
+		if ($showHeader) echo "<h3 class='tableTitle'>$tableName:</h3>"; 
+		echo "</a>\n<span class='floatRight'><strong>Go to:</strong> ";
 		if ($showHeader) echo "<a href='$groupProp$id'>Group Names</a> | ";
 		echo "<a href='#top'>Top</a> | <a href='index.html'>Home</a> </span><table>\n";
 		echoHeaders($headers);
@@ -41,16 +42,16 @@
 		return $parts[0];
 	}
 
-	function processCSV($file)
+	function processCSV($file, $parent)
 	{
 		$result = array();
-		$lastTableID = 1; // This assumes that all datasets have a table with id=1 as the first.
+		$lastTableID = -1;
 		$curTable = array();
 	
 		$first = true;	
 		while( ($row = fgetcsv($file)) !== FALSE)
 		{
-			$data = processRow($row);
+			$data = processRow($row, $parent);
 			$curID = gapIDtoOrder($row[0]);
 			if ($lastTableID != $curID)
 			{
@@ -119,7 +120,7 @@
 		unset($colspan);
 	}
 
-	function processRow($row)
+	function processRow($row, $parent)
 	{
 		// Convert the CSV array of fields into html content, to be placed into table cells
 		$counts = $row;
@@ -130,8 +131,8 @@
 		for($i=1;$i<count($props);$i++) $props[$i] = trueFalseToYesNo($props[$i]);
 		unset($i);
 
-		$latLink_c = "<a href='latdiag.html?$id?count?all15'>View Diagrams</a>\n";
-		$latLink_p = "<a href='latdiag.html?$id?props?all15'>View Diagrams</a>\n";
+		$latLink_c = "<a href='latdiag.html?$id?count?$parent'>View Diagrams</a>\n";
+		$latLink_p = "<a href='latdiag.html?$id?props?$parent'>View Diagrams</a>\n";
 		array_splice($counts, 1, 0, array($latLink_c));		
 		array_splice($props, 1, 0, array($latLink_p));		
 

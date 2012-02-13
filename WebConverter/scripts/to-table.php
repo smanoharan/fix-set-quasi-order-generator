@@ -2,12 +2,13 @@
 	require('common.php'); 
 	$showIndex = true;
 	
-	for ($i=3;$i<$argc;$i++)
+	for ($i=6;$i<$argc;$i++)
 		if ($argv[$i]=="ni") $showIndex = false;
 
 	$groupType = $argv[2];
 	$maxOrder = $argv[3];
 	$startID = $argv[4];	
+	$parent = $argv[5];
 	$title = getPageTitle($groupType, $maxOrder);
 ?>
 <!DOCTYPE html>
@@ -32,7 +33,7 @@
 	}
 
 	$file = fopen($argv[1], "r");
-	$tables = processCSV($file);
+	$tables = processCSV($file, $parent);
 	fclose($file);
 	
 	echo "<a name='Count'><h2>Number of Fix-Orders:</h2></a>\n<br/>\n";

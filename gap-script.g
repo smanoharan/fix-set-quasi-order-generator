@@ -5,6 +5,7 @@ homeR:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/refData/g-";
 homeRS:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/refData/skip/g-";
 homeDih:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/dihData/g-";
 homeCSV:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/csvdata/g-";
+homeSymAlt:= "/home/siva/summer-schol/src/groupsfixsetquasiorder/trunk/symaltData/g-";
 
 
 ImageOf := function(ag, i)
@@ -78,8 +79,8 @@ ExportWithGroup:= function(f,g,h,i)
 end;
 
 ExportGroup:=function(f,g)
-	ExportWithGroup(f, g, ExportTableOf, csg -> false );
-	# ExportWithGroup(f, g, EmptyAuto, csg -> Length(csg) <= 20);
+	# ExportWithGroup(f, g, ExportTableOf, csg -> false );
+	ExportWithGroup(f, g, ExportTableOf, csg -> Length(csg) > 20);
 end;
 
 CountExportAllGroups := function(lb, ub)

@@ -1,0 +1,17 @@
+h1. README
+
+This is a software package which is 
+  able to generate all of the fix-orders of any given group (abstract algebraic structure) 
+  and can output the lattice of all fix-orders as a lattice diagram. 
+
+
+
+h3. Running the system:
+ * Run ./doAll.sh - This places the data from GAP into data/ and then processes each file.
+
+h3. Dependencies:
+ * GAP system - for extracting group information from their names 
+ * GraphViz - for drawing lattices 
+
+
+

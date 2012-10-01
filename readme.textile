@@ -1,9 +1,6 @@
 h1. README
 
-This is a software package which is 
-  able to generate all of the fix-orders of any given group (abstract algebraic structure) 
-  and can output the lattice of all fix-orders as a lattice diagram. 
-
+This is a software package which is able to generate all of the fix-orders of any given group (the abstract algebraic structure) and can output the lattice of all fix-orders as a lattice diagram. 
 
 
 h3. Running the system:

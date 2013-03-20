@@ -325,9 +325,9 @@ public class Generate
     private static FixOrderSet GenerateAllFixOrders(Group inputGroup)
     {
         FixOrderSet relations = new FixOrderSet();
-        long numSubsets = (1 << inputGroup.NumConjugacyClasses);    // 2^M
+        long numSubsets = (1L << inputGroup.NumConjugacyClasses);    // 2^M
 
-        long maxIter = numSubsets / 2;
+        long maxIter = numSubsets / 2L;
         if (maxIter==0) ProcessConjugacyFamily(inputGroup, relations, 1); // only 1 conj-class.
         else for (long s=0;s<maxIter;s++)
                 ProcessConjugacyFamily(inputGroup, relations, (maxIter | s));
